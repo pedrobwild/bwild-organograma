@@ -63,21 +63,23 @@ function ChildrenConnector({
     };
   }, [children.length]);
 
+  const parentLineColor = parentInPath ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+
   if (children.length === 1) {
+    const singleColor = parentInPath && childInPath[0] ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+    const glowStyle = singleColor === HIGHLIGHT_LINE_COLOR
+      ? { filter: "drop-shadow(0 0 4px rgba(96,165,250,0.6))", transition: "all 0.4s ease" }
+      : { transition: "all 0.4s ease" };
     return (
       <div className="flex flex-col items-center mt-5">
-        <div style={{ width: 2, height: 28, background: LINE_COLOR }} />
+        <div style={{ width: 2, height: 28, background: singleColor, ...glowStyle }} />
         <div className="flex flex-col items-center">
-          <div style={{ width: 2, height: 18, background: LINE_COLOR }} />
+          <div style={{ width: 2, height: 18, background: singleColor, ...glowStyle }} />
           {children[0]}
         </div>
       </div>
     );
   }
-
-  return (
-    <div className="flex flex-col items-center mt-5">
-      <div style={{ width: 2, height: 28, background: LINE_COLOR }} />
 
       <div ref={containerRef} className="relative flex items-start gap-4">
         {bar.width > 0 && (
