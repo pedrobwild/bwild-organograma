@@ -7,6 +7,75 @@ import { getDeptColor } from "@/lib/deptColors";
 const LINE_COLOR = "rgba(255,255,255,0.62)";
 const HIGHLIGHT_LINE_COLOR = "#60a5fa";
 
+const VERT_TOP = 28;
+const VERT_CHILD = 18;
+
+const glowFor = (active: boolean): React.CSSProperties =>
+  active
+    ? { filter: "drop-shadow(0 0 4px rgba(96,165,250,0.6))", transition: "all 0.4s ease" }
+    : { transition: "all 0.4s ease" };
+
+function useChildCenters(
+  containerRef: React.RefObject<HTMLDivElement | null>,
+  childCount: number
+) {
+  const [centers, setCenters] = useState<number[]>([]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    let rafId: number;
+    const measure = () => {
+      const cols = container.querySelectorAll<HTMLElement>("[data-child-col]");
+      const results: number[] = [];
+      cols.forEach((col) => {
+        // offsetLeft + offsetWidth/2 gives center relative to offsetParent
+        // This is immune to CSS transform: scale() on ancestors
+        const card = col.querySelector<HTMLElement>("[data-node-card='true']");
+        if (card) {
+          // Walk up offsets from card to container
+          let x = card.offsetWidth / 2;
+          let el: HTMLElement | null = card;
+          while (el && el !== container) {
+            x += el.offsetLeft;
+            el = el.offsetParent as HTMLElement | null;
+          }
+          results.push(x);
+        } else {
+          results.push(col.offsetLeft + col.offsetWidth / 2);
+        }
+      });
+      setCenters(results);
+    };
+
+    // Measure repeatedly during framer-motion layout animations
+    const poll = () => {
+      measure();
+      rafId = requestAnimationFrame(poll);
+    };
+    // Initial burst of measurements for animation settling
+    poll();
+    const stopPolling = setTimeout(() => {
+      cancelAnimationFrame(rafId);
+      // After animations settle, use ResizeObserver for future changes
+      measure();
+    }, 600);
+
+    const ro = new ResizeObserver(measure);
+    ro.observe(container);
+    cols.forEach((c) => ro.observe(c));
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      clearTimeout(stopPolling);
+      ro.disconnect();
+    };
+  }, [containerRef, childCount]);
+
+  return centers;
+}
+
 function ChildrenConnector({
   children,
   parentInPath,
@@ -17,135 +86,83 @@ function ChildrenConnector({
   childInPath: boolean[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [bar, setBar] = useState<{
-    left: number;
-    width: number;
-    parentCenter: number;
-    childCenters: number[];
-  }>({ left: 0, width: 0, parentCenter: 0, childCenters: [] });
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const measure = () => {
-      const columns = Array.from(container.children) as HTMLElement[];
-      const containerRect = container.getBoundingClientRect();
-      const parentCenter = containerRect.width / 2;
-
-      if (columns.length < 2) {
-        setBar({ left: 0, width: 0, parentCenter, childCenters: [] });
-        return;
-      }
-
-      const centers = columns
-        .map((column) => {
-          const card = column.querySelector<HTMLElement>("[data-node-card='true']");
-          if (!card) return null;
-          const cardRect = card.getBoundingClientRect();
-          return cardRect.left + cardRect.width / 2 - containerRect.left;
-        })
-        .filter((v): v is number => v !== null);
-
-      if (centers.length < 2) {
-        setBar({ left: 0, width: 0, parentCenter, childCenters: [] });
-        return;
-      }
-
-      const left = Math.min(parentCenter, centers[0]);
-      const right = Math.max(parentCenter, centers[centers.length - 1]);
-      setBar({
-        left,
-        width: Math.max(0, right - left),
-        parentCenter,
-        childCenters: centers,
-      });
-    };
-
-    const raf = requestAnimationFrame(measure);
-    const resizeObserver = new ResizeObserver(measure);
-    resizeObserver.observe(container);
-    Array.from(container.children).forEach((child) => resizeObserver.observe(child as Element));
-    window.addEventListener("resize", measure);
-
-    return () => {
-      cancelAnimationFrame(raf);
-      resizeObserver.disconnect();
-      window.removeEventListener("resize", measure);
-    };
-  }, [children.length]);
-
-  const parentLineColor = parentInPath ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+  const childCenters = useChildCenters(containerRef, children.length);
 
   if (children.length === 1) {
-    const singleColor = parentInPath && childInPath[0] ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
-    const glowStyle = singleColor === HIGHLIGHT_LINE_COLOR
-      ? { filter: "drop-shadow(0 0 4px rgba(96,165,250,0.6))", transition: "all 0.4s ease" }
-      : { transition: "all 0.4s ease" };
+    const color = parentInPath && childInPath[0] ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
     return (
       <div className="flex flex-col items-center mt-5">
-        <div style={{ width: 2, height: 28, background: singleColor, ...glowStyle }} />
+        <div style={{ width: 2, height: VERT_TOP, background: color, ...glowFor(color === HIGHLIGHT_LINE_COLOR) }} />
         <div className="flex flex-col items-center">
-          <div style={{ width: 2, height: 18, background: singleColor, ...glowStyle }} />
+          <div style={{ width: 2, height: VERT_CHILD, background: color, ...glowFor(color === HIGHLIGHT_LINE_COLOR) }} />
           {children[0]}
         </div>
       </div>
     );
   }
-  const anyChildHighlighted = childInPath.some(Boolean);
-  const mainVertColor = parentInPath && anyChildHighlighted ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
-  const glowFor = (active: boolean) =>
-    active
-      ? { filter: "drop-shadow(0 0 4px rgba(96,165,250,0.6))", transition: "all 0.4s ease" }
-      : { transition: "all 0.4s ease" };
+
+  const anyHighlighted = childInPath.some(Boolean);
+  const mainVertColor = parentInPath && anyHighlighted ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+
+  // Horizontal bar spans from leftmost to rightmost child center
+  const hasPositions = childCenters.length >= 2;
+  const barLeft = hasPositions ? Math.min(...childCenters) : 0;
+  const barRight = hasPositions ? Math.max(...childCenters) : 0;
+  const barWidth = barRight - barLeft;
+
+  // Parent center = container center (flex items-center on parent)
+  const containerWidth = containerRef.current?.offsetWidth ?? 0;
+  const parentCenter = containerWidth / 2;
 
   return (
     <div className="flex flex-col items-center mt-5">
-      <div style={{ width: 2, height: 28, background: mainVertColor, ...glowFor(mainVertColor === HIGHLIGHT_LINE_COLOR) }} />
+      {/* Vertical line from parent down to horizontal bar */}
+      <div style={{ width: 2, height: VERT_TOP, background: mainVertColor, ...glowFor(mainVertColor === HIGHLIGHT_LINE_COLOR) }} />
 
       <div ref={containerRef} className="relative flex items-start gap-4">
-        {bar.width > 0 && (
-          <>
-            <div
-              className="absolute pointer-events-none"
-              style={{
-                top: 0,
-                left: bar.left,
-                width: bar.width,
-                height: 2,
-                background: LINE_COLOR,
-                transition: "all 0.4s ease",
-              }}
-            />
-
-            {parentInPath &&
-              bar.childCenters.map((center, i) => {
-                if (!childInPath[i]) return null;
-                const left = Math.min(bar.parentCenter, center);
-                const width = Math.abs(bar.parentCenter - center);
-                return (
-                  <div
-                    key={`path-segment-${i}`}
-                    className="absolute pointer-events-none"
-                    style={{
-                      top: 0,
-                      left,
-                      width,
-                      height: 2,
-                      background: HIGHLIGHT_LINE_COLOR,
-                      ...glowFor(true),
-                    }}
-                  />
-                );
-              })}
-          </>
+        {/* Base horizontal bar (dim) */}
+        {hasPositions && (
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              top: 0,
+              left: barLeft,
+              width: barWidth,
+              height: 2,
+              background: LINE_COLOR,
+              transition: "all 0.4s ease",
+            }}
+          />
         )}
 
+        {/* Highlighted segments on the horizontal bar */}
+        {hasPositions && parentInPath &&
+          childCenters.map((center, i) => {
+            if (!childInPath[i]) return null;
+            const segLeft = Math.min(parentCenter, center);
+            const segWidth = Math.abs(parentCenter - center) || 2;
+            return (
+              <div
+                key={`hl-${i}`}
+                className="absolute pointer-events-none"
+                style={{
+                  top: 0,
+                  left: segLeft,
+                  width: segWidth,
+                  height: 2,
+                  background: HIGHLIGHT_LINE_COLOR,
+                  ...glowFor(true),
+                }}
+              />
+            );
+          })}
+
+        {/* Child columns with vertical drop lines */}
         {children.map((child, i) => {
-          const lineColor = childInPath[i] ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+          const color = childInPath[i] ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
           return (
             <div key={i} data-child-col className="flex flex-col items-center">
-              <div style={{ width: 2, height: 18, background: lineColor, ...glowFor(childInPath[i]) }} />
+              <div style={{ width: 2, height: VERT_CHILD, background: color, ...glowFor(childInPath[i]) }} />
               {child}
             </div>
           );
