@@ -1,12 +1,4 @@
-const DEPT_COLORS: Record<string, string> = {
-  Diretoria: "#F5A623",
-  Jurídico: "#C084FC",
-  "Business Operations": "#38BDF8",
-  Vendas: "#34D399",
-  Marketing: "#FB7185",
-  Operações: "#FB923C",
-  Arquitetura: "#2DD4BF",
-};
+import { getDeptColor } from "@/lib/deptColors";
 
 interface DepartmentLegendProps {
   departments: string[];
@@ -20,9 +12,9 @@ export function DepartmentLegend({
   onHover,
 }: DepartmentLegendProps) {
   return (
-    <div className="flex items-center gap-2 flex-wrap">
+    <div className="flex items-center gap-1.5 flex-wrap">
       {departments.map((dept) => {
-        const color = DEPT_COLORS[dept] || "#F5A623";
+        const colors = getDeptColor(dept);
         const isActive = highlightDept === dept;
         return (
           <button
@@ -30,16 +22,24 @@ export function DepartmentLegend({
             onMouseEnter={() => onHover(dept)}
             onMouseLeave={() => onHover(null)}
             onClick={() => onHover(isActive ? null : dept)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all"
             style={
               isActive
-                ? { backgroundColor: `${color}55`, borderColor: color, color: "white" }
-                : { backgroundColor: "rgba(255,255,255,0.15)", borderColor: "rgba(255,255,255,0.25)", color: "rgba(255,255,255,0.85)" }
+                ? {
+                    backgroundColor: colors.bg,
+                    color: colors.text,
+                    boxShadow: `0 4px 14px -3px ${colors.bg}88`,
+                  }
+                : {
+                    backgroundColor: "rgba(255,255,255,0.1)",
+                    color: "rgba(255,255,255,0.7)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                  }
             }
           >
             <div
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ backgroundColor: color }}
+              className="w-2 h-2 rounded-full"
+              style={{ backgroundColor: isActive ? colors.text : colors.bg }}
             />
             {dept}
           </button>

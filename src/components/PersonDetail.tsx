@@ -1,33 +1,21 @@
 import { motion } from "framer-motion";
-import { X, User, ArrowUp, ArrowDown, Briefcase, CheckCircle2 } from "lucide-react";
+import { X, User, ArrowUpRight, ArrowDownRight, Briefcase, CheckCircle2, Building2 } from "lucide-react";
 import { Colaborador } from "./OrgChart";
-
-const DEPT_HSL: Record<string, string> = {
-  Diretoria: "45, 100%, 60%",
-  Jurídico: "280, 55%, 70%",
-  "Business Operations": "200, 75%, 60%",
-  Vendas: "155, 55%, 55%",
-  Marketing: "340, 65%, 65%",
-  Operações: "25, 80%, 58%",
-  Arquitetura: "175, 55%, 50%",
-};
-
-function deptColor(dept: string) {
-  return `hsl(${DEPT_HSL[dept] || "45, 100%, 60%"})`;
-}
+import { getDeptColor } from "@/lib/deptColors";
 
 interface PersonDetailProps {
   person: Colaborador;
   byId: Map<string, Colaborador>;
   onClose: () => void;
+  onNavigate: (p: Colaborador) => void;
 }
 
-export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
+export function PersonDetail({ person, byId, onClose, onNavigate }: PersonDetailProps) {
   const superior = person.superior ? byId.get(person.superior) : null;
   const subordinados = person.subordinados
     .map((id) => byId.get(id))
     .filter(Boolean) as Colaborador[];
-  const color = deptColor(person.departamento);
+  const colors = getDeptColor(person.departamento);
 
   return (
     <>
@@ -36,102 +24,142 @@ export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         onClick={onClose}
-        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
+        className="fixed inset-0 z-40"
+        style={{ background: "rgba(5,15,30,0.6)", backdropFilter: "blur(4px)" }}
       />
 
       <motion.div
-        initial={{ x: 400, opacity: 0 }}
+        initial={{ x: 420, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        exit={{ x: 400, opacity: 0 }}
-        transition={{ type: "spring", damping: 30, stiffness: 300 }}
-        className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white border-l border-card-foreground/10 z-50 overflow-y-auto shadow-2xl"
+        exit={{ x: 420, opacity: 0 }}
+        transition={{ type: "spring", damping: 32, stiffness: 320 }}
+        className="fixed right-0 top-0 bottom-0 w-full max-w-[420px] z-50 overflow-y-auto"
+        style={{
+          background: "linear-gradient(180deg, #ffffff 0%, #f8f9fb 100%)",
+          boxShadow: "-20px 0 60px -10px rgba(0,0,0,0.3)",
+        }}
       >
-        <div className="p-6">
+        {/* Header with dept color */}
+        <div
+          className="relative px-6 pt-6 pb-8"
+          style={{
+            background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.bg}dd 100%)`,
+          }}
+        >
           <button
             onClick={onClose}
-            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-muted transition-colors"
+            className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center transition-colors"
+            style={{ background: "rgba(255,255,255,0.2)", color: "white" }}
           >
-            <X className="w-4 h-4 text-card-foreground/60" />
+            <X className="w-4 h-4" />
           </button>
 
-          <div className="flex flex-col items-center text-center mt-4">
+          <div className="flex flex-col items-center text-center pt-4">
             <div
               className="w-20 h-20 rounded-2xl flex items-center justify-center mb-4"
-              style={{ backgroundColor: `${color}20`, color }}
+              style={{ background: "rgba(255,255,255,0.2)", color: "white" }}
             >
-              <User className="w-8 h-8" />
+              <User className="w-9 h-9" />
             </div>
-            <h2 className="font-display text-xl font-bold text-card-foreground">
+            <h2 className="font-display text-xl font-bold text-white">
               {person.nome}
             </h2>
-            <p className="text-sm text-muted-foreground mt-1">{person.cargo}</p>
-            <span
-              className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
-              style={{ backgroundColor: `${color}18`, color }}
-            >
-              {person.departamento}
-            </span>
+            <p className="text-sm text-white/70 mt-1">{person.cargo}</p>
+            <div className="flex items-center gap-1.5 mt-3 px-3 py-1 rounded-full" style={{ background: "rgba(255,255,255,0.15)" }}>
+              <Building2 className="w-3 h-3 text-white/70" />
+              <span className="text-[11px] font-semibold text-white/90">{person.departamento}</span>
+            </div>
           </div>
+        </div>
 
-          <div className="mt-8">
-            <h3 className="font-display text-sm font-semibold text-card-foreground flex items-center gap-2 mb-3">
-              <Briefcase className="w-4 h-4" style={{ color }} />
-              Funções & Responsabilidades
+        <div className="px-6 py-6 space-y-6">
+          {/* Funções */}
+          <div>
+            <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
+              <Briefcase className="w-3.5 h-3.5" />
+              Responsabilidades
             </h3>
-            <ul className="space-y-2">
+            <div className="space-y-2">
               {person.funcoes.map((f, i) => (
-                <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                  <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color }} />
-                  {f}
-                </li>
+                <div
+                  key={i}
+                  className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg"
+                  style={{ background: "#f4f6f9" }}
+                >
+                  <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: colors.bg }} />
+                  <span className="text-sm" style={{ color: "#374151" }}>{f}</span>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
+          {/* Superior */}
           {superior && (
-            <div className="mt-6">
-              <h3 className="font-display text-sm font-semibold text-card-foreground flex items-center gap-2 mb-3">
-                <ArrowUp className="w-4 h-4" style={{ color }} />
+            <div>
+              <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
+                <ArrowUpRight className="w-3.5 h-3.5" />
                 Reporta a
               </h3>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-secondary border border-card-foreground/5">
-                <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                  <User className="w-4 h-4 text-muted-foreground" />
+              <button
+                onClick={() => onNavigate(superior)}
+                className="w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:shadow-md"
+                style={{ background: "#f4f6f9", border: "1px solid #e8ecf1" }}
+              >
+                <div
+                  className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                  style={{ backgroundColor: getDeptColor(superior.departamento).bg, color: "white" }}
+                >
+                  <User className="w-5 h-5" />
                 </div>
-                <div>
-                  <p className="text-sm font-medium text-card-foreground">{superior.nome}</p>
-                  <p className="text-xs text-muted-foreground">{superior.cargo}</p>
+                <div className="text-left">
+                  <p className="text-sm font-semibold" style={{ color: "#0f2137" }}>{superior.nome}</p>
+                  <p className="text-xs" style={{ color: "#7a8ca0" }}>{superior.cargo}</p>
                 </div>
-              </div>
+              </button>
             </div>
           )}
 
+          {/* Subordinados */}
           {subordinados.length > 0 && (
-            <div className="mt-6">
-              <h3 className="font-display text-sm font-semibold text-card-foreground flex items-center gap-2 mb-3">
-                <ArrowDown className="w-4 h-4" style={{ color }} />
-                Subordinados ({subordinados.length})
+            <div>
+              <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
+                <ArrowDownRight className="w-3.5 h-3.5" />
+                Equipe direta ({subordinados.length})
               </h3>
               <div className="space-y-2">
                 {subordinados.map((sub) => (
-                  <div key={sub.id} className="flex items-center gap-3 p-3 rounded-lg bg-secondary border border-card-foreground/5">
-                    <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                      <User className="w-4 h-4 text-muted-foreground" />
+                  <button
+                    key={sub.id}
+                    onClick={() => onNavigate(sub)}
+                    className="w-full flex items-center gap-3 p-3 rounded-xl transition-all hover:shadow-md"
+                    style={{ background: "#f4f6f9", border: "1px solid #e8ecf1" }}
+                  >
+                    <div
+                      className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{ backgroundColor: getDeptColor(sub.departamento).bg, color: "white" }}
+                    >
+                      <User className="w-5 h-5" />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-card-foreground">{sub.nome}</p>
-                      <p className="text-xs text-muted-foreground">{sub.cargo}</p>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold" style={{ color: "#0f2137" }}>{sub.nome}</p>
+                      <p className="text-xs" style={{ color: "#7a8ca0" }}>{sub.cargo}</p>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
           )}
 
-          <div className="mt-8 pt-6 border-t border-card-foreground/5">
+          {/* Footer info */}
+          <div className="pt-4" style={{ borderTop: "1px solid #e8ecf1" }}>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Nível hierárquico</span>
-              <span className="font-display font-semibold text-card-foreground">{person.nivel}</span>
+              <span style={{ color: "#7a8ca0" }}>Nível hierárquico</span>
+              <span
+                className="font-display font-bold px-2.5 py-0.5 rounded-md"
+                style={{ background: colors.light, color: colors.bg }}
+              >
+                {person.nivel}
+              </span>
             </div>
           </div>
         </div>
