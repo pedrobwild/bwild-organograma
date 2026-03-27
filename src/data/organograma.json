@@ -1,0 +1,343 @@
+{
+  "empresa": "Bwild",
+  "colaboradores": [
+    {
+      "id": "pedro-alves",
+      "nome": "Pedro Alves",
+      "cargo": "CEO",
+      "departamento": "Diretoria",
+      "nivel": 0,
+      "foto": null,
+      "funcoes": [
+        "Liderança estratégica da empresa",
+        "Definição de metas e objetivos",
+        "Relacionamento com stakeholders",
+        "Tomada de decisões executivas"
+      ],
+      "superior": null,
+      "subordinados": ["thiago-dantas"]
+    },
+    {
+      "id": "thiago-dantas",
+      "nome": "Thiago Dantas",
+      "cargo": "VP",
+      "departamento": "Diretoria",
+      "nivel": 1,
+      "foto": null,
+      "funcoes": [
+        "Supervisão operacional",
+        "Gestão de departamentos",
+        "Implementação de estratégias",
+        "Desenvolvimento de equipes"
+      ],
+      "superior": "pedro-alves",
+      "subordinados": [
+        "victorya-caponi",
+        "rodrigo-ikuno",
+        "amanda-fontes",
+        "matheus-plasa",
+        "valeska-moraes",
+        "guilherme-rambo"
+      ]
+    },
+    {
+      "id": "victorya-caponi",
+      "nome": "Victorya Caponi",
+      "cargo": "Gerente Jurídica",
+      "departamento": "Jurídico",
+      "nivel": 2,
+      "foto": null,
+      "funcoes": [
+        "Gestão de questões legais",
+        "Conformidade regulatória",
+        "Análise de contratos",
+        "Assessoria jurídica estratégica"
+      ],
+      "superior": "thiago-dantas",
+      "subordinados": []
+    },
+    {
+      "id": "rodrigo-ikuno",
+      "nome": "Rodrigo Ikuno",
+      "cargo": "Gerente de Business Operations",
+      "departamento": "Business Operations",
+      "nivel": 2,
+      "foto": null,
+      "funcoes": [
+        "Otimização de processos",
+        "Gestão de recursos",
+        "Análise de performance",
+        "Melhoria contínua"
+      ],
+      "superior": "thiago-dantas",
+      "subordinados": []
+    },
+    {
+      "id": "amanda-fontes",
+      "nome": "Amanda Fontes",
+      "cargo": "Gerente de Vendas",
+      "departamento": "Vendas",
+      "nivel": 2,
+      "foto": null,
+      "funcoes": [
+        "Estratégia de vendas",
+        "Gestão de pipeline",
+        "Desenvolvimento de clientes",
+        "Metas e resultados comerciais"
+      ],
+      "superior": "thiago-dantas",
+      "subordinados": ["juliana-lima"]
+    },
+    {
+      "id": "matheus-plasa",
+      "nome": "Matheus Plasa",
+      "cargo": "Gerente de Marketing",
+      "departamento": "Marketing",
+      "nivel": 2,
+      "foto": null,
+      "funcoes": [
+        "Estratégia de marketing",
+        "Campanha de marca",
+        "Análise de mercado",
+        "Gestão de conteúdo"
+      ],
+      "superior": "thiago-dantas",
+      "subordinados": ["victor-augusto"]
+    },
+    {
+      "id": "valeska-moraes",
+      "nome": "Valeska Moraes",
+      "cargo": "Gerente de Operações",
+      "departamento": "Operações",
+      "nivel": 2,
+      "foto": null,
+      "funcoes": [
+        "Coordenação operacional",
+        "Gestão de projetos",
+        "Supervisão de equipes",
+        "Qualidade e eficiência"
+      ],
+      "superior": "thiago-dantas",
+      "subordinados": [
+        "bianca-malafaia",
+        "marcos-nascimento",
+        "gabriela-silva"
+      ]
+    },
+    {
+      "id": "guilherme-rambo",
+      "nome": "Guilherme Rambo",
+      "cargo": "Gerente de Arquitetura",
+      "departamento": "Arquitetura",
+      "nivel": 2,
+      "foto": null,
+      "funcoes": [
+        "Gestão de projetos arquitetônicos",
+        "Supervisão técnica",
+        "Orçamentação de projetos",
+        "Qualidade de entrega"
+      ],
+      "superior": "thiago-dantas",
+      "subordinados": ["laisa-rosa"]
+    },
+    {
+      "id": "juliana-lima",
+      "nome": "Juliana Lima",
+      "cargo": "Consultora de Vendas",
+      "departamento": "Vendas",
+      "nivel": 3,
+      "foto": null,
+      "funcoes": [
+        "Prospecção de clientes",
+        "Negociação comercial",
+        "Fechamento de vendas",
+        "Relacionamento com clientes"
+      ],
+      "superior": "amanda-fontes",
+      "subordinados": []
+    },
+    {
+      "id": "victor-augusto",
+      "nome": "Victor Augusto",
+      "cargo": "Produtor Audiovisual",
+      "departamento": "Marketing",
+      "nivel": 3,
+      "foto": null,
+      "funcoes": [
+        "Produção de conteúdo audiovisual",
+        "Edição de vídeos",
+        "Criação de campanhas visuais",
+        "Gestão de mídia"
+      ],
+      "superior": "matheus-plasa",
+      "subordinados": []
+    },
+    {
+      "id": "bianca-malafaia",
+      "nome": "Bianca Malafaia",
+      "cargo": "Coordenadora de Gestão de Obras",
+      "departamento": "Operações",
+      "nivel": 3,
+      "foto": null,
+      "funcoes": [
+        "Coordenação de obras",
+        "Gestão de cronograma",
+        "Supervisão de equipes",
+        "Controle de qualidade"
+      ],
+      "superior": "valeska-moraes",
+      "subordinados": [
+        "lucas-serra",
+        "gabriella-franco"
+      ]
+    },
+    {
+      "id": "marcos-nascimento",
+      "nome": "Marcos Nascimento",
+      "cargo": "Coordenador de Campo",
+      "departamento": "Operações",
+      "nivel": 3,
+      "foto": null,
+      "funcoes": [
+        "Supervisão de campo",
+        "Gestão de equipes operacionais",
+        "Segurança no trabalho",
+        "Relatórios de progresso"
+      ],
+      "superior": "valeska-moraes",
+      "subordinados": [
+        "auxiliar-obra",
+        "oficial-obra",
+        "tecnico-eletricista"
+      ]
+    },
+    {
+      "id": "gabriela-silva",
+      "nome": "Gabriela Silva",
+      "cargo": "Analista de Suprimentos",
+      "departamento": "Operações",
+      "nivel": 3,
+      "foto": null,
+      "funcoes": [
+        "Gestão de suprimentos",
+        "Controle de estoque",
+        "Negociação com fornecedores",
+        "Análise de custos"
+      ],
+      "superior": "valeska-moraes",
+      "subordinados": []
+    },
+    {
+      "id": "laisa-rosa",
+      "nome": "Laisa Rosa",
+      "cargo": "Supervisora de Orçamentos",
+      "departamento": "Arquitetura",
+      "nivel": 3,
+      "foto": null,
+      "funcoes": [
+        "Elaboração de orçamentos",
+        "Análise de custos",
+        "Supervisão de projetos",
+        "Gestão financeira de projetos"
+      ],
+      "superior": "guilherme-rambo",
+      "subordinados": ["marina-cunha"]
+    },
+    {
+      "id": "lucas-serra",
+      "nome": "Lucas Serra",
+      "cargo": "Analista de Sucesso do Cliente",
+      "departamento": "Operações",
+      "nivel": 4,
+      "foto": null,
+      "funcoes": [
+        "Acompanhamento de clientes",
+        "Resolução de problemas",
+        "Satisfação do cliente",
+        "Feedback e melhorias"
+      ],
+      "superior": "bianca-malafaia",
+      "subordinados": []
+    },
+    {
+      "id": "gabriella-franco",
+      "nome": "Gabriella Franco",
+      "cargo": "Analista de Gestão de Obras",
+      "departamento": "Operações",
+      "nivel": 4,
+      "foto": null,
+      "funcoes": [
+        "Planejamento de obras",
+        "Gestão de recursos",
+        "Análise de cronograma",
+        "Documentação de projetos"
+      ],
+      "superior": "bianca-malafaia",
+      "subordinados": []
+    },
+    {
+      "id": "auxiliar-obra",
+      "nome": "A definir",
+      "cargo": "Auxiliar de Obra",
+      "departamento": "Operações",
+      "nivel": 4,
+      "foto": null,
+      "funcoes": [
+        "Suporte operacional",
+        "Execução de tarefas",
+        "Limpeza e organização",
+        "Apoio técnico"
+      ],
+      "superior": "marcos-nascimento",
+      "subordinados": []
+    },
+    {
+      "id": "oficial-obra",
+      "nome": "A definir",
+      "cargo": "Oficial de Obra",
+      "departamento": "Operações",
+      "nivel": 4,
+      "foto": null,
+      "funcoes": [
+        "Execução de obras",
+        "Supervisão de tarefas",
+        "Qualidade de trabalho",
+        "Segurança operacional"
+      ],
+      "superior": "marcos-nascimento",
+      "subordinados": []
+    },
+    {
+      "id": "tecnico-eletricista",
+      "nome": "A definir",
+      "cargo": "Técnico Eletricista",
+      "departamento": "Operações",
+      "nivel": 4,
+      "foto": null,
+      "funcoes": [
+        "Instalações elétricas",
+        "Manutenção elétrica",
+        "Segurança elétrica",
+        "Conformidade técnica"
+      ],
+      "superior": "marcos-nascimento",
+      "subordinados": []
+    },
+    {
+      "id": "marina-cunha",
+      "nome": "Marina Cunha",
+      "cargo": "Analista de Orçamentos",
+      "departamento": "Arquitetura",
+      "nivel": 4,
+      "foto": null,
+      "funcoes": [
+        "Análise de orçamentos",
+        "Controle de custos",
+        "Relatórios financeiros",
+        "Previsões de despesas"
+      ],
+      "superior": "laisa-rosa",
+      "subordinados": []
+    }
+  ]
+}
