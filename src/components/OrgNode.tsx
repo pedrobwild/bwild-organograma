@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { Colaborador } from "./OrgChart";
-import { User, ChevronDown, Users } from "lucide-react";
-import { useState } from "react";
+import { User, ChevronDown } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 import { getDeptColor } from "@/lib/deptColors";
 
 interface OrgNodeProps {
