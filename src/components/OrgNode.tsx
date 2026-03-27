@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Colaborador } from "./OrgChart";
 import { User, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect, ReactNode } from "react";
