@@ -30,11 +30,8 @@ function useChildCenters(
       const cols = container.querySelectorAll<HTMLElement>("[data-child-col]");
       const results: number[] = [];
       cols.forEach((col) => {
-        // offsetLeft + offsetWidth/2 gives center relative to offsetParent
-        // This is immune to CSS transform: scale() on ancestors
         const card = col.querySelector<HTMLElement>("[data-node-card='true']");
         if (card) {
-          // Walk up offsets from card to container
           let x = card.offsetWidth / 2;
           let el: HTMLElement | null = card;
           while (el && el !== container) {
@@ -49,22 +46,19 @@ function useChildCenters(
       setCenters(results);
     };
 
-    // Measure repeatedly during framer-motion layout animations
     const poll = () => {
       measure();
       rafId = requestAnimationFrame(poll);
     };
-    // Initial burst of measurements for animation settling
     poll();
     const stopPolling = setTimeout(() => {
       cancelAnimationFrame(rafId);
-      // After animations settle, use ResizeObserver for future changes
       measure();
     }, 600);
 
     const ro = new ResizeObserver(measure);
     ro.observe(container);
-    cols.forEach((c) => ro.observe(c));
+    container.querySelectorAll<HTMLElement>("[data-child-col]").forEach((c) => ro.observe(c));
 
     return () => {
       cancelAnimationFrame(rafId);
