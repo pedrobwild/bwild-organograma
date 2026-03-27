@@ -4,68 +4,89 @@ import { User, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect, ReactNode } from "react";
 import { getDeptColor } from "@/lib/deptColors";
 
-const LINE_STYLE = "rgba(255,255,255,0.45)";
+const LINE_COLOR = "rgba(255,255,255,0.62)";
 
-/** Draws vertical line from parent → horizontal bar → vertical lines to each child */
 function ChildrenConnector({ children }: { children: ReactNode[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [barStyle, setBarStyle] = useState({ left: 0, width: 0 });
+  const [bar, setBar] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const cols = el.querySelectorAll<HTMLElement>("[data-child-col]");
-    if (cols.length < 2) return;
-    const first = cols[0];
-    const last = cols[cols.length - 1];
-    const parentRect = el.getBoundingClientRect();
-    const firstCenter = first.getBoundingClientRect().left + first.getBoundingClientRect().width / 2 - parentRect.left;
-    const lastCenter = last.getBoundingClientRect().left + last.getBoundingClientRect().width / 2 - parentRect.left;
-    setBarStyle({ left: firstCenter, width: lastCenter - firstCenter });
-  }, [children]);
+    const container = containerRef.current;
+    if (!container) return;
 
-  // Re-measure on window resize
-  useEffect(() => {
-    const onResize = () => {
-      const el = containerRef.current;
-      if (!el) return;
-      const cols = el.querySelectorAll<HTMLElement>("[data-child-col]");
-      if (cols.length < 2) return;
-      const first = cols[0];
-      const last = cols[cols.length - 1];
-      const parentRect = el.getBoundingClientRect();
-      const firstCenter = first.getBoundingClientRect().left + first.getBoundingClientRect().width / 2 - parentRect.left;
-      const lastCenter = last.getBoundingClientRect().left + last.getBoundingClientRect().width / 2 - parentRect.left;
-      setBarStyle({ left: firstCenter, width: lastCenter - firstCenter });
+    const measure = () => {
+      const columns = Array.from(container.children) as HTMLElement[];
+      if (columns.length < 2) {
+        setBar({ left: 0, width: 0 });
+        return;
+      }
+
+      const centers = columns
+        .map((column) => {
+          const card = column.querySelector<HTMLElement>("[data-node-card='true']");
+          if (!card) return null;
+          const cardRect = card.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          return cardRect.left + cardRect.width / 2 - containerRect.left;
+        })
+        .filter((v): v is number => v !== null);
+
+      if (centers.length < 2) {
+        setBar({ left: 0, width: 0 });
+        return;
+      }
+
+      const left = centers[0];
+      const right = centers[centers.length - 1];
+      setBar({ left, width: Math.max(0, right - left) });
     };
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
+
+    const raf = requestAnimationFrame(measure);
+    const resizeObserver = new ResizeObserver(measure);
+    resizeObserver.observe(container);
+    Array.from(container.children).forEach((child) => resizeObserver.observe(child as Element));
+    window.addEventListener("resize", measure);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", measure);
+    };
+  }, [children.length]);
+
+  if (children.length === 1) {
+    return (
+      <div className="flex flex-col items-center mt-5">
+        <div style={{ width: 2, height: 28, background: LINE_COLOR }} />
+        <div className="flex flex-col items-center">
+          <div style={{ width: 2, height: 18, background: LINE_COLOR }} />
+          {children[0]}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center mt-5">
-      {/* Vertical line from parent down */}
-      <div style={{ width: 2, height: 28, background: LINE_STYLE }} />
+      <div style={{ width: 2, height: 28, background: LINE_COLOR }} />
 
-      {/* Children row with horizontal bar */}
       <div ref={containerRef} className="relative flex items-start gap-4">
-        {/* Horizontal bar */}
-        {barStyle.width > 0 && (
+        {bar.width > 0 && (
           <div
             className="absolute pointer-events-none"
             style={{
               top: 0,
-              left: barStyle.left,
-              width: barStyle.width,
+              left: bar.left,
+              width: bar.width,
               height: 2,
-              background: LINE_STYLE,
+              background: LINE_COLOR,
             }}
           />
         )}
-        {(children as ReactNode[]).map((child, i) => (
+
+        {children.map((child, i) => (
           <div key={i} data-child-col className="flex flex-col items-center">
-            {/* Vertical line from bar to child */}
-            <div style={{ width: 2, height: 18, background: LINE_STYLE }} />
+            <div style={{ width: 2, height: 18, background: LINE_COLOR }} />
             {child}
           </div>
         ))}
@@ -103,6 +124,7 @@ export function OrgNode({
   return (
     <div className="flex flex-col items-center">
       <motion.button
+        data-node-card="true"
         layout
         initial={{ opacity: 0, y: 16 }}
         animate={{
@@ -125,7 +147,6 @@ export function OrgNode({
             : "0 8px 32px -8px rgba(0,0,0,0.3), 0 2px 8px -2px rgba(0,0,0,0.15)",
         }}
       >
-        {/* Top dept color stripe */}
         <div
           className="absolute top-0 left-4 right-4 h-[3px] rounded-b-full"
           style={{ backgroundColor: colors.bg }}
