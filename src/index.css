@@ -8,50 +8,42 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 215 30% 18%;
+    --background: 212 60% 12%;
+    --foreground: 0 0% 100%;
 
-    --card: 212 60% 22%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 100%;
+    --card-foreground: 212 60% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 30% 18%;
+    --popover-foreground: 212 60% 15%;
 
-    --primary: 212 65% 28%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 45 100% 60%;
+    --primary-foreground: 212 60% 12%;
 
     --secondary: 210 30% 94%;
-    --secondary-foreground: 215 30% 18%;
+    --secondary-foreground: 212 50% 20%;
 
-    --muted: 210 20% 92%;
-    --muted-foreground: 215 12% 50%;
+    --muted: 210 15% 88%;
+    --muted-foreground: 212 30% 40%;
 
-    --accent: 212 55% 35%;
+    --accent: 200 80% 55%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 20% 88%;
-    --input: 210 20% 88%;
-    --ring: 212 65% 28%;
+    --border: 210 20% 85%;
+    --input: 210 20% 85%;
+    --ring: 45 100% 60%;
 
     --radius: 0.75rem;
 
-    --dept-diretoria: 212 65% 28%;
-    --dept-juridico: 280 60% 65%;
-    --dept-business: 200 80% 55%;
-    --dept-vendas: 150 60% 45%;
-    --dept-marketing: 340 70% 55%;
-    --dept-operacoes: 25 80% 50%;
-    --dept-arquitetura: 170 60% 42%;
-
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 215 30% 18%;
+    --sidebar-foreground: 212 60% 15%;
     --sidebar-primary: 212 65% 28%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 210 30% 94%;
-    --sidebar-accent-foreground: 215 30% 18%;
+    --sidebar-accent-foreground: 212 60% 15%;
     --sidebar-border: 210 20% 88%;
     --sidebar-ring: 212 65% 28%;
   }
