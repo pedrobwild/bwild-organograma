@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Colaborador } from "./OrgChart";
 import { User, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect, ReactNode } from "react";
@@ -278,25 +278,36 @@ export function OrgNode({
         )}
       </motion.button>
 
-      {children.length > 0 && !collapsed && (
-        <ChildrenConnector
-          parentInPath={isInPath}
-          childInPath={children.map((c) => highlightPath.has(c.id))}
-        >
-          {children.map((child) => (
-            <OrgNode
-              key={child.id}
-              person={child}
-              byId={byId}
-              onSelect={onSelect}
-              selectedId={selectedId}
-              highlightDept={highlightDept}
-              highlightPath={highlightPath}
-              depth={depth + 1}
-            />
-          ))}
-        </ChildrenConnector>
-      )}
+      <AnimatePresence initial={false}>
+        {children.length > 0 && !collapsed && (
+          <motion.div
+            key="children"
+            initial={{ opacity: 0, height: 0, scale: 0.95 }}
+            animate={{ opacity: 1, height: "auto", scale: 1 }}
+            exit={{ opacity: 0, height: 0, scale: 0.95 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            style={{ overflow: "hidden", transformOrigin: "top center" }}
+          >
+            <ChildrenConnector
+              parentInPath={isInPath}
+              childInPath={children.map((c) => highlightPath.has(c.id))}
+            >
+              {children.map((child) => (
+                <OrgNode
+                  key={child.id}
+                  person={child}
+                  byId={byId}
+                  onSelect={onSelect}
+                  selectedId={selectedId}
+                  highlightDept={highlightDept}
+                  highlightPath={highlightPath}
+                  depth={depth + 1}
+                />
+              ))}
+            </ChildrenConnector>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
