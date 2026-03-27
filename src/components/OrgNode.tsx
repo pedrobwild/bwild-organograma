@@ -233,7 +233,10 @@ export function OrgNode({
       </motion.button>
 
       {children.length > 0 && !collapsed && (
-        <ChildrenConnector>
+        <ChildrenConnector
+          parentInPath={isInPath}
+          childInPath={children.map((c) => highlightPath.has(c.id))}
+        >
           {children.map((child) => (
             <OrgNode
               key={child.id}
