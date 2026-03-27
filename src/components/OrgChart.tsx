@@ -47,6 +47,20 @@ export default function OrgChart() {
     setSelectedPerson((prev) => (prev?.id === p.id ? null : p));
   }, []);
 
+  // Compute full hierarchical path (ancestors + selected) for highlighting
+  const highlightPath = useMemo(() => {
+    if (!selectedPerson) return new Set<string>();
+    const path = new Set<string>();
+    let current: Colaborador | undefined = selectedPerson;
+    while (current) {
+      path.add(current.id);
+      current = current.superior ? byId.get(current.superior) : undefined;
+    }
+    // Also add direct subordinates
+    selectedPerson.subordinados.forEach((id) => path.add(id));
+    return path;
+  }, [selectedPerson, byId]);
+
   // Mouse drag handlers
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     // Don't start drag on buttons/interactive elements
@@ -141,6 +155,7 @@ export default function OrgChart() {
             onSelect={handleSelectPerson}
             selectedId={selectedPerson?.id || null}
             highlightDept={highlightDept}
+            highlightPath={highlightPath}
           />
         </div>
       </div>
