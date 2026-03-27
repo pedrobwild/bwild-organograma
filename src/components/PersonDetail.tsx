@@ -1,6 +1,20 @@
 import { motion } from "framer-motion";
 import { X, User, ArrowUp, ArrowDown, Briefcase, CheckCircle2 } from "lucide-react";
-import { Colaborador, getDeptClass } from "./OrgChart";
+import { Colaborador } from "./OrgChart";
+
+const DEPT_HSL: Record<string, string> = {
+  Diretoria: "45 100% 60%",
+  Jurídico: "280 60% 65%",
+  "Business Operations": "200 80% 55%",
+  Vendas: "150 60% 50%",
+  Marketing: "340 70% 60%",
+  Operações: "20 80% 55%",
+  Arquitetura: "170 60% 50%",
+};
+
+function deptColor(dept: string) {
+  return `hsl(${DEPT_HSL[dept] || "45 100% 60%"})`;
+}
 
 interface PersonDetailProps {
   person: Colaborador;
@@ -13,11 +27,10 @@ export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
   const subordinados = person.subordinados
     .map((id) => byId.get(id))
     .filter(Boolean) as Colaborador[];
-  const deptClass = getDeptClass(person.departamento);
+  const color = deptColor(person.departamento);
 
   return (
     <>
-      {/* Backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -26,7 +39,6 @@ export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
         className="fixed inset-0 bg-background/60 backdrop-blur-sm z-40"
       />
 
-      {/* Panel */}
       <motion.div
         initial={{ x: 400, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
@@ -35,7 +47,6 @@ export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
         className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-card border-l border-border z-50 overflow-y-auto"
       >
         <div className="p-6">
-          {/* Close */}
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-8 h-8 rounded-full bg-secondary flex items-center justify-center hover:bg-muted transition-colors"
@@ -43,10 +54,10 @@ export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
             <X className="w-4 h-4 text-muted-foreground" />
           </button>
 
-          {/* Avatar & info */}
           <div className="flex flex-col items-center text-center mt-4">
             <div
-              className={`w-20 h-20 rounded-2xl flex items-center justify-center bg-dept-${deptClass.replace("dept-", "")}/15 text-dept-${deptClass.replace("dept-", "")} mb-4`}
+              className="w-20 h-20 rounded-2xl flex items-center justify-center mb-4"
+              style={{ backgroundColor: `${color}22`, color }}
             >
               <User className="w-8 h-8" />
             </div>
@@ -55,13 +66,13 @@ export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
             </h2>
             <p className="text-sm text-muted-foreground mt-1">{person.cargo}</p>
             <span
-              className={`mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-dept-${deptClass.replace("dept-", "")}/15 text-dept-${deptClass.replace("dept-", "")}`}
+              className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-medium"
+              style={{ backgroundColor: `${color}22`, color }}
             >
               {person.departamento}
             </span>
           </div>
 
-          {/* Funções */}
           <div className="mt-8">
             <h3 className="font-display text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
               <Briefcase className="w-4 h-4 text-primary" />
@@ -80,7 +91,6 @@ export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
             </ul>
           </div>
 
-          {/* Superior */}
           {superior && (
             <div className="mt-6">
               <h3 className="font-display text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
@@ -99,7 +109,6 @@ export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
             </div>
           )}
 
-          {/* Subordinados */}
           {subordinados.length > 0 && (
             <div className="mt-6">
               <h3 className="font-display text-sm font-semibold text-foreground flex items-center gap-2 mb-3">
@@ -125,7 +134,6 @@ export function PersonDetail({ person, byId, onClose }: PersonDetailProps) {
             </div>
           )}
 
-          {/* Nível */}
           <div className="mt-8 pt-6 border-t border-border">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Nível hierárquico</span>

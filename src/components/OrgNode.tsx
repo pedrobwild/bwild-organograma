@@ -1,7 +1,21 @@
 import { motion } from "framer-motion";
-import { Colaborador, getDeptClass } from "./OrgChart";
+import { Colaborador } from "./OrgChart";
 import { User, ChevronDown } from "lucide-react";
 import { useState } from "react";
+
+const DEPT_HSL: Record<string, string> = {
+  Diretoria: "45 100% 60%",
+  Jurídico: "280 60% 65%",
+  "Business Operations": "200 80% 55%",
+  Vendas: "150 60% 50%",
+  Marketing: "340 70% 60%",
+  Operações: "20 80% 55%",
+  Arquitetura: "170 60% 50%",
+};
+
+function deptHsl(dept: string) {
+  return DEPT_HSL[dept] || "45 100% 60%";
+}
 
 interface OrgNodeProps {
   person: Colaborador;
@@ -27,16 +41,15 @@ export function OrgNode({
 
   const isSelected = selectedId === person.id;
   const isDimmed = highlightDept !== null && highlightDept !== person.departamento;
-  const deptClass = getDeptClass(person.departamento);
+  const color = `hsl(${deptHsl(person.departamento)})`;
 
   return (
     <div className="flex flex-col items-center">
-      {/* Node card */}
       <motion.button
         layout
         initial={{ opacity: 0, y: 12 }}
         animate={{
-          opacity: isDimmed ? 0.25 : 1,
+          opacity: isDimmed ? 0.2 : 1,
           y: 0,
           scale: isSelected ? 1.05 : 1,
         }}
@@ -46,18 +59,21 @@ export function OrgNode({
         onClick={() => onSelect(person)}
         className={`relative group cursor-pointer rounded-xl border px-4 py-3 min-w-[160px] max-w-[200px] text-center transition-colors
           ${isSelected
-            ? "border-primary bg-secondary shadow-lg shadow-primary/10"
+            ? "border-primary bg-secondary shadow-lg"
             : "border-border bg-card hover:border-muted-foreground/30 hover:bg-secondary"
           }`}
+        style={isSelected ? { boxShadow: `0 8px 30px -8px ${color}33` } : {}}
       >
         {/* Dept accent bar */}
         <div
-          className={`absolute top-0 left-1/2 -translate-x-1/2 h-[3px] w-10 rounded-b-full bg-dept-${deptClass.replace("dept-", "")}`}
+          className="absolute top-0 left-1/2 -translate-x-1/2 h-[3px] w-10 rounded-b-full"
+          style={{ backgroundColor: color }}
         />
 
         <div className="flex flex-col items-center gap-1.5">
           <div
-            className={`w-9 h-9 rounded-full flex items-center justify-center bg-dept-${deptClass.replace("dept-", "")}/15 text-dept-${deptClass.replace("dept-", "")}`}
+            className="w-9 h-9 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: `${color}22`, color }}
           >
             <User className="w-4 h-4" />
           </div>
@@ -69,7 +85,6 @@ export function OrgNode({
           </span>
         </div>
 
-        {/* Expand/collapse for children */}
         {children.length > 0 && (
           <button
             onClick={(e) => {
@@ -87,42 +102,23 @@ export function OrgNode({
         )}
       </motion.button>
 
-      {/* Children */}
       {children.length > 0 && !collapsed && (
         <div className="flex flex-col items-center mt-3">
-          {/* Vertical connector */}
           <div className="w-px h-6 bg-border" />
-
-          {/* Horizontal connector + children */}
-          <div className="relative flex items-start gap-2">
-            {children.length > 1 && (
-              <div
-                className="absolute top-0 bg-border"
-                style={{
-                  height: "1px",
-                  left: `calc(50% / ${children.length} * (${children.length} - 1))`,
-                  right: `calc(50% / ${children.length} * (${children.length} - 1))`,
-                  // simple approach: span from first to last child center
-                  ...(children.length > 1 ? { left: "calc(50% - 50% + 80px)", right: "calc(50% - 50% + 80px)" } : {}),
-                }}
-              />
-            )}
-            <div className="flex items-start gap-1">
-              {children.map((child, i) => (
-                <div key={child.id} className="flex flex-col items-center">
-                  {/* Vertical line from horizontal bar to child */}
-                  <div className="w-px h-4 bg-border" />
-                  <OrgNode
-                    person={child}
-                    byId={byId}
-                    onSelect={onSelect}
-                    selectedId={selectedId}
-                    highlightDept={highlightDept}
-                    depth={depth + 1}
-                  />
-                </div>
-              ))}
-            </div>
+          <div className="flex items-start gap-1">
+            {children.map((child) => (
+              <div key={child.id} className="flex flex-col items-center px-1">
+                <div className="w-px h-4 bg-border" />
+                <OrgNode
+                  person={child}
+                  byId={byId}
+                  onSelect={onSelect}
+                  selectedId={selectedId}
+                  highlightDept={highlightDept}
+                  depth={depth + 1}
+                />
+              </div>
+            ))}
           </div>
         </div>
       )}
