@@ -29,7 +29,6 @@ export function OrgNode({
   const isSelected = selectedId === person.id;
   const isDimmed = highlightDept !== null && highlightDept !== person.departamento;
   const colors = getDeptColor(person.departamento);
-  const isLeader = depth <= 1;
 
   return (
     <div className="flex flex-col items-center">
@@ -69,24 +68,17 @@ export function OrgNode({
         <div className="flex flex-col items-center gap-2">
           {/* Avatar */}
           <div
-            className="flex items-center justify-center rounded-full"
-            style={{
-              width: isLeader ? 44 : 36,
-              height: isLeader ? 44 : 36,
-              backgroundColor: colors.bg,
-              color: colors.text,
-            }}
+            className="flex items-center justify-center rounded-full w-10 h-10"
+            style={{ backgroundColor: colors.bg, color: colors.text }}
           >
-            <User style={{ width: isLeader ? 20 : 16, height: isLeader ? 20 : 16 }} />
+            <User className="w-[18px] h-[18px]" />
+          </div>
           </div>
 
           {/* Name */}
           <span
-            className="font-display font-bold leading-tight"
-            style={{
-              fontSize: isLeader ? "14px" : "12.5px",
-              color: "#0f2137",
-            }}
+            className="font-display font-bold leading-tight text-[13px]"
+            style={{ color: "#0f2137" }}
           >
             {person.nome}
           </span>
