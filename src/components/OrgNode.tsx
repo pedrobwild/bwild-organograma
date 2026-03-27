@@ -17,7 +17,12 @@ function ChildrenConnector({
   childInPath: boolean[];
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [bar, setBar] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
+  const [bar, setBar] = useState<{
+    left: number;
+    width: number;
+    parentCenter: number;
+    childCenters: number[];
+  }>({ left: 0, width: 0, parentCenter: 0, childCenters: [] });
 
   useEffect(() => {
     const container = containerRef.current;
@@ -25,8 +30,11 @@ function ChildrenConnector({
 
     const measure = () => {
       const columns = Array.from(container.children) as HTMLElement[];
+      const containerRect = container.getBoundingClientRect();
+      const parentCenter = containerRect.width / 2;
+
       if (columns.length < 2) {
-        setBar({ left: 0, width: 0 });
+        setBar({ left: 0, width: 0, parentCenter, childCenters: [] });
         return;
       }
 
@@ -35,19 +43,23 @@ function ChildrenConnector({
           const card = column.querySelector<HTMLElement>("[data-node-card='true']");
           if (!card) return null;
           const cardRect = card.getBoundingClientRect();
-          const containerRect = container.getBoundingClientRect();
           return cardRect.left + cardRect.width / 2 - containerRect.left;
         })
         .filter((v): v is number => v !== null);
 
       if (centers.length < 2) {
-        setBar({ left: 0, width: 0 });
+        setBar({ left: 0, width: 0, parentCenter, childCenters: [] });
         return;
       }
 
-      const left = centers[0];
-      const right = centers[centers.length - 1];
-      setBar({ left, width: Math.max(0, right - left) });
+      const left = Math.min(parentCenter, centers[0]);
+      const right = Math.max(parentCenter, centers[centers.length - 1]);
+      setBar({
+        left,
+        width: Math.max(0, right - left),
+        parentCenter,
+        childCenters: centers,
+      });
     };
 
     const raf = requestAnimationFrame(measure);
@@ -93,17 +105,40 @@ function ChildrenConnector({
 
       <div ref={containerRef} className="relative flex items-start gap-4">
         {bar.width > 0 && (
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              top: 0,
-              left: bar.left,
-              width: bar.width,
-              height: 2,
-              background: anyChildHighlighted ? HIGHLIGHT_LINE_COLOR : LINE_COLOR,
-              ...glowFor(anyChildHighlighted),
-            }}
-          />
+          <>
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: 0,
+                left: bar.left,
+                width: bar.width,
+                height: 2,
+                background: LINE_COLOR,
+                transition: "all 0.4s ease",
+              }}
+            />
+
+            {parentInPath &&
+              bar.childCenters.map((center, i) => {
+                if (!childInPath[i]) return null;
+                const left = Math.min(bar.parentCenter, center);
+                const width = Math.abs(bar.parentCenter - center);
+                return (
+                  <div
+                    key={`path-segment-${i}`}
+                    className="absolute pointer-events-none"
+                    style={{
+                      top: 0,
+                      left,
+                      width,
+                      height: 2,
+                      background: HIGHLIGHT_LINE_COLOR,
+                      ...glowFor(true),
+                    }}
+                  />
+                );
+              })}
+          </>
         )}
 
         {children.map((child, i) => {
