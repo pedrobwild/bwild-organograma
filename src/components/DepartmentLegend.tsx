@@ -1,11 +1,11 @@
-const DEPT_HSL: Record<string, string> = {
-  Diretoria: "45, 100%, 60%",
-  Jurídico: "280, 55%, 70%",
-  "Business Operations": "200, 75%, 60%",
-  Vendas: "155, 55%, 55%",
-  Marketing: "340, 65%, 65%",
-  Operações: "25, 80%, 58%",
-  Arquitetura: "175, 55%, 50%",
+const DEPT_COLORS: Record<string, string> = {
+  Diretoria: "#F5A623",
+  Jurídico: "#C084FC",
+  "Business Operations": "#38BDF8",
+  Vendas: "#34D399",
+  Marketing: "#FB7185",
+  Operações: "#FB923C",
+  Arquitetura: "#2DD4BF",
 };
 
 interface DepartmentLegendProps {
@@ -22,7 +22,7 @@ export function DepartmentLegend({
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {departments.map((dept) => {
-        const color = `hsl(${DEPT_HSL[dept] || "45, 100%, 60%"})`;
+        const color = DEPT_COLORS[dept] || "#F5A623";
         const isActive = highlightDept === dept;
         return (
           <button
@@ -30,19 +30,15 @@ export function DepartmentLegend({
             onMouseEnter={() => onHover(dept)}
             onMouseLeave={() => onHover(null)}
             onClick={() => onHover(isActive ? null : dept)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all backdrop-blur-sm
-              ${isActive
-                ? "border-transparent text-white"
-                : "bg-white/10 border-white/20 text-white/80 hover:text-white hover:bg-white/20"
-              }`}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold border transition-all"
             style={
               isActive
-                ? { backgroundColor: `${color}44`, borderColor: `${color}88`, color: "white" }
-                : {}
+                ? { backgroundColor: `${color}55`, borderColor: color, color: "white" }
+                : { backgroundColor: "rgba(255,255,255,0.15)", borderColor: "rgba(255,255,255,0.25)", color: "rgba(255,255,255,0.85)" }
             }
           >
             <div
-              className="w-2 h-2 rounded-full"
+              className="w-2.5 h-2.5 rounded-full"
               style={{ backgroundColor: color }}
             />
             {dept}
