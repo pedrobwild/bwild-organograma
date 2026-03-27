@@ -5,8 +5,17 @@ import { useState, useRef, useEffect, ReactNode } from "react";
 import { getDeptColor } from "@/lib/deptColors";
 
 const LINE_COLOR = "rgba(255,255,255,0.62)";
+const HIGHLIGHT_LINE_COLOR = "#60a5fa";
 
-function ChildrenConnector({ children }: { children: ReactNode[] }) {
+function ChildrenConnector({
+  children,
+  parentInPath,
+  childInPath,
+}: {
+  children: ReactNode[];
+  parentInPath: boolean;
+  childInPath: boolean[];
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [bar, setBar] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
 
