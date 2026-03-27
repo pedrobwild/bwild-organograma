@@ -71,15 +71,14 @@ export function OrgNode({
 
         <div className="flex flex-col items-center gap-1.5">
           <div
-            className="w-9 h-9 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: `${color}22`, color }}
+            className="w-9 h-9 rounded-full flex items-center justify-center bg-white/15 text-card-foreground"
           >
             <User className="w-4 h-4" />
           </div>
-          <span className="font-display text-sm font-semibold text-foreground leading-tight">
+          <span className="font-display text-sm font-semibold text-card-foreground leading-tight">
             {person.nome}
           </span>
-          <span className="text-[11px] text-muted-foreground leading-tight">
+          <span className="text-[11px] text-card-foreground/70 leading-tight">
             {person.cargo}
           </span>
         </div>
