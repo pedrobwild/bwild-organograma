@@ -5,8 +5,17 @@ import { useState, useRef, useEffect, ReactNode } from "react";
 import { getDeptColor } from "@/lib/deptColors";
 
 const LINE_COLOR = "rgba(255,255,255,0.62)";
+const HIGHLIGHT_LINE_COLOR = "#60a5fa";
 
-function ChildrenConnector({ children }: { children: ReactNode[] }) {
+function ChildrenConnector({
+  children,
+  parentInPath,
+  childInPath,
+}: {
+  children: ReactNode[];
+  parentInPath: boolean;
+  childInPath: boolean[];
+}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [bar, setBar] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
 
@@ -54,21 +63,33 @@ function ChildrenConnector({ children }: { children: ReactNode[] }) {
     };
   }, [children.length]);
 
+  const parentLineColor = parentInPath ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+
   if (children.length === 1) {
+    const singleColor = parentInPath && childInPath[0] ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+    const glowStyle = singleColor === HIGHLIGHT_LINE_COLOR
+      ? { filter: "drop-shadow(0 0 4px rgba(96,165,250,0.6))", transition: "all 0.4s ease" }
+      : { transition: "all 0.4s ease" };
     return (
       <div className="flex flex-col items-center mt-5">
-        <div style={{ width: 2, height: 28, background: LINE_COLOR }} />
+        <div style={{ width: 2, height: 28, background: singleColor, ...glowStyle }} />
         <div className="flex flex-col items-center">
-          <div style={{ width: 2, height: 18, background: LINE_COLOR }} />
+          <div style={{ width: 2, height: 18, background: singleColor, ...glowStyle }} />
           {children[0]}
         </div>
       </div>
     );
   }
+  const anyChildHighlighted = childInPath.some(Boolean);
+  const mainVertColor = parentInPath && anyChildHighlighted ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+  const glowFor = (active: boolean) =>
+    active
+      ? { filter: "drop-shadow(0 0 4px rgba(96,165,250,0.6))", transition: "all 0.4s ease" }
+      : { transition: "all 0.4s ease" };
 
   return (
     <div className="flex flex-col items-center mt-5">
-      <div style={{ width: 2, height: 28, background: LINE_COLOR }} />
+      <div style={{ width: 2, height: 28, background: mainVertColor, ...glowFor(mainVertColor === HIGHLIGHT_LINE_COLOR) }} />
 
       <div ref={containerRef} className="relative flex items-start gap-4">
         {bar.width > 0 && (
@@ -79,17 +100,21 @@ function ChildrenConnector({ children }: { children: ReactNode[] }) {
               left: bar.left,
               width: bar.width,
               height: 2,
-              background: LINE_COLOR,
+              background: anyChildHighlighted ? HIGHLIGHT_LINE_COLOR : LINE_COLOR,
+              ...glowFor(anyChildHighlighted),
             }}
           />
         )}
 
-        {children.map((child, i) => (
-          <div key={i} data-child-col className="flex flex-col items-center">
-            <div style={{ width: 2, height: 18, background: LINE_COLOR }} />
-            {child}
-          </div>
-        ))}
+        {children.map((child, i) => {
+          const lineColor = childInPath[i] ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+          return (
+            <div key={i} data-child-col className="flex flex-col items-center">
+              <div style={{ width: 2, height: 18, background: lineColor, ...glowFor(childInPath[i]) }} />
+              {child}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -208,7 +233,10 @@ export function OrgNode({
       </motion.button>
 
       {children.length > 0 && !collapsed && (
-        <ChildrenConnector>
+        <ChildrenConnector
+          parentInPath={isInPath}
+          childInPath={children.map((c) => highlightPath.has(c.id))}
+        >
           {children.map((child) => (
             <OrgNode
               key={child.id}
