@@ -101,6 +101,7 @@ interface OrgNodeProps {
   onSelect: (p: Colaborador) => void;
   selectedId: string | null;
   highlightDept: string | null;
+  highlightPath: Set<string>;
   depth?: number;
 }
 
@@ -110,6 +111,7 @@ export function OrgNode({
   onSelect,
   selectedId,
   highlightDept,
+  highlightPath,
   depth = 0,
 }: OrgNodeProps) {
   const [collapsed, setCollapsed] = useState(false);
@@ -118,7 +120,10 @@ export function OrgNode({
     .filter(Boolean) as Colaborador[];
 
   const isSelected = selectedId === person.id;
-  const isDimmed = highlightDept !== null && highlightDept !== person.departamento;
+  const isInPath = highlightPath.size > 0 && highlightPath.has(person.id);
+  const isDimmedByPath = highlightPath.size > 0 && !isInPath;
+  const isDimmedByDept = highlightDept !== null && highlightDept !== person.departamento;
+  const isDimmed = isDimmedByDept || isDimmedByPath;
   const colors = getDeptColor(person.departamento);
 
   return (
@@ -130,7 +135,7 @@ export function OrgNode({
         animate={{
           opacity: isDimmed ? 0.15 : 1,
           y: 0,
-          scale: isSelected ? 1.04 : 1,
+          scale: isSelected ? 1.06 : 1,
         }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         whileHover={{ y: -3 }}
@@ -141,9 +146,15 @@ export function OrgNode({
           borderRadius: "14px",
           padding: "16px 20px",
           width: "170px",
-          background: isSelected ? "rgba(255,255,255,0.98)" : "rgba(255,255,255,0.93)",
+          background: isSelected
+            ? "rgba(255,255,255,1)"
+            : isInPath
+            ? "rgba(255,255,255,0.97)"
+            : "rgba(255,255,255,0.93)",
           boxShadow: isSelected
-            ? `0 0 0 2px ${colors.bg}, 0 20px 50px -12px rgba(0,0,0,0.4)`
+            ? `0 0 0 3px ${colors.bg}, 0 20px 50px -12px rgba(0,0,0,0.5)`
+            : isInPath
+            ? `0 0 0 2px ${colors.bg}88, 0 12px 36px -8px rgba(0,0,0,0.35)`
             : "0 8px 32px -8px rgba(0,0,0,0.3), 0 2px 8px -2px rgba(0,0,0,0.15)",
         }}
       >
@@ -206,6 +217,7 @@ export function OrgNode({
               onSelect={onSelect}
               selectedId={selectedId}
               highlightDept={highlightDept}
+              highlightPath={highlightPath}
               depth={depth + 1}
             />
           ))}
