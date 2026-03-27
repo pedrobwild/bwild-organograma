@@ -61,20 +61,20 @@ export function OrgNode({
           style={{ backgroundColor: colors.bg }}
         />
 
-        <div className="flex flex-col items-center gap-2">
+        <div className="flex flex-col items-center gap-2" style={{ minHeight: "90px" }}>
           <div
-            className="flex items-center justify-center rounded-full w-10 h-10"
+            className="flex items-center justify-center rounded-full w-10 h-10 flex-shrink-0"
             style={{ backgroundColor: colors.bg, color: colors.text }}
           >
             <User className="w-[18px] h-[18px]" />
           </div>
 
-          <span className="font-display font-bold leading-tight text-[13px]" style={{ color: "#0f2137" }}>
+          <span className="font-display font-bold leading-tight text-[13px] line-clamp-2" style={{ color: "#0f2137" }}>
             {person.nome}
           </span>
 
           <span
-            className="font-body font-medium leading-tight rounded-md px-2.5 py-1 text-[10.5px]"
+            className="font-body font-medium leading-tight rounded-md px-2.5 py-1 text-[10px] text-center line-clamp-1 max-w-full truncate"
             style={{
               color: colors.bg,
               backgroundColor: colors.light,
@@ -83,15 +83,6 @@ export function OrgNode({
           >
             {person.cargo}
           </span>
-
-          {children.length > 0 && (
-            <div className="flex items-center gap-1 mt-0.5" style={{ color: "#7a8ca0" }}>
-              <Users className="w-[11px] h-[11px]" />
-              <span className="text-[10px] font-medium">
-                {children.length} {children.length === 1 ? "report" : "reports"}
-              </span>
-            </div>
-          )}
         </div>
 
         {children.length > 0 && (
