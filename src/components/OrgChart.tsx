@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { AnimatePresence } from "framer-motion";
 import orgData from "@/data/organograma.json";
 import { OrgNode } from "./OrgNode";
 import { PersonDetail } from "./PersonDetail";
 import { DepartmentLegend } from "./DepartmentLegend";
+import logoSrc from "@/assets/logo-bwild.png";
 
 export interface Colaborador {
   id: string;
@@ -34,6 +35,10 @@ export default function OrgChart() {
     [colaboradores]
   );
 
+  const handleSelectPerson = useCallback((p: Colaborador) => {
+    setSelectedPerson((prev) => (prev?.id === p.id ? null : p));
+  }, []);
+
   return (
     <div
       className="min-h-screen font-body relative"
@@ -44,19 +49,22 @@ export default function OrgChart() {
         backgroundAttachment: "fixed",
       }}
     >
-      {/* Subtle overlay for readability */}
-      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+      {/* Overlay */}
+      <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(10,30,60,0.55) 0%, rgba(10,30,60,0.35) 100%)" }} />
 
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-white/10 bg-black/30 backdrop-blur-xl px-6 py-4">
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="font-display text-2xl font-bold text-foreground tracking-tight">
-              {orgData.empresa}
-            </h1>
-            <p className="text-sm text-foreground/60 mt-0.5">
-              Organograma Organizacional
-            </p>
+      <header className="sticky top-0 z-30 px-6 py-3" style={{ background: "rgba(10,30,60,0.7)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+        <div className="max-w-[1800px] mx-auto flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex items-center gap-3">
+            <img src={logoSrc} alt="Bwild" className="h-9 w-auto rounded-lg" />
+            <div>
+              <h1 className="font-display text-lg font-bold text-white tracking-tight leading-tight">
+                {orgData.empresa}
+              </h1>
+              <p className="text-[11px] text-white/50 font-medium uppercase tracking-widest">
+                Organograma
+              </p>
+            </div>
           </div>
           <DepartmentLegend
             departments={departments}
@@ -67,12 +75,12 @@ export default function OrgChart() {
       </header>
 
       {/* Tree */}
-      <div className="relative z-10 px-6 py-10 overflow-x-auto">
-        <div className="min-w-[900px] flex flex-col items-center">
+      <div className="relative z-10 px-6 py-12 overflow-x-auto">
+        <div className="min-w-[1000px] flex flex-col items-center">
           <OrgNode
             person={root}
             byId={byId}
-            onSelect={setSelectedPerson}
+            onSelect={handleSelectPerson}
             selectedId={selectedPerson?.id || null}
             highlightDept={highlightDept}
           />
@@ -86,6 +94,7 @@ export default function OrgChart() {
             person={selectedPerson}
             byId={byId}
             onClose={() => setSelectedPerson(null)}
+            onNavigate={handleSelectPerson}
           />
         )}
       </AnimatePresence>
