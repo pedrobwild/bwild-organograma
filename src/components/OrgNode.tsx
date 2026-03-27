@@ -80,6 +80,16 @@ function ChildrenConnector({
       </div>
     );
   }
+  const anyChildHighlighted = childInPath.some(Boolean);
+  const mainVertColor = parentInPath && anyChildHighlighted ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+  const glowFor = (active: boolean) =>
+    active
+      ? { filter: "drop-shadow(0 0 4px rgba(96,165,250,0.6))", transition: "all 0.4s ease" }
+      : { transition: "all 0.4s ease" };
+
+  return (
+    <div className="flex flex-col items-center mt-5">
+      <div style={{ width: 2, height: 28, background: mainVertColor, ...glowFor(mainVertColor === HIGHLIGHT_LINE_COLOR) }} />
 
       <div ref={containerRef} className="relative flex items-start gap-4">
         {bar.width > 0 && (
@@ -90,17 +100,21 @@ function ChildrenConnector({
               left: bar.left,
               width: bar.width,
               height: 2,
-              background: LINE_COLOR,
+              background: anyChildHighlighted ? HIGHLIGHT_LINE_COLOR : LINE_COLOR,
+              ...glowFor(anyChildHighlighted),
             }}
           />
         )}
 
-        {children.map((child, i) => (
-          <div key={i} data-child-col className="flex flex-col items-center">
-            <div style={{ width: 2, height: 18, background: LINE_COLOR }} />
-            {child}
-          </div>
-        ))}
+        {children.map((child, i) => {
+          const lineColor = childInPath[i] ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
+          return (
+            <div key={i} data-child-col className="flex flex-col items-center">
+              <div style={{ width: 2, height: 18, background: lineColor, ...glowFor(childInPath[i]) }} />
+              {child}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
