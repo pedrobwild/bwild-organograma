@@ -2,7 +2,25 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Colaborador } from "./OrgChart";
 import { User, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect, ReactNode } from "react";
-import { getDeptColor } from "@/lib/deptColors";
+import { getDeptColor, DEPT_COLORS } from "@/lib/deptColors";
+
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .filter(Boolean)
+    .map((w) => w[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
+
+const LEVEL_SIZES: Record<number, { width: string; avatarSize: string; avatarIcon: string; nameSize: string; badgeSize: string; pad: string; minH: string }> = {
+  0: { width: "200px", avatarSize: "w-14 h-14", avatarIcon: "text-xl", nameSize: "text-[15px]", badgeSize: "text-[11px]", pad: "20px 24px", minH: "110px" },
+  1: { width: "185px", avatarSize: "w-12 h-12", avatarIcon: "text-lg", nameSize: "text-[14px]", badgeSize: "text-[11px]", pad: "18px 22px", minH: "100px" },
+  2: { width: "170px", avatarSize: "w-10 h-10", avatarIcon: "text-base", nameSize: "text-[13px]", badgeSize: "text-[10px]", pad: "16px 20px", minH: "90px" },
+  3: { width: "160px", avatarSize: "w-9 h-9", avatarIcon: "text-sm", nameSize: "text-[12px]", badgeSize: "text-[10px]", pad: "14px 18px", minH: "85px" },
+  4: { width: "150px", avatarSize: "w-8 h-8", avatarIcon: "text-xs", nameSize: "text-[11px]", badgeSize: "text-[9px]", pad: "12px 16px", minH: "80px" },
+};
 
 const LINE_COLOR = "rgba(255,255,255,0.62)";
 const HIGHLIGHT_LINE_COLOR = "#60a5fa";
