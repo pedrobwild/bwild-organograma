@@ -35,14 +35,26 @@ export default function OrgChart() {
   );
 
   return (
-    <div className="min-h-screen bg-background font-body relative overflow-x-auto">
-      <header className="sticky top-0 z-30 border-b border-border bg-background/90 backdrop-blur-xl px-6 py-4">
+    <div
+      className="min-h-screen font-body relative"
+      style={{
+        backgroundImage: "url('/images/bg-bwild.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundAttachment: "fixed",
+      }}
+    >
+      {/* Subtle overlay for readability */}
+      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+
+      {/* Header */}
+      <header className="sticky top-0 z-30 border-b border-white/10 bg-black/30 backdrop-blur-xl px-6 py-4">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4 flex-wrap">
           <div>
             <h1 className="font-display text-2xl font-bold text-foreground tracking-tight">
               {orgData.empresa}
             </h1>
-            <p className="text-sm text-muted-foreground mt-0.5">
+            <p className="text-sm text-foreground/60 mt-0.5">
               Organograma Organizacional
             </p>
           </div>
@@ -54,7 +66,8 @@ export default function OrgChart() {
         </div>
       </header>
 
-      <div className="px-6 py-10 overflow-x-auto">
+      {/* Tree */}
+      <div className="relative z-10 px-6 py-10 overflow-x-auto">
         <div className="min-w-[900px] flex flex-col items-center">
           <OrgNode
             person={root}
@@ -66,6 +79,7 @@ export default function OrgChart() {
         </div>
       </div>
 
+      {/* Detail panel */}
       <AnimatePresence>
         {selectedPerson && (
           <PersonDetail

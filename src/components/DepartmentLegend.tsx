@@ -1,11 +1,11 @@
 const DEPT_HSL: Record<string, string> = {
-  Diretoria: "45 100% 60%",
-  Jurídico: "280 60% 65%",
-  "Business Operations": "200 80% 55%",
-  Vendas: "150 60% 50%",
-  Marketing: "340 70% 60%",
-  Operações: "20 80% 55%",
-  Arquitetura: "170 60% 50%",
+  Diretoria: "45, 100%, 60%",
+  Jurídico: "280, 55%, 70%",
+  "Business Operations": "200, 75%, 60%",
+  Vendas: "155, 55%, 55%",
+  Marketing: "340, 65%, 65%",
+  Operações: "25, 80%, 58%",
+  Arquitetura: "175, 55%, 50%",
 };
 
 interface DepartmentLegendProps {
@@ -22,7 +22,7 @@ export function DepartmentLegend({
   return (
     <div className="flex items-center gap-2 flex-wrap">
       {departments.map((dept) => {
-        const color = `hsl(${DEPT_HSL[dept] || "45 100% 60%"})`;
+        const color = `hsl(${DEPT_HSL[dept] || "45, 100%, 60%"})`;
         const isActive = highlightDept === dept;
         return (
           <button
@@ -30,14 +30,14 @@ export function DepartmentLegend({
             onMouseEnter={() => onHover(dept)}
             onMouseLeave={() => onHover(null)}
             onClick={() => onHover(isActive ? null : dept)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all backdrop-blur-sm
               ${isActive
-                ? "border-transparent"
-                : "bg-secondary border-border text-muted-foreground hover:text-foreground"
+                ? "border-transparent text-white"
+                : "bg-white/10 border-white/20 text-white/80 hover:text-white hover:bg-white/20"
               }`}
             style={
               isActive
-                ? { backgroundColor: `${color}22`, borderColor: `${color}66`, color }
+                ? { backgroundColor: `${color}44`, borderColor: `${color}88`, color: "white" }
                 : {}
             }
           >
