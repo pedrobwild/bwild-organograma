@@ -57,12 +57,11 @@ export function OrgNode({
         whileHover={{ scale: 1.07, y: -2 }}
         whileTap={{ scale: 0.97 }}
         onClick={() => onSelect(person)}
-        className={`relative group cursor-pointer rounded-xl border px-4 py-3 min-w-[160px] max-w-[200px] text-center transition-colors
+        className={`relative group cursor-pointer rounded-xl border px-4 py-3 min-w-[160px] max-w-[200px] text-center transition-all shadow-md
           ${isSelected
-            ? "border-primary bg-secondary shadow-lg"
-            : "border-border bg-card hover:border-muted-foreground/30 hover:bg-secondary"
+            ? "border-primary bg-card text-card-foreground shadow-xl ring-2 ring-primary/30"
+            : "border-card/20 bg-card text-card-foreground hover:shadow-lg hover:-translate-y-0.5"
           }`}
-        style={isSelected ? { boxShadow: `0 8px 30px -8px ${color}33` } : {}}
       >
         {/* Dept accent bar */}
         <div
