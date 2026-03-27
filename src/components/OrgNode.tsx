@@ -1,8 +1,78 @@
 import { motion } from "framer-motion";
 import { Colaborador } from "./OrgChart";
-import { User, ChevronDown, Users } from "lucide-react";
-import { useState } from "react";
+import { User, ChevronDown } from "lucide-react";
+import { useState, useRef, useEffect, ReactNode } from "react";
 import { getDeptColor } from "@/lib/deptColors";
+
+const LINE_STYLE = "rgba(255,255,255,0.45)";
+
+/** Draws vertical line from parent → horizontal bar → vertical lines to each child */
+function ChildrenConnector({ children }: { children: ReactNode[] }) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [barStyle, setBarStyle] = useState({ left: 0, width: 0 });
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const cols = el.querySelectorAll<HTMLElement>("[data-child-col]");
+    if (cols.length < 2) return;
+    const first = cols[0];
+    const last = cols[cols.length - 1];
+    const parentRect = el.getBoundingClientRect();
+    const firstCenter = first.getBoundingClientRect().left + first.getBoundingClientRect().width / 2 - parentRect.left;
+    const lastCenter = last.getBoundingClientRect().left + last.getBoundingClientRect().width / 2 - parentRect.left;
+    setBarStyle({ left: firstCenter, width: lastCenter - firstCenter });
+  }, [children]);
+
+  // Re-measure on window resize
+  useEffect(() => {
+    const onResize = () => {
+      const el = containerRef.current;
+      if (!el) return;
+      const cols = el.querySelectorAll<HTMLElement>("[data-child-col]");
+      if (cols.length < 2) return;
+      const first = cols[0];
+      const last = cols[cols.length - 1];
+      const parentRect = el.getBoundingClientRect();
+      const firstCenter = first.getBoundingClientRect().left + first.getBoundingClientRect().width / 2 - parentRect.left;
+      const lastCenter = last.getBoundingClientRect().left + last.getBoundingClientRect().width / 2 - parentRect.left;
+      setBarStyle({ left: firstCenter, width: lastCenter - firstCenter });
+    };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  return (
+    <div className="flex flex-col items-center mt-5">
+      {/* Vertical line from parent down */}
+      <div style={{ width: 2, height: 28, background: LINE_STYLE }} />
+
+      {/* Children row with horizontal bar */}
+      <div ref={containerRef} className="relative flex items-start gap-4">
+        {/* Horizontal bar */}
+        {barStyle.width > 0 && (
+          <div
+            className="absolute pointer-events-none"
+            style={{
+              top: 0,
+              left: barStyle.left,
+              width: barStyle.width,
+              height: 2,
+              background: LINE_STYLE,
+            }}
+          />
+        )}
+        {(children as ReactNode[]).map((child, i) => (
+          <div key={i} data-child-col className="flex flex-col items-center">
+            {/* Vertical line from bar to child */}
+            <div style={{ width: 2, height: 18, background: LINE_STYLE }} />
+            {child}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 interface OrgNodeProps {
   person: Colaborador;
@@ -106,59 +176,19 @@ export function OrgNode({
       </motion.button>
 
       {children.length > 0 && !collapsed && (
-        <div className="flex flex-col items-center mt-5">
-          <svg width="2" height="28" className="overflow-visible">
-            <line x1="1" y1="0" x2="1" y2="28" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeDasharray="4 3" />
-          </svg>
-
-          {children.length === 1 ? (
-            <div className="flex flex-col items-center">
-              <svg width="2" height="16" className="overflow-visible">
-                <line x1="1" y1="0" x2="1" y2="16" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeDasharray="4 3" />
-              </svg>
-              <OrgNode
-                person={children[0]}
-                byId={byId}
-                onSelect={onSelect}
-                selectedId={selectedId}
-                highlightDept={highlightDept}
-                depth={depth + 1}
-              />
-            </div>
-          ) : (
-            <div className="relative flex items-start gap-3">
-              <svg
-                className="absolute top-0 left-0 right-0 overflow-visible pointer-events-none"
-                style={{ height: "2px", width: "100%" }}
-              >
-                <line
-                  x1={`${100 / (children.length * 2)}%`}
-                  y1="1"
-                  x2={`${100 - 100 / (children.length * 2)}%`}
-                  y2="1"
-                  stroke="rgba(255,255,255,0.5)"
-                  strokeWidth="2"
-                  strokeDasharray="4 3"
-                />
-              </svg>
-              {children.map((child) => (
-                <div key={child.id} className="flex flex-col items-center">
-                  <svg width="2" height="18" className="overflow-visible">
-                    <line x1="1" y1="0" x2="1" y2="18" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeDasharray="4 3" />
-                  </svg>
-                  <OrgNode
-                    person={child}
-                    byId={byId}
-                    onSelect={onSelect}
-                    selectedId={selectedId}
-                    highlightDept={highlightDept}
-                    depth={depth + 1}
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <ChildrenConnector>
+          {children.map((child) => (
+            <OrgNode
+              key={child.id}
+              person={child}
+              byId={byId}
+              onSelect={onSelect}
+              selectedId={selectedId}
+              highlightDept={highlightDept}
+              depth={depth + 1}
+            />
+          ))}
+        </ChildrenConnector>
       )}
     </div>
   );
