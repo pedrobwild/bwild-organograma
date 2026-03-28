@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import logoSrc from "@/assets/logo-bwild.png";
 import { useOrganogram } from "@/hooks/use-organogram";
+import { setDeptColorMap } from "@/lib/deptColors";
 import { DepartmentLegend } from "./DepartmentLegend";
 import { OrgNode } from "./OrgNode";
 import { OrgSidebar } from "./OrgSidebar";
@@ -28,13 +30,22 @@ export default function OrgChart() {
     zoomOut,
     resetView,
     closeSidebar,
+    isLoading,
+    deptColorMap,
   } = useOrganogram();
 
-  if (!root) {
+  // Sync dynamic dept colors
+  useEffect(() => {
+    if (deptColorMap && Object.keys(deptColorMap).length > 0) {
+      setDeptColorMap(deptColorMap);
+    }
+  }, [deptColorMap]);
+
+  if (isLoading || !root) {
     return (
       <div className="h-screen flex items-center justify-center" style={{ background: "rgba(10,30,60,0.9)" }}>
         <p className="text-white/60 text-sm">
-          Nenhum nó raiz encontrado no organograma.
+          {isLoading ? "Carregando organograma..." : "Nenhum nó raiz encontrado no organograma."}
         </p>
       </div>
     );
