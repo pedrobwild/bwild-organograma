@@ -105,11 +105,12 @@ export function OrgNode({
         }}
         transition={{ duration: 0.22 }}
         className={cn(
-          "group relative rounded-[28px] border text-center backdrop-blur-xl transition-all",
+          "group relative rounded-[28px] border text-center backdrop-blur-xl transition-all overflow-visible",
           "bg-white/95 shadow-[0_20px_55px_-24px_rgba(15,23,42,0.45)]",
           "before:absolute before:inset-x-6 before:top-0 before:h-px before:bg-white/80 before:content-['']",
           level.width,
-          level.padding
+          level.padding,
+          children.length > 0 && "pb-6"
         )}
         style={{
           borderColor: isSelected ? `${colors.bg}88` : "rgba(148,163,184,0.18)",
