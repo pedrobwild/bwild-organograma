@@ -130,17 +130,21 @@ export function OrgNode({
           {/* Avatar */}
           <div
             className={cn(
-              "flex items-center justify-center rounded-full ring-2 ring-white/80 shadow-md flex-shrink-0",
+              "flex items-center justify-center rounded-full ring-2 ring-white/80 shadow-md flex-shrink-0 overflow-hidden",
               level.avatar
             )}
             style={{
               background: isPlaceholder
                 ? "rgba(150,160,175,0.5)"
+                : person.foto
+                ? undefined
                 : `linear-gradient(135deg, ${colors.bg}, ${colors.bg}cc)`,
               color: colors.text,
             }}
           >
-            {isPlaceholder ? (
+            {person.foto ? (
+              <img src={person.foto} alt={person.nome} className="w-full h-full object-cover" />
+            ) : isPlaceholder ? (
               <User className="opacity-60" />
             ) : (
               <span className="font-display font-bold leading-none">{initials}</span>

@@ -41,11 +41,11 @@ export default function OrgChart() {
     }
   }, [deptColorMap]);
 
-  if (!root) {
+  if (isLoading || !root) {
     return (
       <div className="h-screen flex items-center justify-center" style={{ background: "rgba(10,30,60,0.9)" }}>
         <p className="text-white/60 text-sm">
-          Nenhum nó raiz encontrado no organograma.
+          {isLoading ? "Carregando organograma..." : "Nenhum nó raiz encontrado no organograma."}
         </p>
       </div>
     );
