@@ -209,54 +209,68 @@ export default function Admin() {
                     <Plus className="w-4 h-4 mr-1" /> Novo colaborador
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Novo colaborador</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-3 pt-2">
-                    <div className="space-y-1">
-                      <Label>Nome</Label>
-                      <Input value={newForm.nome} onChange={(e) => setNewForm((p) => ({ ...p, nome: e.target.value }))} />
+                <DialogContent className="sm:max-w-[480px] p-0 gap-0 overflow-hidden">
+                  <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-5">
+                    <DialogHeader>
+                      <DialogTitle className="text-white flex items-center gap-2 text-base">
+                        <Users className="w-4 h-4" /> Novo colaborador
+                      </DialogTitle>
+                      <p className="text-slate-300 text-xs mt-1">Preencha os dados para adicionar ao organograma</p>
+                    </DialogHeader>
+                  </div>
+                  <div className="px-6 py-5 space-y-4 max-h-[60vh] overflow-y-auto scrollbar-thin">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5 col-span-2">
+                        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Nome</Label>
+                        <Input value={newForm.nome} onChange={(e) => setNewForm((p) => ({ ...p, nome: e.target.value }))} placeholder="Nome completo" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Cargo</Label>
+                        <Input value={newForm.cargo} onChange={(e) => setNewForm((p) => ({ ...p, cargo: e.target.value }))} placeholder="Ex: Gerente" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Nível</Label>
+                        <Input type="number" min={0} max={10} value={newForm.nivel} onChange={(e) => setNewForm((p) => ({ ...p, nivel: e.target.value }))} />
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <Label>Cargo</Label>
-                      <Input value={newForm.cargo} onChange={(e) => setNewForm((p) => ({ ...p, cargo: e.target.value }))} />
+                    <Separator />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Departamento</Label>
+                        <Select value={newForm.departamento} onValueChange={(v) => setNewForm((p) => ({ ...p, departamento: v }))}>
+                          <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+                          <SelectContent>
+                            {departments.map((d) => (
+                              <SelectItem key={d} value={d}>{d}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="space-y-1.5">
+                        <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Superior</Label>
+                        <Select value={newForm.superior_id} onValueChange={(v) => setNewForm((p) => ({ ...p, superior_id: v }))}>
+                          <SelectTrigger><SelectValue placeholder="Nenhum (raiz)" /></SelectTrigger>
+                          <SelectContent>
+                            {colaboradores?.map((c) => (
+                              <SelectItem key={c.id} value={c.id}>{c.nome} — {c.cargo}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
-                    <div className="space-y-1">
-                      <Label>Departamento</Label>
-                      <Select value={newForm.departamento} onValueChange={(v) => setNewForm((p) => ({ ...p, departamento: v }))}>
-                        <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
-                        <SelectContent>
-                          {departments.map((d) => (
-                            <SelectItem key={d} value={d}>{d}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1">
-                      <Label>Nível</Label>
-                      <Input type="number" min={0} max={10} value={newForm.nivel} onChange={(e) => setNewForm((p) => ({ ...p, nivel: e.target.value }))} />
-                    </div>
-                    <div className="space-y-1">
-                      <Label>Superior</Label>
-                      <Select value={newForm.superior_id} onValueChange={(v) => setNewForm((p) => ({ ...p, superior_id: v }))}>
-                        <SelectTrigger><SelectValue placeholder="Nenhum (raiz)" /></SelectTrigger>
-                        <SelectContent>
-                          {colaboradores?.map((c) => (
-                            <SelectItem key={c.id} value={c.id}>{c.nome} — {c.cargo}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-1">
-                      <Label>Funções (uma por linha)</Label>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Funções (uma por linha)</Label>
                       <textarea
-                        className="w-full border rounded-md px-3 py-2 text-sm min-h-[80px]"
+                        className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-[80px] resize-none"
                         value={newForm.funcoes}
                         onChange={(e) => setNewForm((p) => ({ ...p, funcoes: e.target.value }))}
+                        placeholder="Gestão de equipes&#10;Planejamento estratégico"
                       />
                     </div>
-                    <Button onClick={handleCreateColab} className="w-full">Criar</Button>
+                  </div>
+                  <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setNewColabOpen(false)}>Cancelar</Button>
+                    <Button size="sm" onClick={handleCreateColab}>Criar colaborador</Button>
                   </div>
                 </DialogContent>
               </Dialog>
