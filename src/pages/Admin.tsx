@@ -315,24 +315,38 @@ export default function Admin() {
                       {/* Info */}
                       <div className="flex-1 min-w-0">
                         {editingColab === c.id ? (
-                          <div className="space-y-2">
-                            <Input value={editForm.nome} onChange={(e) => setEditForm((p) => ({ ...p, nome: e.target.value }))} placeholder="Nome" />
-                            <Input value={editForm.cargo} onChange={(e) => setEditForm((p) => ({ ...p, cargo: e.target.value }))} placeholder="Cargo" />
-                            <Select value={editForm.departamento} onValueChange={(v) => setEditForm((p) => ({ ...p, departamento: v }))}>
-                              <SelectTrigger><SelectValue /></SelectTrigger>
-                              <SelectContent>
-                                {departments.map((d) => (
-                                  <SelectItem key={d} value={d}>{d}</SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <textarea
-                              className="w-full border rounded-md px-3 py-2 text-sm min-h-[60px]"
-                              value={editForm.funcoes}
-                              onChange={(e) => setEditForm((p) => ({ ...p, funcoes: e.target.value }))}
-                              placeholder="Funções (uma por linha)"
-                            />
-                            <div className="flex gap-2">
+                          <div className="space-y-3 bg-slate-50 rounded-lg p-4 border border-slate-200">
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1 col-span-2">
+                                <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Nome</Label>
+                                <Input value={editForm.nome} onChange={(e) => setEditForm((p) => ({ ...p, nome: e.target.value }))} placeholder="Nome" />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Cargo</Label>
+                                <Input value={editForm.cargo} onChange={(e) => setEditForm((p) => ({ ...p, cargo: e.target.value }))} placeholder="Cargo" />
+                              </div>
+                              <div className="space-y-1">
+                                <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Departamento</Label>
+                                <Select value={editForm.departamento} onValueChange={(v) => setEditForm((p) => ({ ...p, departamento: v }))}>
+                                  <SelectTrigger><SelectValue /></SelectTrigger>
+                                  <SelectContent>
+                                    {departments.map((d) => (
+                                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </div>
+                            </div>
+                            <div className="space-y-1">
+                              <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Funções (uma por linha)</Label>
+                              <textarea
+                                className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 min-h-[60px] resize-none"
+                                value={editForm.funcoes}
+                                onChange={(e) => setEditForm((p) => ({ ...p, funcoes: e.target.value }))}
+                                placeholder="Funções (uma por linha)"
+                              />
+                            </div>
+                            <div className="flex gap-2 pt-1">
                               <Button size="sm" onClick={saveEdit}>Salvar</Button>
                               <Button size="sm" variant="outline" onClick={() => setEditingColab(null)}>Cancelar</Button>
                             </div>
