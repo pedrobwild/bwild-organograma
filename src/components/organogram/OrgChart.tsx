@@ -33,7 +33,7 @@ export default function OrgChart() {
               <p className="text-[11px] text-white/50 font-medium uppercase tracking-widest">Organograma</p>
             </div>
           </div>
-          <DepartmentLegend departments={departments} highlightDept={highlightDept} onHover={setHighlightDept} />
+          <DepartmentLegend departments={departments} highlightDept={highlightDept} onChange={setHighlightDept} />
         </div>
       </header>
 
