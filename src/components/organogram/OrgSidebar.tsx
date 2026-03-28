@@ -51,15 +51,15 @@ export function OrgSidebar({
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 420, opacity: 0 }}
         transition={{ type: "spring", damping: 32, stiffness: 320 }}
-        className="fixed right-0 top-0 bottom-0 w-full max-w-[420px] z-50 overflow-y-auto"
+        className="fixed right-0 top-0 bottom-0 w-full max-w-[420px] z-50 flex flex-col"
         style={{
           background: "linear-gradient(180deg, #ffffff 0%, #f8f9fb 100%)",
           boxShadow: "-20px 0 60px -10px rgba(0,0,0,0.3)",
         }}
       >
-        {/* Header */}
+        {/* Header — fixed */}
         <div
-          className="relative px-6 pt-6 pb-8"
+          className="relative px-6 pt-6 pb-8 flex-shrink-0"
           style={{
             background: `linear-gradient(135deg, ${colors.bg} 0%, ${colors.bg}dd 100%)`,
           }}
@@ -101,8 +101,8 @@ export function OrgSidebar({
           </div>
         </div>
 
-        {/* Content */}
-        <div className="px-6 py-6 space-y-6">
+        {/* Content — scrollable */}
+        <div className="flex-1 overflow-y-auto scrollbar-thin px-6 py-6 space-y-6">
           {/* Responsabilidades */}
           <div>
             <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
@@ -118,7 +118,7 @@ export function OrgSidebar({
                   style={{ background: "#f4f6f9" }}
                 >
                   <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: colors.bg }} />
-                  <span className="text-sm" style={{ color: "#374151" }}>{funcao}</span>
+                  <span className="text-sm break-words min-w-0" style={{ color: "#374151" }}>{funcao}</span>
                 </div>
               ))}
             </div>
@@ -142,9 +142,9 @@ export function OrgSidebar({
                 >
                   {getInitials(superior.nome)}
                 </div>
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: "#0f2137" }}>{superior.nome}</p>
-                  <p className="text-xs" style={{ color: "#7a8ca0" }}>{superior.cargo}</p>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold truncate" style={{ color: "#0f2137" }}>{superior.nome}</p>
+                  <p className="text-xs truncate" style={{ color: "#7a8ca0" }}>{superior.cargo}</p>
                 </div>
               </button>
             </div>
@@ -173,11 +173,11 @@ export function OrgSidebar({
                         ? <User className="w-5 h-5" />
                         : getInitials(subordinado.nome)}
                     </div>
-                    <div>
-                      <p className="text-sm font-semibold" style={{ color: "#0f2137" }}>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate" style={{ color: "#0f2137" }}>
                         {subordinado.nome}
                       </p>
-                      <p className="text-xs" style={{ color: "#7a8ca0" }}>
+                      <p className="text-xs truncate" style={{ color: "#7a8ca0" }}>
                         {subordinado.cargo}
                       </p>
                     </div>
