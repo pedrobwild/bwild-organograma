@@ -393,26 +393,7 @@ export default function Admin() {
             ) : (
               <div className="grid gap-3">
                 {deptColors?.map((dc) => (
-                  <Card key={dc.id}>
-                    <CardContent className="flex items-center gap-4 py-4">
-                      <input
-                        type="color"
-                        value={dc.bg}
-                        onChange={(e) => handleSaveColor(dc.id, e.target.value)}
-                        className="w-10 h-10 rounded border cursor-pointer flex-shrink-0"
-                      />
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm" style={{ color: "#0f2137" }}>{dc.departamento}</p>
-                        <p className="text-xs text-muted-foreground">{dc.bg}</p>
-                      </div>
-                      <div
-                        className="px-3 py-1 rounded-full text-xs font-semibold"
-                        style={{ backgroundColor: dc.bg, color: dc.text_color }}
-                      >
-                        Preview
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <DeptColorCard key={dc.id} dc={dc} onSave={handleSaveColor} />
                 ))}
               </div>
             )}
