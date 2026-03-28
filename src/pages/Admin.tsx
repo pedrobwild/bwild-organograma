@@ -389,28 +389,42 @@ export default function Admin() {
                     <Plus className="w-4 h-4 mr-1" /> Novo departamento
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Novo departamento</DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-3 pt-2">
-                    <div className="space-y-1">
-                      <Label>Nome do departamento</Label>
-                      <Input value={newDeptForm.departamento} onChange={(e) => setNewDeptForm((p) => ({ ...p, departamento: e.target.value }))} />
+                <DialogContent className="sm:max-w-[420px] p-0 gap-0 overflow-hidden">
+                  <div className="bg-gradient-to-r from-slate-800 to-slate-700 px-6 py-5">
+                    <DialogHeader>
+                      <DialogTitle className="text-white flex items-center gap-2 text-base">
+                        <Palette className="w-4 h-4" /> Novo departamento
+                      </DialogTitle>
+                      <p className="text-slate-300 text-xs mt-1">Defina o nome e a cor do departamento</p>
+                    </DialogHeader>
+                  </div>
+                  <div className="px-6 py-5 space-y-4">
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Nome do departamento</Label>
+                      <Input value={newDeptForm.departamento} onChange={(e) => setNewDeptForm((p) => ({ ...p, departamento: e.target.value }))} placeholder="Ex: Financeiro" />
                     </div>
-                    <div className="space-y-1">
-                      <Label>Cor</Label>
+                    <div className="space-y-1.5">
+                      <Label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Cor</Label>
                       <div className="flex items-center gap-3">
                         <input
                           type="color"
                           value={newDeptForm.bg}
                           onChange={(e) => setNewDeptForm((p) => ({ ...p, bg: e.target.value }))}
-                          className="w-10 h-10 rounded border cursor-pointer"
+                          className="w-10 h-10 rounded-lg border border-input cursor-pointer"
                         />
-                        <Input value={newDeptForm.bg} onChange={(e) => setNewDeptForm((p) => ({ ...p, bg: e.target.value }))} className="flex-1" />
+                        <Input value={newDeptForm.bg} onChange={(e) => setNewDeptForm((p) => ({ ...p, bg: e.target.value }))} className="flex-1 font-mono text-xs" />
+                        <div
+                          className="px-3 py-1.5 rounded-full text-xs font-semibold"
+                          style={{ backgroundColor: newDeptForm.bg, color: "#fff" }}
+                        >
+                          Preview
+                        </div>
                       </div>
                     </div>
-                    <Button onClick={handleCreateDept} className="w-full">Criar</Button>
+                  </div>
+                  <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-2">
+                    <Button variant="outline" size="sm" onClick={() => setNewDeptOpen(false)}>Cancelar</Button>
+                    <Button size="sm" onClick={handleCreateDept}>Criar departamento</Button>
                   </div>
                 </DialogContent>
               </Dialog>
