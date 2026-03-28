@@ -1,6 +1,8 @@
+import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import logoSrc from "@/assets/logo-bwild.png";
 import { useOrganogram } from "@/hooks/use-organogram";
+import { setDeptColorMap } from "@/lib/deptColors";
 import { DepartmentLegend } from "./DepartmentLegend";
 import { OrgNode } from "./OrgNode";
 import { OrgSidebar } from "./OrgSidebar";
@@ -28,7 +30,16 @@ export default function OrgChart() {
     zoomOut,
     resetView,
     closeSidebar,
+    isLoading,
+    deptColorMap,
   } = useOrganogram();
+
+  // Sync dynamic dept colors
+  useEffect(() => {
+    if (deptColorMap && Object.keys(deptColorMap).length > 0) {
+      setDeptColorMap(deptColorMap);
+    }
+  }, [deptColorMap]);
 
   if (!root) {
     return (
