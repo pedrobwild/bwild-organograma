@@ -1,42 +1,94 @@
 import { AnimatePresence } from "framer-motion";
+import logoSrc from "@/assets/logo-bwild.png";
+import { useOrganogram } from "@/hooks/use-organogram";
+import { DepartmentLegend } from "./DepartmentLegend";
 import { OrgNode } from "./OrgNode";
 import { OrgSidebar } from "./OrgSidebar";
-import { DepartmentLegend } from "./DepartmentLegend";
 import { OrgToolbar } from "./OrgToolbar";
-import { useOrganogram } from "@/hooks/use-organogram";
-import logoSrc from "@/assets/logo-bwild.png";
 
 export default function OrgChart() {
   const {
-    companyName, selectedPerson, closeSidebar, highlightDept, setHighlightDept,
-    byId, root, departments, handleSelectPerson, highlightPath,
-    zoom, pan, isDragging, containerRef,
-    handleMouseDown, handleMouseMove, handleMouseUp,
-    zoomIn, zoomOut, resetView,
+    companyName,
+    byId,
+    root,
+    departments,
+    selectedPerson,
+    highlightDept,
+    setHighlightDept,
+    highlightPath,
+    zoom,
+    pan,
+    isDragging,
+    containerRef,
+    handleSelectPerson,
+    handleMouseDown,
+    handleMouseMove,
+    handleMouseUp,
+    zoomIn,
+    zoomOut,
+    resetView,
+    closeSidebar,
   } = useOrganogram();
 
-  if (!root) return null;
+  if (!root) {
+    return (
+      <div className="h-screen flex items-center justify-center" style={{ background: "rgba(10,30,60,0.9)" }}>
+        <p className="text-white/60 text-sm">
+          Nenhum nó raiz encontrado no organograma.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div
       className="h-screen font-body relative overflow-hidden flex flex-col"
-      style={{ backgroundImage: "url('/images/bg-bwild.png')", backgroundSize: "cover", backgroundPosition: "center" }}
+      style={{
+        backgroundImage: "url('/images/bg-bwild.png')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+      }}
     >
-      <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(180deg, rgba(10,30,60,0.55) 0%, rgba(10,30,60,0.35) 100%)" }} />
+      {/* Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{ background: "linear-gradient(180deg, rgba(10,30,60,0.55) 0%, rgba(10,30,60,0.35) 100%)" }}
+      />
 
-      <header className="relative z-30 px-6 py-3 flex-shrink-0" style={{ background: "rgba(10,30,60,0.7)", backdropFilter: "blur(20px)", borderBottom: "1px solid rgba(255,255,255,0.08)" }}>
+      {/* Header */}
+      <header
+        className="relative z-30 px-6 py-3 flex-shrink-0"
+        style={{
+          background: "rgba(10,30,60,0.7)",
+          backdropFilter: "blur(20px)",
+          borderBottom: "1px solid rgba(255,255,255,0.08)",
+        }}
+      >
         <div className="max-w-[1800px] mx-auto flex items-center justify-between gap-4 flex-wrap">
           <div className="flex items-center gap-3">
-            <img src={logoSrc} alt="Bwild" className="h-9 w-auto rounded-lg" />
+            <div className="h-9 w-9 rounded-lg overflow-hidden flex-shrink-0">
+              <img src={logoSrc} alt={companyName} className="h-full w-full object-cover" />
+            </div>
+
             <div>
-              <h1 className="font-display text-lg font-bold text-white tracking-tight leading-tight">{companyName}</h1>
-              <p className="text-[11px] text-white/50 font-medium uppercase tracking-widest">Organograma</p>
+              <p className="text-[10px] text-white/40 font-semibold uppercase tracking-[0.2em] leading-none">
+                Estrutura organizacional
+              </p>
+              <h1 className="font-display text-lg font-bold text-white tracking-tight leading-tight">
+                {companyName} Org Chart
+              </h1>
             </div>
           </div>
-          <DepartmentLegend departments={departments} highlightDept={highlightDept} onChange={setHighlightDept} />
+
+          <DepartmentLegend
+            departments={departments}
+            highlightDept={highlightDept}
+            onChange={setHighlightDept}
+          />
         </div>
       </header>
 
+      {/* Canvas */}
       <div
         ref={containerRef}
         className="relative z-10 flex-1 overflow-hidden select-none"
