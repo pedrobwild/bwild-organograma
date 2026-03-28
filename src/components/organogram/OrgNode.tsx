@@ -236,28 +236,30 @@ export function OrgNode({
                   }}
                 />
 
-                {/* Horizontal bar */}
+                {/* Children with horizontal bar segments */}
                 <div className="relative flex items-start gap-4">
-                  <div
-                    className="absolute top-0 pointer-events-none"
-                    style={{
-                      left: 0,
-                      right: 0,
-                      height: 2,
-                      background: "rgba(148,163,184,0.55)",
-                    }}
-                  />
-
-                  {/* Children with vertical drop lines */}
-                  {children.map((child) => {
+                  {children.map((child, index) => {
+                    const isFirst = index === 0;
+                    const isLast = index === children.length - 1;
                     const childActive = highlightPath.has(child.id);
                     const connectorColor =
                       isInPath && childActive
                         ? "#60a5fa"
                         : "rgba(148,163,184,0.55)";
+                    const barColor = isInPath ? "#60a5fa" : "rgba(148,163,184,0.55)";
 
                     return (
-                      <div key={child.id} className="flex flex-col items-center">
+                      <div key={child.id} className="flex flex-col items-center relative">
+                        {/* Horizontal bar segment */}
+                        <div
+                          className="absolute top-0 h-[2px] pointer-events-none"
+                          style={{
+                            left: isFirst ? "50%" : 0,
+                            right: isLast ? "50%" : 0,
+                            background: barColor,
+                          }}
+                        />
+                        {/* Vertical drop */}
                         <div
                           className="w-[2px] transition-colors duration-300"
                           style={{ height: 18, background: connectorColor }}
