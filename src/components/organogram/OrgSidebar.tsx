@@ -1,3 +1,4 @@
+import { useRef, useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowDownRight,
@@ -34,6 +35,24 @@ export function OrgSidebar({
 
   const colors = getDeptColor(person.departamento);
   const initials = getInitials(person.nome);
+
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setCanScrollDown(el.scrollHeight - el.scrollTop - el.clientHeight > 20);
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const el = scrollRef.current;
+    if (!el) return;
+    el.addEventListener("scroll", checkScroll, { passive: true });
+    return () => el.removeEventListener("scroll", checkScroll);
+  }, [checkScroll, person.id]);
+
 
   return (
     <>
@@ -102,9 +121,13 @@ export function OrgSidebar({
         </div>
 
         {/* Content — scrollable */}
-        <div className="flex-1 overflow-y-auto scrollbar-thin px-6 py-6 space-y-6">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto scroll-smooth scrollbar-thin px-6 py-6 space-y-6 relative">
           {/* Responsabilidades */}
-          <div>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.3 }}
+          >
             <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
               <Briefcase className="w-3.5 h-3.5" />
               Responsabilidades
@@ -112,21 +135,28 @@ export function OrgSidebar({
 
             <div className="space-y-2">
               {person.funcoes.map((funcao, i) => (
-                <div
+                <motion.div
                   key={i}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.2 + i * 0.04, duration: 0.25 }}
                   className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg"
                   style={{ background: "#f4f6f9" }}
                 >
                   <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: colors.bg }} />
                   <span className="text-sm break-words min-w-0" style={{ color: "#374151" }}>{funcao}</span>
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
 
           {/* Superior */}
           {superior && (
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25, duration: 0.3 }}
+            >
               <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
                 <ArrowUpRight className="w-3.5 h-3.5" />
                 Superior direto
@@ -147,21 +177,28 @@ export function OrgSidebar({
                   <p className="text-xs truncate" style={{ color: "#7a8ca0" }}>{superior.cargo}</p>
                 </div>
               </button>
-            </div>
+            </motion.div>
           )}
 
           {/* Subordinados */}
           {subordinados.length > 0 && (
-            <div>
+            <motion.div
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.3 }}
+            >
               <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
                 <ArrowDownRight className="w-3.5 h-3.5" />
                 Liderados diretos
               </h3>
 
               <div className="space-y-2">
-                {subordinados.map((subordinado) => (
-                  <button
+                {subordinados.map((subordinado, i) => (
+                  <motion.button
                     key={subordinado.id}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.35 + i * 0.04, duration: 0.25 }}
                     onClick={() => onNavigate(subordinado)}
                     className="flex w-full items-center gap-3 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-left transition-all hover:-translate-y-0.5 hover:shadow-md"
                   >
@@ -181,12 +218,32 @@ export function OrgSidebar({
                         {subordinado.cargo}
                       </p>
                     </div>
-                  </button>
+                  </motion.button>
                 ))}
               </div>
-            </div>
+            </motion.div>
           )}
         </div>
+
+        {/* Scroll indicator */}
+        <motion.div
+          initial={false}
+          animate={{ opacity: canScrollDown ? 1 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="absolute bottom-0 left-0 right-0 h-16 pointer-events-none z-10"
+          style={{
+            background: "linear-gradient(to top, rgba(248,249,251,1) 0%, rgba(248,249,251,0) 100%)",
+          }}
+        >
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex flex-col items-center gap-0.5">
+            <motion.div
+              animate={{ y: [0, 4, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            >
+              <ArrowDownRight className="w-4 h-4 rotate-45" style={{ color: "#7a8ca0" }} />
+            </motion.div>
+          </div>
+        </motion.div>
       </motion.div>
     </>
   );
