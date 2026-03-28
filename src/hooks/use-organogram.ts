@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import organograma from "@/data/organograma.json";
-import { Colaborador, OrganogramaData } from "@/types/organogram";
+import { useColaboradores, useDepartmentColors } from "@/hooks/use-colaboradores";
+import { Colaborador } from "@/types/organogram";
 import {
   buildByIdMap,
   getDepartments,
@@ -13,8 +13,22 @@ const MIN_ZOOM = 0.45;
 const MAX_ZOOM = 1.8;
 
 export function useOrganogram() {
-  const data = organograma as OrganogramaData;
-  const colaboradores = data.colaboradores;
+  const { data: colaboradores = [], isLoading } = useColaboradores();
+  const { data: deptColorRows = [] } = useDepartmentColors();
+
+  // Build dept color map for deptColors lib
+  const deptColorMap = useMemo(() => {
+    const map: Record<string, { bg: string; text: string; light: string; border: string }> = {};
+    for (const row of deptColorRows) {
+      map[row.departamento] = {
+        bg: row.bg,
+        text: row.text_color,
+        light: `${row.bg}1f`,
+        border: `${row.bg}4d`,
+      };
+    }
+    return map;
+  }, [deptColorRows]);
 
   const byId = useMemo(() => buildByIdMap(colaboradores), [colaboradores]);
   const root = useMemo(() => getRootNode(colaboradores), [colaboradores]);
@@ -104,7 +118,7 @@ export function useOrganogram() {
   }, []);
 
   return {
-    companyName: data.empresa,
+    companyName: "Bwild",
     colaboradores,
     byId,
     root,
@@ -125,5 +139,7 @@ export function useOrganogram() {
     zoomOut,
     resetView,
     closeSidebar: () => setSelectedPerson(null),
+    isLoading,
+    deptColorMap,
   };
 }
