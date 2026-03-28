@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import type { Colaborador } from "@/types/organogram";
-import { buildLookupMap, computeHighlightPath } from "@/lib/organogram";
+import { buildByIdMap, getHighlightPath } from "@/lib/organogram";
 import orgData from "@/data/organograma.json";
 
 export function useOrganogram() {
@@ -8,7 +8,7 @@ export function useOrganogram() {
   const [highlightDept, setHighlightDept] = useState<string | null>(null);
 
   const colaboradores = orgData.colaboradores as Colaborador[];
-  const byId = useMemo(() => buildLookupMap(colaboradores), [colaboradores]);
+  const byId = useMemo(() => buildByIdMap(colaboradores), [colaboradores]);
   const root = colaboradores.find((c) => c.nivel === 0)!;
   const departments = useMemo(
     () => [...new Set(colaboradores.map((c) => c.departamento))],
@@ -20,7 +20,7 @@ export function useOrganogram() {
   }, []);
 
   const highlightPath = useMemo(
-    () => computeHighlightPath(selectedPerson, byId),
+    () => getHighlightPath(selectedPerson, byId),
     [selectedPerson, byId]
   );
 
