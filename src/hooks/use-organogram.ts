@@ -1,100 +1,129 @@
-import { useState, useMemo, useCallback, useRef, useEffect } from "react";
-import type { Colaborador } from "@/types/organogram";
-import { buildByIdMap, getHighlightPath } from "@/lib/organogram";
-import orgData from "@/data/organograma.json";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import organograma from "@/data/organograma.json";
+import { Colaborador, OrganogramaData } from "@/types/organogram";
+import {
+  buildByIdMap,
+  getDepartments,
+  getHighlightPath,
+  getRootNode,
+} from "@/lib/organogram";
+
+const INITIAL_ZOOM = 0.9;
+const MIN_ZOOM = 0.45;
+const MAX_ZOOM = 1.8;
 
 export function useOrganogram() {
+  const data = organograma as OrganogramaData;
+  const colaboradores = data.colaboradores;
+
+  const byId = useMemo(() => buildByIdMap(colaboradores), [colaboradores]);
+  const root = useMemo(() => getRootNode(colaboradores), [colaboradores]);
+  const departments = useMemo(() => getDepartments(colaboradores), [colaboradores]);
+
   const [selectedPerson, setSelectedPerson] = useState<Colaborador | null>(null);
   const [highlightDept, setHighlightDept] = useState<string | null>(null);
 
-  const colaboradores = orgData.colaboradores as Colaborador[];
-  const byId = useMemo(() => buildByIdMap(colaboradores), [colaboradores]);
-  const root = colaboradores.find((c) => c.nivel === 0)!;
-  const departments = useMemo(
-    () => [...new Set(colaboradores.map((c) => c.departamento))],
-    [colaboradores]
-  );
+  const [zoom, setZoom] = useState(INITIAL_ZOOM);
+  const [pan, setPan] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
 
-  const handleSelectPerson = useCallback((p: Colaborador) => {
-    setSelectedPerson((prev) => (prev?.id === p.id ? null : p));
-  }, []);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
 
   const highlightPath = useMemo(
     () => getHighlightPath(selectedPerson, byId),
     [selectedPerson, byId]
   );
 
-  return {
-    selectedPerson,
-    setSelectedPerson,
-    highlightDept,
-    setHighlightDept,
-    colaboradores,
-    byId,
-    root,
-    departments,
-    handleSelectPerson,
-    highlightPath,
-  };
-}
+  const zoomIn = useCallback(() => {
+    setZoom((prev) => Math.min(MAX_ZOOM, prev + 0.15));
+  }, []);
 
-export function usePanZoom() {
-  const [zoom, setZoom] = useState(0.85);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isDragging, setIsDragging] = useState(false);
-  const dragStart = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
-  const containerRef = useRef<HTMLDivElement>(null);
+  const zoomOut = useCallback(() => {
+    setZoom((prev) => Math.max(MIN_ZOOM, prev - 0.15));
+  }, []);
+
+  const resetView = useCallback(() => {
+    setZoom(INITIAL_ZOOM);
+    setPan({ x: 0, y: 0 });
+  }, []);
+
+  const handleSelectPerson = useCallback((person: Colaborador) => {
+    setSelectedPerson((prev) => (prev?.id === person.id ? null : person));
+  }, []);
 
   const handleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if ((e.target as HTMLElement).closest("button")) return;
+    (event: React.MouseEvent<HTMLDivElement>) => {
+      if ((event.target as HTMLElement).closest("button")) return;
+
       setIsDragging(true);
-      dragStart.current = { x: e.clientX, y: e.clientY, panX: pan.x, panY: pan.y };
+      dragStartRef.current = {
+        x: event.clientX,
+        y: event.clientY,
+        panX: pan.x,
+        panY: pan.y,
+      };
     },
     [pan]
   );
 
   const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
+    (event: React.MouseEvent<HTMLDivElement>) => {
       if (!isDragging) return;
-      const dx = e.clientX - dragStart.current.x;
-      const dy = e.clientY - dragStart.current.y;
-      setPan({ x: dragStart.current.panX + dx, y: dragStart.current.panY + dy });
+
+      const dx = event.clientX - dragStartRef.current.x;
+      const dy = event.clientY - dragStartRef.current.y;
+
+      setPan({
+        x: dragStartRef.current.panX + dx,
+        y: dragStartRef.current.panY + dy,
+      });
     },
     [isDragging]
   );
 
-  const handleMouseUp = useCallback(() => setIsDragging(false), []);
-
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      const delta = e.deltaY > 0 ? -0.05 : 0.05;
-      setZoom((z) => Math.max(0.3, Math.min(2, z + delta)));
-    };
-    el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
+  const handleMouseUp = useCallback(() => {
+    setIsDragging(false);
   }, []);
 
-  const zoomIn = () => setZoom((z) => Math.min(2, z + 0.15));
-  const zoomOut = () => setZoom((z) => Math.max(0.3, z - 0.15));
-  const resetView = () => {
-    setZoom(0.85);
-    setPan({ x: 0, y: 0 });
-  };
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element) return;
+
+    const handleWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const delta = event.deltaY > 0 ? -0.05 : 0.05;
+      setZoom((prev) => Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, prev + delta)));
+    };
+
+    element.addEventListener("wheel", handleWheel, { passive: false });
+
+    return () => {
+      element.removeEventListener("wheel", handleWheel);
+    };
+  }, []);
 
   return {
+    companyName: data.empresa,
+    colaboradores,
+    byId,
+    root,
+    departments,
+    selectedPerson,
+    highlightDept,
+    setHighlightDept,
+    highlightPath,
     zoom,
     pan,
     isDragging,
     containerRef,
+    handleSelectPerson,
     handleMouseDown,
     handleMouseMove,
     handleMouseUp,
     zoomIn,
     zoomOut,
     resetView,
+    closeSidebar: () => setSelectedPerson(null),
   };
 }
