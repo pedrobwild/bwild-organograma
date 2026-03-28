@@ -1,23 +1,21 @@
 import { AnimatePresence } from "framer-motion";
-import orgData from "@/data/organograma.json";
 import { OrgNode } from "./OrgNode";
 import { OrgSidebar } from "./OrgSidebar";
 import { DepartmentLegend } from "./DepartmentLegend";
 import { OrgToolbar } from "./OrgToolbar";
-import { useOrganogram, usePanZoom } from "@/hooks/use-organogram";
+import { useOrganogram } from "@/hooks/use-organogram";
 import logoSrc from "@/assets/logo-bwild.png";
 
 export default function OrgChart() {
   const {
-    selectedPerson, setSelectedPerson, highlightDept, setHighlightDept,
+    companyName, selectedPerson, closeSidebar, highlightDept, setHighlightDept,
     byId, root, departments, handleSelectPerson, highlightPath,
-  } = useOrganogram();
-
-  const {
     zoom, pan, isDragging, containerRef,
     handleMouseDown, handleMouseMove, handleMouseUp,
     zoomIn, zoomOut, resetView,
-  } = usePanZoom();
+  } = useOrganogram();
+
+  if (!root) return null;
 
   return (
     <div
@@ -31,7 +29,7 @@ export default function OrgChart() {
           <div className="flex items-center gap-3">
             <img src={logoSrc} alt="Bwild" className="h-9 w-auto rounded-lg" />
             <div>
-              <h1 className="font-display text-lg font-bold text-white tracking-tight leading-tight">{orgData.empresa}</h1>
+              <h1 className="font-display text-lg font-bold text-white tracking-tight leading-tight">{companyName}</h1>
               <p className="text-[11px] text-white/50 font-medium uppercase tracking-widest">Organograma</p>
             </div>
           </div>
@@ -74,7 +72,7 @@ export default function OrgChart() {
           <OrgSidebar
             person={selectedPerson}
             byId={byId}
-            onClose={() => setSelectedPerson(null)}
+            onClose={closeSidebar}
             onNavigate={handleSelectPerson}
           />
         )}
