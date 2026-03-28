@@ -1,4 +1,4 @@
-import OrgChart from "@/components/OrgChart";
+import OrgChart from "@/components/organogram/OrgChart";
 
 const Index = () => <OrgChart />;
 

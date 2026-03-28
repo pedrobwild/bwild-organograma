@@ -1,16 +1,16 @@
 import { motion } from "framer-motion";
 import { X, User, ArrowUpRight, ArrowDownRight, Briefcase, CheckCircle2, Building2 } from "lucide-react";
-import { Colaborador } from "./OrgChart";
+import type { Colaborador } from "@/types/organogram";
 import { getDeptColor } from "@/lib/deptColors";
 
-interface PersonDetailProps {
+interface OrgSidebarProps {
   person: Colaborador;
   byId: Map<string, Colaborador>;
   onClose: () => void;
   onNavigate: (p: Colaborador) => void;
 }
 
-export function PersonDetail({ person, byId, onClose, onNavigate }: PersonDetailProps) {
+export function OrgSidebar({ person, byId, onClose, onNavigate }: OrgSidebarProps) {
   const superior = person.superior ? byId.get(person.superior) : null;
   const subordinados = person.subordinados
     .map((id) => byId.get(id))
@@ -39,7 +39,6 @@ export function PersonDetail({ person, byId, onClose, onNavigate }: PersonDetail
           boxShadow: "-20px 0 60px -10px rgba(0,0,0,0.3)",
         }}
       >
-        {/* Header with dept color */}
         <div
           className="relative px-6 pt-6 pb-8"
           style={{
@@ -73,7 +72,6 @@ export function PersonDetail({ person, byId, onClose, onNavigate }: PersonDetail
         </div>
 
         <div className="px-6 py-6 space-y-6">
-          {/* Funções */}
           <div>
             <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
               <Briefcase className="w-3.5 h-3.5" />
@@ -81,11 +79,7 @@ export function PersonDetail({ person, byId, onClose, onNavigate }: PersonDetail
             </h3>
             <div className="space-y-2">
               {person.funcoes.map((f, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg"
-                  style={{ background: "#f4f6f9" }}
-                >
+                <div key={i} className="flex items-start gap-2.5 px-3 py-2.5 rounded-lg" style={{ background: "#f4f6f9" }}>
                   <CheckCircle2 className="w-4 h-4 mt-0.5 flex-shrink-0" style={{ color: colors.bg }} />
                   <span className="text-sm" style={{ color: "#374151" }}>{f}</span>
                 </div>
@@ -93,7 +87,6 @@ export function PersonDetail({ person, byId, onClose, onNavigate }: PersonDetail
             </div>
           </div>
 
-          {/* Superior */}
           {superior && (
             <div>
               <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
@@ -119,7 +112,6 @@ export function PersonDetail({ person, byId, onClose, onNavigate }: PersonDetail
             </div>
           )}
 
-          {/* Subordinados */}
           {subordinados.length > 0 && (
             <div>
               <h3 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-3" style={{ color: "#7a8ca0" }}>
@@ -150,7 +142,6 @@ export function PersonDetail({ person, byId, onClose, onNavigate }: PersonDetail
             </div>
           )}
 
-          {/* Footer info */}
           <div className="pt-4" style={{ borderTop: "1px solid #e8ecf1" }}>
             <div className="flex items-center justify-between text-sm">
               <span style={{ color: "#7a8ca0" }}>Nível hierárquico</span>

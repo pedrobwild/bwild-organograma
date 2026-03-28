@@ -1,18 +1,9 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { Colaborador } from "./OrgChart";
+import type { Colaborador } from "@/types/organogram";
 import { User, ChevronDown } from "lucide-react";
 import { useState, useRef, useEffect, ReactNode } from "react";
-import { getDeptColor, DEPT_COLORS } from "@/lib/deptColors";
-
-function getInitials(name: string) {
-  return name
-    .split(" ")
-    .filter(Boolean)
-    .map((w) => w[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
+import { getDeptColor } from "@/lib/deptColors";
+import { getInitials } from "@/lib/organogram";
 
 const LEVEL_SIZES: Record<number, { width: string; avatarSize: string; avatarIcon: string; nameSize: string; badgeSize: string; pad: string; minH: string }> = {
   0: { width: "200px", avatarSize: "w-14 h-14", avatarIcon: "text-xl", nameSize: "text-[15px]", badgeSize: "text-[11px]", pad: "20px 24px", minH: "110px" },
@@ -24,7 +15,6 @@ const LEVEL_SIZES: Record<number, { width: string; avatarSize: string; avatarIco
 
 const LINE_COLOR = "rgba(255,255,255,0.62)";
 const HIGHLIGHT_LINE_COLOR = "#60a5fa";
-
 const VERT_TOP = 28;
 const VERT_CHILD = 18;
 
@@ -116,38 +106,23 @@ function ChildrenConnector({
   const anyHighlighted = childInPath.some(Boolean);
   const mainVertColor = parentInPath && anyHighlighted ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
 
-  // Horizontal bar spans from leftmost to rightmost child center
   const hasPositions = childCenters.length >= 2;
   const barLeft = hasPositions ? Math.min(...childCenters) : 0;
   const barRight = hasPositions ? Math.max(...childCenters) : 0;
   const barWidth = barRight - barLeft;
-
-  // Parent center = container center (flex items-center on parent)
   const containerWidth = containerRef.current?.offsetWidth ?? 0;
   const parentCenter = containerWidth / 2;
 
   return (
     <div className="flex flex-col items-center mt-5">
-      {/* Vertical line from parent down to horizontal bar */}
       <div style={{ width: 2, height: VERT_TOP, background: mainVertColor, ...glowFor(mainVertColor === HIGHLIGHT_LINE_COLOR) }} />
-
       <div ref={containerRef} className="relative flex items-start gap-4">
-        {/* Base horizontal bar (dim) */}
         {hasPositions && (
           <div
             className="absolute pointer-events-none"
-            style={{
-              top: 0,
-              left: barLeft,
-              width: barWidth,
-              height: 2,
-              background: LINE_COLOR,
-              transition: "all 0.4s ease",
-            }}
+            style={{ top: 0, left: barLeft, width: barWidth, height: 2, background: LINE_COLOR, transition: "all 0.4s ease" }}
           />
         )}
-
-        {/* Highlighted segments on the horizontal bar */}
         {hasPositions && parentInPath &&
           childCenters.map((center, i) => {
             if (!childInPath[i]) return null;
@@ -157,19 +132,10 @@ function ChildrenConnector({
               <div
                 key={`hl-${i}`}
                 className="absolute pointer-events-none"
-                style={{
-                  top: 0,
-                  left: segLeft,
-                  width: segWidth,
-                  height: 2,
-                  background: HIGHLIGHT_LINE_COLOR,
-                  ...glowFor(true),
-                }}
+                style={{ top: 0, left: segLeft, width: segWidth, height: 2, background: HIGHLIGHT_LINE_COLOR, ...glowFor(true) }}
               />
             );
           })}
-
-        {/* Child columns with vertical drop lines */}
         {children.map((child, i) => {
           const color = childInPath[i] ? HIGHLIGHT_LINE_COLOR : LINE_COLOR;
           return (
@@ -195,18 +161,10 @@ interface OrgNodeProps {
 }
 
 export function OrgNode({
-  person,
-  byId,
-  onSelect,
-  selectedId,
-  highlightDept,
-  highlightPath,
-  depth = 0,
+  person, byId, onSelect, selectedId, highlightDept, highlightPath, depth = 0,
 }: OrgNodeProps) {
   const [collapsed, setCollapsed] = useState(false);
-  const children = person.subordinados
-    .map((id) => byId.get(id))
-    .filter(Boolean) as Colaborador[];
+  const children = person.subordinados.map((id) => byId.get(id)).filter(Boolean) as Colaborador[];
 
   const isSelected = selectedId === person.id;
   const isInPath = highlightPath.size > 0 && highlightPath.has(person.id);
@@ -224,11 +182,7 @@ export function OrgNode({
         data-node-card="true"
         layout
         initial={{ opacity: 0, y: 16 }}
-        animate={{
-          opacity: isDimmed ? 0.12 : 1,
-          y: 0,
-          scale: isSelected ? 1.06 : 1,
-        }}
+        animate={{ opacity: isDimmed ? 0.12 : 1, y: 0, scale: isSelected ? 1.06 : 1 }}
         transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
         whileHover={{ y: -4, boxShadow: `0 0 0 2px ${colors.bg}66, 0 24px 48px -12px rgba(0,0,0,0.45)` }}
         whileTap={{ scale: 0.97 }}
@@ -238,11 +192,7 @@ export function OrgNode({
           borderRadius: "16px",
           padding: level.pad,
           width: level.width,
-          background: isSelected
-            ? "rgba(255,255,255,1)"
-            : isInPath
-            ? "rgba(255,255,255,0.98)"
-            : "rgba(255,255,255,0.92)",
+          background: isSelected ? "rgba(255,255,255,1)" : isInPath ? "rgba(255,255,255,0.98)" : "rgba(255,255,255,0.92)",
           backdropFilter: "blur(12px)",
           boxShadow: isSelected
             ? `0 0 0 2.5px ${colors.bg}, 0 20px 50px -12px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.5)`
@@ -251,72 +201,39 @@ export function OrgNode({
             : "0 8px 32px -8px rgba(0,0,0,0.25), 0 2px 8px -2px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.5)",
         }}
       >
-        {/* Top accent gradient bar */}
-        <div
-          className="absolute top-0 left-0 right-0 h-[3px] rounded-t-[16px]"
-          style={{
-            background: `linear-gradient(90deg, ${colors.bg}, ${colors.bg}99)`,
-          }}
-        />
-
+        <div className="absolute top-0 left-0 right-0 h-[3px] rounded-t-[16px]" style={{ background: `linear-gradient(90deg, ${colors.bg}, ${colors.bg}99)` }} />
         <div className="flex flex-col items-center gap-2.5" style={{ minHeight: level.minH }}>
-          {/* Avatar with initials or placeholder icon */}
           <div
             className={`flex items-center justify-center rounded-full ${level.avatarSize} flex-shrink-0 ring-2 ring-white/80 shadow-md`}
             style={{
-              background: isPlaceholder
-                ? "rgba(150,160,175,0.5)"
-                : `linear-gradient(135deg, ${colors.bg}, ${colors.bg}cc)`,
+              background: isPlaceholder ? "rgba(150,160,175,0.5)" : `linear-gradient(135deg, ${colors.bg}, ${colors.bg}cc)`,
               color: colors.text,
             }}
           >
             {isPlaceholder ? (
               <User className={`${level.avatarIcon} opacity-60`} />
             ) : (
-              <span className={`font-display font-bold ${level.avatarIcon} leading-none`}>
-                {initials}
-              </span>
+              <span className={`font-display font-bold ${level.avatarIcon} leading-none`}>{initials}</span>
             )}
           </div>
-
-          {/* Name */}
-          <span
-            className={`font-display font-bold leading-tight ${level.nameSize} line-clamp-2`}
-            style={{ color: isPlaceholder ? "#8896a7" : "#0f2137" }}
-          >
+          <span className={`font-display font-bold leading-tight ${level.nameSize} line-clamp-2`} style={{ color: isPlaceholder ? "#8896a7" : "#0f2137" }}>
             {person.nome}
           </span>
-
-          {/* Role badge */}
           <span
             className={`font-body font-semibold leading-tight rounded-full px-3 py-1 ${level.badgeSize} text-center line-clamp-1 max-w-full truncate`}
-            style={{
-              color: colors.bg,
-              backgroundColor: colors.light,
-              border: `1px solid ${colors.border}`,
-            }}
+            style={{ color: colors.bg, backgroundColor: colors.light, border: `1px solid ${colors.border}` }}
           >
             {person.cargo}
           </span>
-
-          {/* Subordinate count indicator */}
           {children.length > 0 && (
-            <span
-              className="text-[9px] font-medium tracking-wide uppercase"
-              style={{ color: "rgba(15,33,55,0.35)" }}
-            >
+            <span className="text-[9px] font-medium tracking-wide uppercase" style={{ color: "rgba(15,33,55,0.35)" }}>
               {children.length} {children.length === 1 ? "report" : "reports"}
             </span>
           )}
         </div>
-
-        {/* Expand/collapse button */}
         {children.length > 0 && (
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setCollapsed(!collapsed);
-            }}
+            onClick={(e) => { e.stopPropagation(); setCollapsed(!collapsed); }}
             className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 w-7 h-7 rounded-full flex items-center justify-center transition-all hover:scale-110 z-10"
             style={{
               background: `linear-gradient(135deg, ${colors.bg}, ${colors.bg}dd)`,
@@ -324,9 +241,7 @@ export function OrgNode({
               boxShadow: `0 4px 12px -2px ${colors.bg}55`,
             }}
           >
-            <ChevronDown
-              className={`w-3.5 h-3.5 transition-transform duration-300 ${collapsed ? "-rotate-90" : ""}`}
-            />
+            <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-300 ${collapsed ? "-rotate-90" : ""}`} />
           </button>
         )}
       </motion.button>
@@ -341,10 +256,7 @@ export function OrgNode({
             transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             style={{ overflow: "hidden", transformOrigin: "top center" }}
           >
-            <ChildrenConnector
-              parentInPath={isInPath}
-              childInPath={children.map((c) => highlightPath.has(c.id))}
-            >
+            <ChildrenConnector parentInPath={isInPath} childInPath={children.map((c) => highlightPath.has(c.id))}>
               {children.map((child) => (
                 <OrgNode
                   key={child.id}
