@@ -163,29 +163,15 @@ export function OrgNode({
 
             <span
               className={cn(
-                "font-body font-semibold leading-tight rounded-full px-3 py-1 text-center line-clamp-1 max-w-full truncate",
+                "font-body font-medium leading-tight text-center line-clamp-1 max-w-full truncate tracking-wide uppercase",
                 level.role
               )}
               style={{
-                color: colors.bg,
-                backgroundColor: colors.light,
-                border: `1px solid ${colors.border}`,
+                color: "rgba(15,33,55,0.45)",
               }}
             >
               {person.cargo}
             </span>
-          </div>
-
-          {/* Meta info */}
-          <div className="flex flex-col items-center gap-0.5">
-            <span className="text-[9px] font-medium uppercase tracking-wider" style={{ color: "rgba(15,33,55,0.4)" }}>
-              {person.departamento}
-            </span>
-            {children.length > 0 && (
-              <span className="text-[9px] font-medium uppercase tracking-wide" style={{ color: "rgba(15,33,55,0.3)" }}>
-                {children.length} {children.length === 1 ? "liderado" : "liderados"}
-              </span>
-            )}
           </div>
         </div>
 
