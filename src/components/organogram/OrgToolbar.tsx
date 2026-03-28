@@ -1,4 +1,5 @@
-import { ZoomIn, ZoomOut, Maximize } from "lucide-react";
+import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface OrgToolbarProps {
   zoom: number;
@@ -7,37 +8,57 @@ interface OrgToolbarProps {
   onReset: () => void;
 }
 
-export function OrgToolbar({ zoom, onZoomIn, onZoomOut, onReset }: OrgToolbarProps) {
-  const actions = [
-    { icon: ZoomIn, action: onZoomIn, label: "Zoom in" },
-    { icon: ZoomOut, action: onZoomOut, label: "Zoom out" },
-    { icon: Maximize, action: onReset, label: "Reset" },
-  ];
-
+export function OrgToolbar({
+  zoom,
+  onZoomIn,
+  onZoomOut,
+  onReset,
+}: OrgToolbarProps) {
   return (
-    <div className="absolute bottom-6 left-6 z-30 flex flex-col gap-1.5">
-      {actions.map(({ icon: Icon, action, label }) => (
-        <button
-          key={label}
-          onClick={action}
-          title={label}
-          className="w-10 h-10 rounded-xl flex items-center justify-center transition-all hover:scale-105"
-          style={{
-            background: "rgba(255,255,255,0.15)",
-            backdropFilter: "blur(12px)",
-            border: "1px solid rgba(255,255,255,0.15)",
-            color: "white",
-          }}
-        >
-          <Icon className="w-4 h-4" />
-        </button>
-      ))}
+    <div className="absolute bottom-6 left-6 z-30 flex flex-col items-center gap-1">
       <div
-        className="text-center text-[10px] font-semibold mt-1 rounded-lg py-1"
-        style={{ color: "rgba(255,255,255,0.6)" }}
+        className="flex flex-col gap-1 rounded-xl p-1"
+        style={{
+          background: "rgba(255,255,255,0.12)",
+          backdropFilter: "blur(12px)",
+          border: "1px solid rgba(255,255,255,0.12)",
+        }}
+      >
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onZoomIn}
+          title="Zoom in"
+          className="w-9 h-9 text-white hover:bg-white/15 hover:text-white"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onZoomOut}
+          title="Zoom out"
+          className="w-9 h-9 text-white hover:bg-white/15 hover:text-white"
+        >
+          <ZoomOut className="w-4 h-4" />
+        </Button>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onReset}
+          title="Reset view"
+          className="w-9 h-9 text-white hover:bg-white/15 hover:text-white"
+        >
+          <Maximize2 className="w-4 h-4" />
+        </Button>
+      </div>
+
+      <span
+        className="text-[10px] font-semibold rounded-md py-0.5 px-2"
+        style={{ color: "rgba(255,255,255,0.55)" }}
       >
         {Math.round(zoom * 100)}%
-      </div>
+      </span>
     </div>
   );
 }
