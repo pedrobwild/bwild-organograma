@@ -9,3 +9,8 @@ export interface Colaborador {
   superior: string | null;
   subordinados: string[];
 }
+
+export interface OrganogramaData {
+  empresa: string;
+  colaboradores: Colaborador[];
+}
