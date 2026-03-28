@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback, useRef, useEffect } from "react";
 import type { Colaborador } from "@/types/organogram";
-import { buildLookupMap, computeHighlightPath } from "@/lib/organogram";
+import { buildByIdMap, getHighlightPath } from "@/lib/organogram";
 import orgData from "@/data/organograma.json";
 
 export function useOrganogram() {
