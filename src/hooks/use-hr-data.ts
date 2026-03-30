@@ -199,6 +199,29 @@ export function useHistoricoCargos(colaboradorId: string | null) {
   });
 }
 
+export function useCreateHistorico() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (row: {
+      colaborador_id: string;
+      cargo_anterior?: string | null;
+      cargo_novo: string;
+      salario_anterior?: number | null;
+      salario_novo?: number | null;
+      data_mudanca: string;
+      motivo?: string | null;
+    }) => {
+      const { error } = await supabase.from("historico_cargos").insert(row);
+      if (error) throw error;
+      return row.colaborador_id;
+    },
+    onSuccess: (_d, v) => {
+      qc.invalidateQueries({ queryKey: ["historico_cargos", v.colaborador_id] });
+      qc.invalidateQueries({ queryKey: ["dashboard_historico"] });
+    },
+  });
+}
+
 // ─── Full colaborador row (with new HR columns) ───
 export function useColaboradorFull(colaboradorId: string | null) {
   return useQuery({

@@ -62,7 +62,7 @@ export function useOrganogram() {
   const [selectedPerson, setSelectedPerson] = useState<Colaborador | null>(null);
   const [highlightDept, setHighlightDept] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [showDesligados, setShowDesligados] = useState(true);
+  const [showDesligados, setShowDesligados] = useState(false);
   const [viewMode, setViewMode] = useState<"tree" | "list">("tree");
   const [isFullscreen, setIsFullscreen] = useState(false);
 
