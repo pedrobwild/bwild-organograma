@@ -196,8 +196,8 @@ function OrgConnectors({
 
   const vDrop = 48;
   const curveR = 16;
-  const strokeW = 2.5;
-  const dashArray = isPJ ? "6 4" : "none";
+  const strokeW = 3.5;
+  const dashArray = isPJ ? "8 5" : "none";
 
   if (childCount === 1) {
     const color = isInPath && highlightPath.has(children[0].id)
