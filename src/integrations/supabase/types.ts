@@ -14,41 +14,145 @@ export type Database = {
   }
   public: {
     Tables: {
+      beneficios_colaborador: {
+        Row: {
+          ativo: boolean | null
+          colaborador_id: string
+          created_at: string | null
+          descricao: string | null
+          id: string
+          tipo: string
+          valor: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          colaborador_id: string
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          tipo: string
+          valor?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          colaborador_id?: string
+          created_at?: string | null
+          descricao?: string | null
+          id?: string
+          tipo?: string
+          valor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "beneficios_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       colaboradores: {
         Row: {
+          agencia: string | null
+          banco: string | null
+          carga_horaria: string | null
           cargo: string
+          cep: string | null
+          chave_pix: string | null
+          cidade: string | null
+          conta: string | null
+          cpf: string | null
           created_at: string
+          data_desligamento: string | null
+          data_inicio: string | null
+          data_nascimento: string | null
           departamento: string
+          email_corporativo: string | null
+          email_pessoal: string | null
+          endereco: string | null
+          estado: string | null
           foto_url: string | null
           funcoes: string[]
           id: string
+          motivo_desligamento: string | null
           nivel: number
           nome: string
+          observacoes: string | null
+          salario_base: number | null
+          status: string
           superior_id: string | null
+          telefone: string | null
+          tipo_conta: string | null
+          tipo_contrato: string | null
           updated_at: string
         }
         Insert: {
+          agencia?: string | null
+          banco?: string | null
+          carga_horaria?: string | null
           cargo: string
+          cep?: string | null
+          chave_pix?: string | null
+          cidade?: string | null
+          conta?: string | null
+          cpf?: string | null
           created_at?: string
+          data_desligamento?: string | null
+          data_inicio?: string | null
+          data_nascimento?: string | null
           departamento: string
+          email_corporativo?: string | null
+          email_pessoal?: string | null
+          endereco?: string | null
+          estado?: string | null
           foto_url?: string | null
           funcoes?: string[]
           id: string
+          motivo_desligamento?: string | null
           nivel?: number
           nome: string
+          observacoes?: string | null
+          salario_base?: number | null
+          status?: string
           superior_id?: string | null
+          telefone?: string | null
+          tipo_conta?: string | null
+          tipo_contrato?: string | null
           updated_at?: string
         }
         Update: {
+          agencia?: string | null
+          banco?: string | null
+          carga_horaria?: string | null
           cargo?: string
+          cep?: string | null
+          chave_pix?: string | null
+          cidade?: string | null
+          conta?: string | null
+          cpf?: string | null
           created_at?: string
+          data_desligamento?: string | null
+          data_inicio?: string | null
+          data_nascimento?: string | null
           departamento?: string
+          email_corporativo?: string | null
+          email_pessoal?: string | null
+          endereco?: string | null
+          estado?: string | null
           foto_url?: string | null
           funcoes?: string[]
           id?: string
+          motivo_desligamento?: string | null
           nivel?: number
           nome?: string
+          observacoes?: string | null
+          salario_base?: number | null
+          status?: string
           superior_id?: string | null
+          telefone?: string | null
+          tipo_conta?: string | null
+          tipo_contrato?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -87,6 +191,200 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      documentos_colaborador: {
+        Row: {
+          colaborador_id: string
+          created_at: string | null
+          data_documento: string | null
+          descricao: string | null
+          id: string
+          mime_type: string | null
+          nome_arquivo: string
+          storage_path: string
+          tamanho_bytes: number | null
+          tipo: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string | null
+          data_documento?: string | null
+          descricao?: string | null
+          id?: string
+          mime_type?: string | null
+          nome_arquivo: string
+          storage_path: string
+          tamanho_bytes?: number | null
+          tipo: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string | null
+          data_documento?: string | null
+          descricao?: string | null
+          id?: string
+          mime_type?: string | null
+          nome_arquivo?: string
+          storage_path?: string
+          tamanho_bytes?: number | null
+          tipo?: string
+          uploaded_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_colaborador_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      historico_cargos: {
+        Row: {
+          aprovado_por: string | null
+          cargo_anterior: string | null
+          cargo_novo: string
+          colaborador_id: string
+          created_at: string | null
+          data_mudanca: string
+          id: string
+          motivo: string | null
+          salario_anterior: number | null
+          salario_novo: number | null
+        }
+        Insert: {
+          aprovado_por?: string | null
+          cargo_anterior?: string | null
+          cargo_novo: string
+          colaborador_id: string
+          created_at?: string | null
+          data_mudanca: string
+          id?: string
+          motivo?: string | null
+          salario_anterior?: number | null
+          salario_novo?: number | null
+        }
+        Update: {
+          aprovado_por?: string | null
+          cargo_anterior?: string | null
+          cargo_novo?: string
+          colaborador_id?: string
+          created_at?: string | null
+          data_mudanca?: string
+          id?: string
+          motivo?: string | null
+          salario_anterior?: number | null
+          salario_novo?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "historico_cargos_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      politicas_comissao: {
+        Row: {
+          ativo: boolean | null
+          base_calculo: string | null
+          colaborador_id: string
+          created_at: string | null
+          descricao: string
+          id: string
+          meta_mensal: number | null
+          observacoes: string | null
+          percentual: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          base_calculo?: string | null
+          colaborador_id: string
+          created_at?: string | null
+          descricao: string
+          id?: string
+          meta_mensal?: number | null
+          observacoes?: string | null
+          percentual?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          ativo?: boolean | null
+          base_calculo?: string | null
+          colaborador_id?: string
+          created_at?: string | null
+          descricao?: string
+          id?: string
+          meta_mensal?: number | null
+          observacoes?: string | null
+          percentual?: number | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "politicas_comissao_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      politicas_veiculo: {
+        Row: {
+          ativo: boolean | null
+          colaborador_id: string
+          created_at: string | null
+          id: string
+          modelo_veiculo: string | null
+          observacoes: string | null
+          placa_veiculo: string | null
+          tem_direito: boolean | null
+          teto_mensal: number | null
+          tipo: string | null
+          valor_km: number | null
+        }
+        Insert: {
+          ativo?: boolean | null
+          colaborador_id: string
+          created_at?: string | null
+          id?: string
+          modelo_veiculo?: string | null
+          observacoes?: string | null
+          placa_veiculo?: string | null
+          tem_direito?: boolean | null
+          teto_mensal?: number | null
+          tipo?: string | null
+          valor_km?: number | null
+        }
+        Update: {
+          ativo?: boolean | null
+          colaborador_id?: string
+          created_at?: string | null
+          id?: string
+          modelo_veiculo?: string | null
+          observacoes?: string | null
+          placa_veiculo?: string | null
+          tem_direito?: boolean | null
+          teto_mensal?: number | null
+          tipo?: string | null
+          valor_km?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "politicas_veiculo_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
