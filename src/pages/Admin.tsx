@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
+import { EmployeeDrawer } from "@/components/employee/EmployeeDrawer";
+import type { Colaborador } from "@/types/organogram";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import {
