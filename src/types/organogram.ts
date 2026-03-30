@@ -8,6 +8,8 @@ export interface Colaborador {
   funcoes: string[];
   superior: string | null;
   subordinados: string[];
+  status: string;
+  tipo_contrato: string | null;
 }
 
 export interface OrganogramaData {
