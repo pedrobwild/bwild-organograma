@@ -198,6 +198,9 @@ function OrgConnectors({
   const curveR = 16;
   const strokeW = 3.5;
   const dashArray = isPJ ? "8 5" : "none";
+  const animStyle: React.CSSProperties = {
+    transition: "stroke 0.4s ease, stroke-dashoffset 0.5s ease",
+  };
 
   if (childCount === 1) {
     const color = isInPath && highlightPath.has(children[0].id)
@@ -212,6 +215,12 @@ function OrgConnectors({
             stroke={color}
             strokeWidth={strokeW}
             strokeDasharray={dashArray}
+            style={{
+              ...animStyle,
+              strokeDashoffset: 0,
+              strokeDasharray: dashArray === "none" ? `${vDrop}` : dashArray,
+              animation: "connectorDraw 0.5s ease forwards",
+            }}
           />
         </svg>
       </div>
@@ -235,6 +244,7 @@ function OrgConnectors({
           stroke={isInPath ? "#3b82f6" : parentColor}
           strokeWidth={strokeW}
           strokeDasharray={dashArray}
+          style={animStyle}
         />
 
         {dims.positions.map((px, i) => {
@@ -247,13 +257,15 @@ function OrgConnectors({
           const childDash = isPJChild ? "8 5" : "none";
 
           const midY = vDrop / 2;
-          // Bezier curve from center horizontal bar to child position
           const d =
             px === centerX
               ? `M ${centerX} ${midY} L ${px} ${svgH}`
               : px < centerX
               ? `M ${centerX} ${midY} L ${px + curveR} ${midY} Q ${px} ${midY} ${px} ${midY + curveR} L ${px} ${svgH}`
               : `M ${centerX} ${midY} L ${px - curveR} ${midY} Q ${px} ${midY} ${px} ${midY + curveR} L ${px} ${svgH}`;
+
+          // Estimate path length for draw animation
+          const dist = Math.abs(px - centerX) + svgH - midY + curveR;
 
           return (
             <path
@@ -262,8 +274,15 @@ function OrgConnectors({
               fill="none"
               stroke={lineColor}
               strokeWidth={strokeW}
-              strokeDasharray={childDash}
+              strokeDasharray={childDash === "none" ? `${dist}` : childDash}
+              strokeDashoffset={childDash === "none" ? dist : 0}
               strokeLinecap="round"
+              style={{
+                ...animStyle,
+                animation: childDash === "none"
+                  ? `connectorDraw 0.5s ease ${0.05 * i}s forwards`
+                  : `connectorDrawDashed 0.5s ease ${0.05 * i}s forwards`,
+              }}
             />
           );
         })}
