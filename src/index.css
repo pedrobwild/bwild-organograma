@@ -88,3 +88,14 @@ table.polished-table thead {
 table.polished-table tbody tr:hover {
   background-color: hsl(var(--accent));
 }
+
+/* Org chart connector draw animations */
+@keyframes connectorDraw {
+  from { stroke-dashoffset: var(--path-length, 200); }
+  to   { stroke-dashoffset: 0; }
+}
+
+@keyframes connectorDrawDashed {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
