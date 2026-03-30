@@ -91,7 +91,7 @@ export function OrgTreeNode({
             animate={{ opacity: 1, height: "auto", scale: 1 }}
             exit={{ opacity: 0, height: 0, scale: 0.96 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col items-center overflow-hidden"
+            className="flex flex-col items-center overflow-visible"
           >
             {/* SVG connector lines */}
             <OrgConnectors
