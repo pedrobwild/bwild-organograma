@@ -41,6 +41,11 @@ export function OrgTreeNode({
   const isSearchActive = searchMatch !== null;
   const isVisible = !isSearchActive || searchMatch!.has(person.id);
 
+  const visibleChildren = useMemo(() => {
+    if (!isSearchActive) return children;
+    return children.filter((child) => searchMatch!.has(child.id));
+  }, [children, isSearchActive, searchMatch]);
+
   if (!isVisible) return null;
   if (!showDesligados && person.status === "desligado") return null;
 
@@ -61,7 +66,7 @@ export function OrgTreeNode({
         />
 
         {/* Collapse toggle */}
-        {children.length > 0 && (
+        {visibleChildren.length > 0 && (
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -84,7 +89,7 @@ export function OrgTreeNode({
       </div>
 
       <AnimatePresence initial={false}>
-        {!collapsed && children.length > 0 && (
+        {!collapsed && visibleChildren.length > 0 && (
           <motion.div
             key="children"
             initial={{ opacity: 0, height: 0, scale: 0.96 }}
@@ -96,20 +101,20 @@ export function OrgTreeNode({
             {/* SVG connector lines */}
             <OrgConnectors
               parentColor={colors.bg}
-              childCount={children.length}
+              childCount={visibleChildren.length}
               isInPath={isInPath}
               highlightPath={highlightPath}
-              children={children}
+              children={visibleChildren}
               isPJ={isPJ}
             />
 
             <div
               className={cn(
                 "flex items-start",
-                children.length > 1 ? "gap-5" : ""
+                visibleChildren.length > 1 ? "gap-5" : ""
               )}
             >
-              {children.map((child) => (
+              {visibleChildren.map((child) => (
                 <OrgTreeNode
                   key={child.id}
                   person={child}
