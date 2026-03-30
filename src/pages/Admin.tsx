@@ -365,7 +365,7 @@ export default function Admin() {
 
                       {/* Actions */}
                       {editingColab !== c.id && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(c)}>
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
