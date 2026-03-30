@@ -11,6 +11,8 @@ interface DbColaborador {
   foto_url: string | null;
   funcoes: string[];
   superior_id: string | null;
+  status: string;
+  tipo_contrato: string | null;
 }
 
 function dbToColaborador(db: DbColaborador, allDb: DbColaborador[]): Colaborador {
@@ -28,6 +30,8 @@ function dbToColaborador(db: DbColaborador, allDb: DbColaborador[]): Colaborador
     funcoes: db.funcoes,
     superior: db.superior_id,
     subordinados,
+    status: db.status,
+    tipo_contrato: db.tipo_contrato,
   };
 }
 

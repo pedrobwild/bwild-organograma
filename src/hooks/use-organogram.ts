@@ -12,11 +12,36 @@ const INITIAL_ZOOM = 0.9;
 const MIN_ZOOM = 0.45;
 const MAX_ZOOM = 1.8;
 
+function getDescendantIds(id: string, byId: Map<string, Colaborador>): Set<string> {
+  const result = new Set<string>();
+  const queue = [id];
+  while (queue.length) {
+    const curr = queue.shift()!;
+    result.add(curr);
+    const node = byId.get(curr);
+    if (node) {
+      for (const sub of node.subordinados) {
+        queue.push(sub);
+      }
+    }
+  }
+  return result;
+}
+
+function getAncestorIds(id: string, byId: Map<string, Colaborador>): Set<string> {
+  const result = new Set<string>();
+  let curr = byId.get(id);
+  while (curr) {
+    result.add(curr.id);
+    curr = curr.superior ? byId.get(curr.superior) : undefined;
+  }
+  return result;
+}
+
 export function useOrganogram() {
   const { data: colaboradores = [], isLoading } = useColaboradores();
   const { data: deptColorRows = [] } = useDepartmentColors();
 
-  // Build dept color map for deptColors lib
   const deptColorMap = useMemo(() => {
     const map: Record<string, { bg: string; text: string; light: string; border: string }> = {};
     for (const row of deptColorRows) {
@@ -36,18 +61,44 @@ export function useOrganogram() {
 
   const [selectedPerson, setSelectedPerson] = useState<Colaborador | null>(null);
   const [highlightDept, setHighlightDept] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showDesligados, setShowDesligados] = useState(true);
+  const [viewMode, setViewMode] = useState<"tree" | "list">("tree");
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const [zoom, setZoom] = useState(INITIAL_ZOOM);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<HTMLDivElement>(null);
   const dragStartRef = useRef({ x: 0, y: 0, panX: 0, panY: 0 });
 
   const highlightPath = useMemo(
     () => getHighlightPath(selectedPerson, byId),
     [selectedPerson, byId]
   );
+
+  // Search matching — include ancestors so tree path stays visible
+  const searchMatch = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    const q = searchQuery.toLowerCase();
+    const matched = colaboradores.filter(
+      (c) =>
+        c.nome.toLowerCase().includes(q) ||
+        c.cargo.toLowerCase().includes(q) ||
+        c.departamento.toLowerCase().includes(q)
+    );
+    const ids = new Set<string>();
+    for (const m of matched) {
+      const anc = getAncestorIds(m.id, byId);
+      anc.forEach((id) => ids.add(id));
+      ids.add(m.id);
+      // Also show direct children
+      for (const sub of m.subordinados) ids.add(sub);
+    }
+    return ids;
+  }, [searchQuery, colaboradores, byId]);
 
   const zoomIn = useCallback(() => {
     setZoom((prev) => Math.min(MAX_ZOOM, prev + 0.15));
@@ -66,9 +117,20 @@ export function useOrganogram() {
     setSelectedPerson((prev) => (prev?.id === person.id ? null : person));
   }, []);
 
+  const toggleFullscreen = useCallback(() => {
+    const el = chartRef.current;
+    if (!el) return;
+    if (!document.fullscreenElement) {
+      el.requestFullscreen().then(() => setIsFullscreen(true)).catch(() => {});
+    } else {
+      document.exitFullscreen().then(() => setIsFullscreen(false)).catch(() => {});
+    }
+  }, []);
+
   const handleMouseDown = useCallback(
     (event: React.MouseEvent<HTMLDivElement>) => {
       if ((event.target as HTMLElement).closest("button")) return;
+      if ((event.target as HTMLElement).closest("input")) return;
 
       setIsDragging(true);
       dragStartRef.current = {
@@ -111,10 +173,14 @@ export function useOrganogram() {
     };
 
     element.addEventListener("wheel", handleWheel, { passive: false });
+    return () => element.removeEventListener("wheel", handleWheel);
+  }, []);
 
-    return () => {
-      element.removeEventListener("wheel", handleWheel);
-    };
+  // Listen for fullscreen change
+  useEffect(() => {
+    const handler = () => setIsFullscreen(!!document.fullscreenElement);
+    document.addEventListener("fullscreenchange", handler);
+    return () => document.removeEventListener("fullscreenchange", handler);
   }, []);
 
   return {
@@ -131,6 +197,7 @@ export function useOrganogram() {
     pan,
     isDragging,
     containerRef,
+    chartRef,
     handleSelectPerson,
     handleMouseDown,
     handleMouseMove,
@@ -141,5 +208,14 @@ export function useOrganogram() {
     closeSidebar: () => setSelectedPerson(null),
     isLoading,
     deptColorMap,
+    searchQuery,
+    setSearchQuery,
+    showDesligados,
+    setShowDesligados,
+    viewMode,
+    setViewMode,
+    searchMatch,
+    isFullscreen,
+    toggleFullscreen,
   };
 }
