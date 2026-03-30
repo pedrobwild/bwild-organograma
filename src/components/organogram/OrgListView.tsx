@@ -72,7 +72,7 @@ function ListItem({
         )}
         style={{
           marginLeft: depth * 24,
-          ringColor: isSelected ? `${colors.bg}44` : undefined,
+          ...(isSelected ? { boxShadow: `0 0 0 1px ${colors.bg}44` } : {}),
         }}
       >
         {/* Avatar */}
