@@ -198,6 +198,9 @@ function OrgConnectors({
   const curveR = 16;
   const strokeW = 3.5;
   const dashArray = isPJ ? "8 5" : "none";
+  const animStyle: React.CSSProperties = {
+    transition: "stroke 0.4s ease, stroke-dashoffset 0.5s ease",
+  };
 
   if (childCount === 1) {
     const color = isInPath && highlightPath.has(children[0].id)
