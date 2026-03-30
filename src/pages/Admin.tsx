@@ -285,7 +285,7 @@ export default function Admin() {
             ) : (
               <div className="grid gap-3">
                 {colaboradores?.map((c) => (
-                  <Card key={c.id}>
+                  <Card key={c.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setDrawerPerson(c)}>
                     <CardContent className="flex items-center gap-4 py-4">
                       {/* Photo */}
                       <div className="relative group">
