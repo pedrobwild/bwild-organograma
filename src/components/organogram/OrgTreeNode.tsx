@@ -190,13 +190,13 @@ function OrgConnectors({
 
   const vDrop = 48;
   const curveR = 16;
-  const strokeW = 2;
+  const strokeW = 2.5;
   const dashArray = isPJ ? "6 4" : "none";
 
   if (childCount === 1) {
     const color = isInPath && highlightPath.has(children[0].id)
-      ? "#60a5fa"
-      : `${parentColor}88`;
+      ? "#3b82f6"
+      : `${parentColor}cc`;
     return (
       <div ref={containerRef}>
         <svg width={strokeW + 2} height={vDrop} className="block mx-auto mt-3">
@@ -226,7 +226,7 @@ function OrgConnectors({
         <line
           x1={centerX} y1={0}
           x2={centerX} y2={vDrop / 2}
-          stroke={isInPath ? "#60a5fa" : `${parentColor}66`}
+          stroke={isInPath ? "#3b82f6" : `${parentColor}aa`}
           strokeWidth={strokeW}
           strokeDasharray={dashArray}
         />
@@ -235,8 +235,8 @@ function OrgConnectors({
           const child = children[i];
           const childActive = child && highlightPath.has(child.id);
           const lineColor = isInPath && childActive
-            ? "#60a5fa"
-            : `${parentColor}55`;
+            ? "#3b82f6"
+            : `${parentColor}99`;
           const isPJChild = child?.tipo_contrato === "PJ";
           const childDash = isPJChild ? "6 4" : "none";
 
