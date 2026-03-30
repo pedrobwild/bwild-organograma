@@ -234,7 +234,7 @@ function TerminationModal({
             <div className="flex flex-col items-center text-center gap-4 py-4">
               <div
                 className="w-16 h-16 rounded-full flex items-center justify-center overflow-hidden ring-2"
-                style={{ background: `${colors.bg}15`, ringColor: `${colors.bg}33`, color: colors.bg }}
+                style={{ background: `${colors.bg}15`, boxShadow: `0 0 0 2px ${colors.bg}33`, color: colors.bg }}
               >
                 {data.foto_url ? (
                   <img src={data.foto_url} alt={data.nome} className="w-full h-full object-cover" />
