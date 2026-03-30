@@ -53,6 +53,7 @@ export default function Admin() {
   const [newForm, setNewForm] = useState({ id: "", nome: "", cargo: "", departamento: "", nivel: "0", superior_id: "", funcoes: "" });
   const [newDeptOpen, setNewDeptOpen] = useState(false);
   const [newDeptForm, setNewDeptForm] = useState({ departamento: "", bg: "#1B4F72" });
+  const [drawerPerson, setDrawerPerson] = useState<Colaborador | null>(null);
 
   if (loading) {
     return (
