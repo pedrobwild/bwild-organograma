@@ -190,7 +190,7 @@ function OrgConnectors({
 
   const vDrop = 48;
   const curveR = 16;
-  const strokeW = 2;
+  const strokeW = 2.5;
   const dashArray = isPJ ? "6 4" : "none";
 
   if (childCount === 1) {
