@@ -468,7 +468,59 @@ export default function Dashboard() {
               </Card>
             </div>
 
-            {/* Salary distribution (admins only) */}
+            {/* Onboarding em Andamento */}
+            {(() => {
+              const sixtyDaysAgo = subDays(now, 60);
+              const recentHires = ativos.filter(
+                (c) => c.data_inicio && parseISO(c.data_inicio) >= sixtyDaysAgo
+              );
+              if (recentHires.length === 0) return null;
+              return (
+                <Card className="border-slate-200">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-semibold flex items-center gap-2" style={{ color: "#0f2137" }}>
+                      <ClipboardList className="w-4 h-4 text-blue-500" /> Onboardings em Andamento
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2 max-h-[280px] overflow-y-auto scrollbar-thin">
+                      {recentHires.map((c) => {
+                        const summary = onboardingSummary[c.id];
+                        const total = summary?.total ?? 0;
+                        const done = summary?.done ?? 0;
+                        const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+                        return (
+                          <button
+                            key={c.id}
+                            onClick={() => openDrawer(c)}
+                            className="flex items-center gap-3 w-full text-left p-3 rounded-lg hover:bg-slate-50 transition-colors border border-slate-100"
+                          >
+                            <Avatar url={c.foto_url} nome={c.nome} size={32} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-slate-700 truncate">{c.nome}</p>
+                              <p className="text-[11px] text-slate-400">{c.cargo} · Início: {c.data_inicio ? format(parseISO(c.data_inicio), "dd/MM/yyyy") : "—"}</p>
+                            </div>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              <div className="w-16 h-2 bg-slate-100 rounded-full overflow-hidden">
+                                <div
+                                  className="h-full rounded-full transition-all"
+                                  style={{
+                                    width: `${pct}%`,
+                                    backgroundColor: pct === 100 ? "#22c55e" : pct > 50 ? "#3b82f6" : "#f59e0b",
+                                  }}
+                                />
+                              </div>
+                              <span className="text-[11px] font-semibold text-slate-500 w-8 text-right tabular-nums">{pct}%</span>
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
             {isAdmin && salaryData.length > 0 && (
               <Card className="border-slate-200">
                 <CardHeader className="pb-2">
