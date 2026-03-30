@@ -289,6 +289,56 @@ export type Database = {
           },
         ]
       }
+      onboarding_checklist: {
+        Row: {
+          colaborador_id: string
+          concluido: boolean
+          created_at: string
+          data_conclusao: string | null
+          data_limite: string | null
+          id: string
+          is_custom: boolean
+          label: string
+          notas: string | null
+          ordem: number
+          updated_at: string
+        }
+        Insert: {
+          colaborador_id: string
+          concluido?: boolean
+          created_at?: string
+          data_conclusao?: string | null
+          data_limite?: string | null
+          id?: string
+          is_custom?: boolean
+          label: string
+          notas?: string | null
+          ordem?: number
+          updated_at?: string
+        }
+        Update: {
+          colaborador_id?: string
+          concluido?: boolean
+          created_at?: string
+          data_conclusao?: string | null
+          data_limite?: string | null
+          id?: string
+          is_custom?: boolean
+          label?: string
+          notas?: string | null
+          ordem?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "onboarding_checklist_colaborador_id_fkey"
+            columns: ["colaborador_id"]
+            isOneToOne: false
+            referencedRelation: "colaboradores"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       politicas_comissao: {
         Row: {
           ativo: boolean | null

@@ -16,6 +16,7 @@ import { TabRemuneracao } from "./tabs/TabRemuneracao";
 import { TabDocumentos } from "./tabs/TabDocumentos";
 import { TabHistorico } from "./tabs/TabHistorico";
 import { TabDadosBancarios } from "./tabs/TabDadosBancarios";
+import { TabOnboarding } from "./tabs/TabOnboarding";
 import { EmployeeActions } from "./EmployeeActions";
 
 interface EmployeeDrawerProps {
@@ -119,13 +120,14 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
             </div>
           ) : (
             <Tabs defaultValue="pessoais" className="h-full flex flex-col">
-              <TabsList className="mx-8 mt-4 mb-0 justify-start bg-slate-100 p-1 rounded-xl flex-shrink-0">
+              <TabsList className="mx-8 mt-4 mb-0 justify-start bg-slate-100 p-1 rounded-xl flex-shrink-0 flex-wrap">
                 <TabsTrigger value="pessoais" className="text-xs rounded-lg">Pessoais</TabsTrigger>
                 <TabsTrigger value="profissionais" className="text-xs rounded-lg">Profissionais</TabsTrigger>
                 <TabsTrigger value="remuneracao" className="text-xs rounded-lg">Remuneração</TabsTrigger>
                 <TabsTrigger value="documentos" className="text-xs rounded-lg">Documentos</TabsTrigger>
                 <TabsTrigger value="historico" className="text-xs rounded-lg">Histórico</TabsTrigger>
                 <TabsTrigger value="bancarios" className="text-xs rounded-lg">Bancários</TabsTrigger>
+                <TabsTrigger value="onboarding" className="text-xs rounded-lg">Onboarding</TabsTrigger>
               </TabsList>
 
               <div className="flex-1 overflow-y-auto px-8 py-6">
@@ -146,6 +148,9 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
                 </TabsContent>
                 <TabsContent value="bancarios" className="mt-0">
                   <TabDadosBancarios data={fullData} editing={editing} colaboradorId={person.id} />
+                </TabsContent>
+                <TabsContent value="onboarding" className="mt-0">
+                  <TabOnboarding colaboradorId={person.id} isAdmin={isAdmin} dataInicio={fullData?.data_inicio} />
                 </TabsContent>
               </div>
             </Tabs>
