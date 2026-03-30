@@ -52,7 +52,7 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: 740, opacity: 0 }}
         transition={{ type: "spring", damping: 32, stiffness: 300 }}
-        className="fixed right-0 top-0 bottom-0 w-full max-w-[720px] z-50 flex flex-col bg-white shadow-2xl"
+        className="fixed right-0 top-0 bottom-0 w-full max-w-[720px] z-50 flex flex-col bg-card shadow-2xl md:max-w-[720px]"
       >
         {/* Header */}
         <div
