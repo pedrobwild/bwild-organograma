@@ -64,7 +64,7 @@ export function useDepartmentColors() {
 export function useUpdateColaborador() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (updates: { id: string; nome?: string; cargo?: string; departamento?: string; nivel?: number; foto_url?: string | null; funcoes?: string[]; superior_id?: string | null }) => {
+    mutationFn: async (updates: Record<string, any> & { id: string }) => {
       const { id, ...rest } = updates;
       const { error } = await supabase
         .from("colaboradores")
@@ -72,7 +72,10 @@ export function useUpdateColaborador() {
         .eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["colaboradores"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["colaboradores"] });
+      queryClient.invalidateQueries({ queryKey: ["colaborador_full"] });
+    },
   });
 }
 

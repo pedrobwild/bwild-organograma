@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { AnimatePresence } from "framer-motion";
+import { EmployeeDrawer } from "@/components/employee/EmployeeDrawer";
+import type { Colaborador } from "@/types/organogram";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/use-auth";
 import {
@@ -50,6 +53,7 @@ export default function Admin() {
   const [newForm, setNewForm] = useState({ id: "", nome: "", cargo: "", departamento: "", nivel: "0", superior_id: "", funcoes: "" });
   const [newDeptOpen, setNewDeptOpen] = useState(false);
   const [newDeptForm, setNewDeptForm] = useState({ departamento: "", bg: "#1B4F72" });
+  const [drawerPerson, setDrawerPerson] = useState<Colaborador | null>(null);
 
   if (loading) {
     return (
@@ -281,7 +285,7 @@ export default function Admin() {
             ) : (
               <div className="grid gap-3">
                 {colaboradores?.map((c) => (
-                  <Card key={c.id}>
+                  <Card key={c.id} className="cursor-pointer hover:bg-slate-50 transition-colors" onClick={() => setDrawerPerson(c)}>
                     <CardContent className="flex items-center gap-4 py-4">
                       {/* Photo */}
                       <div className="relative group">
@@ -361,7 +365,7 @@ export default function Admin() {
 
                       {/* Actions */}
                       {editingColab !== c.id && (
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
                           <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => startEdit(c)}>
                             <Pencil className="w-3.5 h-3.5" />
                           </Button>
@@ -442,6 +446,16 @@ export default function Admin() {
           </TabsContent>
         </Tabs>
       </main>
+
+      <AnimatePresence>
+        {drawerPerson && colaboradores && (
+          <EmployeeDrawer
+            person={drawerPerson}
+            allColaboradores={colaboradores}
+            onClose={() => setDrawerPerson(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -7,10 +7,12 @@ import { DepartmentLegend } from "./DepartmentLegend";
 import { OrgNode } from "./OrgNode";
 import { OrgSidebar } from "./OrgSidebar";
 import { OrgToolbar } from "./OrgToolbar";
+import { EmployeeDrawer } from "@/components/employee/EmployeeDrawer";
 
 export default function OrgChart() {
   const {
     companyName,
+    colaboradores,
     byId,
     root,
     departments,
@@ -132,11 +134,10 @@ export default function OrgChart() {
 
       <AnimatePresence>
         {selectedPerson && (
-          <OrgSidebar
+          <EmployeeDrawer
             person={selectedPerson}
-            byId={byId}
+            allColaboradores={colaboradores}
             onClose={closeSidebar}
-            onNavigate={handleSelectPerson}
           />
         )}
       </AnimatePresence>
