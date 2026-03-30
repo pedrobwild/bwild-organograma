@@ -60,19 +60,37 @@ export function OrgNodeCard({
       }}
       transition={{ duration: 0.2 }}
       className={cn(
-        "group relative rounded-2xl border text-left backdrop-blur-xl transition-all overflow-visible",
-        "bg-white/[0.97] shadow-[0_8px_32px_-12px_rgba(15,23,42,0.25)]",
-        "hover:shadow-[0_16px_48px_-16px_rgba(15,23,42,0.35)]",
+        "group relative rounded-2xl border text-left backdrop-blur-xl overflow-visible",
+        "bg-white/[0.97]",
+        "transition-[border-color,box-shadow] duration-300 ease-out",
       )}
       style={{
         width: s.w,
         padding: `${s.py}px ${s.px}px`,
         borderColor: isSelected ? `${colors.bg}66` : "rgba(148,163,184,0.15)",
+        // @ts-ignore -- CSS custom property for hover glow
+        ["--hover-glow" as string]: `0 0 0 1.5px ${colors.bg}28, 0 20px 50px -14px ${colors.bg}30`,
         boxShadow: isSelected
           ? `0 0 0 2px ${colors.bg}30, 0 20px 60px -20px ${colors.bg}44`
           : isInPath
           ? `0 0 0 1px ${colors.bg}20, 0 12px 36px -16px ${colors.bg}30`
-          : undefined,
+          : "0 8px 32px -12px rgba(15,23,42,0.25)",
+      }}
+      onMouseEnter={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        if (!isSelected) {
+          el.style.boxShadow = el.style.getPropertyValue("--hover-glow") || `0 0 0 1.5px ${colors.bg}28, 0 20px 50px -14px ${colors.bg}30`;
+          el.style.borderColor = `${colors.bg}44`;
+        }
+      }}
+      onMouseLeave={(e) => {
+        const el = e.currentTarget as HTMLElement;
+        if (!isSelected) {
+          el.style.boxShadow = isInPath
+            ? `0 0 0 1px ${colors.bg}20, 0 12px 36px -16px ${colors.bg}30`
+            : "0 8px 32px -12px rgba(15,23,42,0.25)";
+          el.style.borderColor = "rgba(148,163,184,0.15)";
+        }
       }}
     >
       {/* Top accent */}
