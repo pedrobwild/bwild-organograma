@@ -13,8 +13,9 @@ import {
   TrendingDown,
   TrendingUp,
   Users,
+  ClipboardList,
 } from "lucide-react";
-import { format, differenceInYears, differenceInMonths, isSameMonth, parseISO } from "date-fns";
+import { format, differenceInYears, differenceInMonths, differenceInDays, isSameMonth, parseISO, subDays } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import {
   BarChart,
@@ -31,6 +32,7 @@ import {
 
 import { useAuth } from "@/hooks/use-auth";
 import { useDashboardData } from "@/hooks/use-dashboard-data";
+import { useOnboardingSummary } from "@/hooks/use-onboarding";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
