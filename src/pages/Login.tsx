@@ -29,8 +29,11 @@ export default function Login() {
     }
 
     toast.success("Login realizado com sucesso!");
-    navigate("/admin");
-    setIsLoading(false);
+    // Small delay to let onAuthStateChange propagate before navigating
+    setTimeout(() => {
+      navigate("/admin");
+      setIsLoading(false);
+    }, 300);
   };
 
   return (
