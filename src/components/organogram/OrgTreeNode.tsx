@@ -196,8 +196,8 @@ function OrgConnectors({
 
   const vDrop = 48;
   const curveR = 16;
-  const strokeW = 2.5;
-  const dashArray = isPJ ? "6 4" : "none";
+  const strokeW = 3.5;
+  const dashArray = isPJ ? "8 5" : "none";
 
   if (childCount === 1) {
     const color = isInPath && highlightPath.has(children[0].id)
@@ -227,7 +227,7 @@ function OrgConnectors({
 
   return (
     <div ref={containerRef} className="mt-3" style={{ width: dims.width, height: svgH }}>
-      <svg width={dims.width} height={svgH} className="block">
+      <svg width={dims.width} height={svgH} className="block" style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))" }}>
         {/* Vertical from parent */}
         <line
           x1={centerX} y1={0}
@@ -244,7 +244,7 @@ function OrgConnectors({
             ? "#3b82f6"
             : parentColor;
           const isPJChild = child?.tipo_contrato === "PJ";
-          const childDash = isPJChild ? "6 4" : "none";
+          const childDash = isPJChild ? "8 5" : "none";
 
           const midY = vDrop / 2;
           // Bezier curve from center horizontal bar to child position
