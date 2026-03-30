@@ -159,14 +159,20 @@ function OrgConnectors({
     if (!el) return;
     const parent = el.nextElementSibling as HTMLElement;
     if (!parent) return;
-    const cards = parent.querySelectorAll("[data-node-card]");
-    if (cards.length === 0) return;
+    // Select only the top-level child containers (direct children of the flex wrapper)
+    const childContainers = parent.children;
+    if (childContainers.length === 0) return;
 
     const parentRect = parent.getBoundingClientRect();
-    const positions = Array.from(cards).slice(0, childCount).map((card) => {
-      const r = card.getBoundingClientRect();
-      return r.left + r.width / 2 - parentRect.left;
-    });
+    const positions: number[] = [];
+    for (let i = 0; i < Math.min(childCount, childContainers.length); i++) {
+      const card = childContainers[i].querySelector("[data-node-card]");
+      if (card) {
+        const r = card.getBoundingClientRect();
+        positions.push(r.left + r.width / 2 - parentRect.left);
+      }
+    }
+    if (positions.length === 0) return;
 
     setDims({ width: parentRect.width, positions });
   }, [childCount]);
