@@ -61,6 +61,11 @@ export function AppLayout({ children, fullScreen = false }: AppLayoutProps) {
               </div>
             </header>
           )}
+          {fullScreen && (
+            <div className="fixed top-3 left-3 z-40">
+              <SidebarTrigger className="h-8 w-8 border border-border bg-card/90 text-foreground hover:bg-accent" />
+            </div>
+          )}
           <main className={fullScreen ? "flex-1" : "flex-1 overflow-y-auto"}>
             {children}
           </main>
