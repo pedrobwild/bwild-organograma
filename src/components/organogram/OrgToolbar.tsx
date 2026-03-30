@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
 interface OrgToolbarProps {
@@ -79,6 +80,9 @@ export function OrgToolbar({
           borderBottom: "1px solid rgba(255,255,255,0.06)",
         }}
       >
+        {/* Sidebar trigger */}
+        <SidebarTrigger className="text-white/60 hover:text-white hover:bg-white/10 flex-shrink-0" />
+
         {/* Search */}
         <div className="relative flex-1 min-w-[200px] max-w-[320px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
