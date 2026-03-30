@@ -57,6 +57,7 @@ export default function Dashboard() {
   const { user, isAdmin, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const { colaboradores, historico, documentos, deptColors, isLoading } = useDashboardData();
+  const { data: onboardingSummary = {} } = useOnboardingSummary();
 
   const [search, setSearch] = useState("");
   const [deptFilter, setDeptFilter] = useState<string | null>(null);
