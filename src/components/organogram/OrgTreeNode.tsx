@@ -215,6 +215,12 @@ function OrgConnectors({
             stroke={color}
             strokeWidth={strokeW}
             strokeDasharray={dashArray}
+            style={{
+              ...animStyle,
+              strokeDashoffset: 0,
+              strokeDasharray: dashArray === "none" ? `${vDrop}` : dashArray,
+              animation: "connectorDraw 0.5s ease forwards",
+            }}
           />
         </svg>
       </div>
