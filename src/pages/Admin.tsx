@@ -446,6 +446,16 @@ export default function Admin() {
           </TabsContent>
         </Tabs>
       </main>
+
+      <AnimatePresence>
+        {drawerPerson && colaboradores && (
+          <EmployeeDrawer
+            person={drawerPerson}
+            allColaboradores={colaboradores}
+            onClose={() => setDrawerPerson(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
