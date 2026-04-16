@@ -72,7 +72,7 @@ export function useUpdateColaborador() {
       const { id, ...rest } = updates;
       const { error } = await supabase
         .from("colaboradores")
-        .update(rest)
+        .update(rest as any)
         .eq("id", id);
       if (error) throw error;
     },

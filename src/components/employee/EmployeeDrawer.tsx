@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { GitBranch, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import { TabHistorico } from "./tabs/TabHistorico";
 import { TabDadosBancarios } from "./tabs/TabDadosBancarios";
 import { TabOnboarding } from "./tabs/TabOnboarding";
 import { EmployeeActions } from "./EmployeeActions";
+import { HierarchyEditDialog } from "@/components/organogram/HierarchyEditDialog";
 
 interface EmployeeDrawerProps {
   person: Colaborador;
@@ -28,6 +29,7 @@ interface EmployeeDrawerProps {
 export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDrawerProps) {
   const { isAdmin } = useAuth();
   const [editing, setEditing] = useState(false);
+  const [showHierarchyEdit, setShowHierarchyEdit] = useState(false);
   const { data: fullData, isLoading } = useColaboradorFull(person.id);
   const colors = getDeptColor(person.departamento);
   const initials = getInitials(person.nome);
@@ -63,14 +65,25 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
         >
           <div className="absolute top-4 right-4 flex items-center gap-2">
             {isAdmin && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setEditing((p) => !p)}
-                className="text-white/80 hover:text-white hover:bg-white/15 text-xs"
-              >
-                {editing ? "Cancelar edição" : "Editar"}
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowHierarchyEdit(true)}
+                  className="text-white/80 hover:text-white hover:bg-white/15 text-xs gap-1"
+                >
+                  <GitBranch className="w-3.5 h-3.5" />
+                  Hierarquia
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditing((p) => !p)}
+                  className="text-white/80 hover:text-white hover:bg-white/15 text-xs"
+                >
+                  {editing ? "Cancelar edição" : "Editar"}
+                </Button>
+              </>
             )}
             <Button
               variant="ghost"
@@ -168,6 +181,17 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
           />
         )}
       </motion.div>
+
+      {/* Hierarchy edit dialog */}
+      <AnimatePresence>
+        {showHierarchyEdit && (
+          <HierarchyEditDialog
+            person={person}
+            allColaboradores={allColaboradores}
+            onClose={() => setShowHierarchyEdit(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }
