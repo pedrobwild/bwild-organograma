@@ -181,6 +181,17 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
           />
         )}
       </motion.div>
+
+      {/* Hierarchy edit dialog */}
+      <AnimatePresence>
+        {showHierarchyEdit && (
+          <HierarchyEditDialog
+            person={person}
+            allColaboradores={allColaboradores}
+            onClose={() => setShowHierarchyEdit(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }
