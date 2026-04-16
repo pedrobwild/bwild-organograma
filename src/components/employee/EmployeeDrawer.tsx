@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X } from "lucide-react";
+import { GitBranch, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -18,6 +18,7 @@ import { TabHistorico } from "./tabs/TabHistorico";
 import { TabDadosBancarios } from "./tabs/TabDadosBancarios";
 import { TabOnboarding } from "./tabs/TabOnboarding";
 import { EmployeeActions } from "./EmployeeActions";
+import { HierarchyEditDialog } from "@/components/organogram/HierarchyEditDialog";
 
 interface EmployeeDrawerProps {
   person: Colaborador;
@@ -28,6 +29,7 @@ interface EmployeeDrawerProps {
 export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDrawerProps) {
   const { isAdmin } = useAuth();
   const [editing, setEditing] = useState(false);
+  const [showHierarchyEdit, setShowHierarchyEdit] = useState(false);
   const { data: fullData, isLoading } = useColaboradorFull(person.id);
   const colors = getDeptColor(person.departamento);
   const initials = getInitials(person.nome);
