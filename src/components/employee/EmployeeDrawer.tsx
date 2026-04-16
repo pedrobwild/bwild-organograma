@@ -65,14 +65,25 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
         >
           <div className="absolute top-4 right-4 flex items-center gap-2">
             {isAdmin && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setEditing((p) => !p)}
-                className="text-white/80 hover:text-white hover:bg-white/15 text-xs"
-              >
-                {editing ? "Cancelar edição" : "Editar"}
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowHierarchyEdit(true)}
+                  className="text-white/80 hover:text-white hover:bg-white/15 text-xs gap-1"
+                >
+                  <GitBranch className="w-3.5 h-3.5" />
+                  Hierarquia
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setEditing((p) => !p)}
+                  className="text-white/80 hover:text-white hover:bg-white/15 text-xs"
+                >
+                  {editing ? "Cancelar edição" : "Editar"}
+                </Button>
+              </>
             )}
             <Button
               variant="ghost"
