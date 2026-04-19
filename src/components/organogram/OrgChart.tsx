@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
-import { Search, Users } from "lucide-react";
-import logoSrc from "@/assets/logo-bwild.png";
+import { ChevronRight, Home, Search, X } from "lucide-react";
 import { useOrganogram } from "@/hooks/use-organogram";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { setDeptColorMap } from "@/lib/deptColors";
@@ -10,10 +9,11 @@ import { OrgTreeNode } from "./OrgTreeNode";
 import { OrgListView } from "./OrgListView";
 import { OrgToolbar } from "./OrgToolbar";
 import { EmployeeDrawer } from "@/components/employee/EmployeeDrawer";
+import { CommandPalette } from "./CommandPalette";
+import { ShortcutsHelp } from "./ShortcutsHelp";
 
 export default function OrgChart() {
   const {
-    companyName,
     colaboradores,
     byId,
     root,
@@ -46,6 +46,13 @@ export default function OrgChart() {
     searchMatch,
     isFullscreen,
     toggleFullscreen,
+    paletteOpen,
+    setPaletteOpen,
+    focusedBranchId,
+    focusBranch,
+    focusBreadcrumb,
+    density,
+    toggleDensity,
   } = useOrganogram();
 
   const isMobile = useIsMobile();
@@ -57,6 +64,121 @@ export default function OrgChart() {
       setDeptColorMap(deptColorMap);
     }
   }, [deptColorMap]);
+
+  // Global keyboard shortcuts
+  useEffect(() => {
+    const isTyping = (target: EventTarget | null) => {
+      const el = target as HTMLElement | null;
+      if (!el) return false;
+      const tag = el.tagName;
+      return (
+        tag === "INPUT" ||
+        tag === "TEXTAREA" ||
+        tag === "SELECT" ||
+        el.isContentEditable
+      );
+    };
+
+    const onKey = (e: KeyboardEvent) => {
+      // ⌘K / Ctrl+K - open palette (always, even when typing)
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setPaletteOpen(true);
+        return;
+      }
+
+      // Escape - close open panels
+      if (e.key === "Escape") {
+        if (paletteOpen) return; // palette handles its own
+        if (selectedPerson) {
+          closeSidebar();
+          return;
+        }
+        if (focusedBranchId) {
+          focusBranch(null);
+          return;
+        }
+        if (searchQuery) {
+          setSearchQuery("");
+          return;
+        }
+      }
+
+      // Skip shortcuts while typing
+      if (isTyping(e.target)) return;
+
+      switch (e.key) {
+        case "+":
+        case "=":
+          e.preventDefault();
+          zoomIn();
+          break;
+        case "-":
+        case "_":
+          e.preventDefault();
+          zoomOut();
+          break;
+        case "0":
+          e.preventDefault();
+          resetView();
+          break;
+        case "f":
+        case "F":
+          e.preventDefault();
+          toggleFullscreen();
+          break;
+        case "t":
+        case "T":
+          e.preventDefault();
+          setViewMode("tree");
+          break;
+        case "h":
+        case "H":
+          e.preventDefault();
+          setViewMode("tree-h");
+          break;
+        case "l":
+        case "L":
+          e.preventDefault();
+          setViewMode("list");
+          break;
+        case "d":
+        case "D":
+          e.preventDefault();
+          toggleDensity();
+          break;
+        case "/": {
+          e.preventDefault();
+          const input = document.querySelector<HTMLInputElement>(
+            'input[placeholder*="Buscar"]'
+          );
+          input?.focus();
+          input?.select();
+          break;
+        }
+        default:
+          break;
+      }
+    };
+
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [
+    paletteOpen,
+    selectedPerson,
+    focusedBranchId,
+    searchQuery,
+    setPaletteOpen,
+    closeSidebar,
+    focusBranch,
+    setSearchQuery,
+    zoomIn,
+    zoomOut,
+    resetView,
+    toggleFullscreen,
+    setViewMode,
+    toggleDensity,
+  ]);
 
   if (isLoading || !root) {
     return (
@@ -102,17 +224,95 @@ export default function OrgChart() {
         isFullscreen={isFullscreen}
         onToggleFullscreen={toggleFullscreen}
         chartRef={chartRef as React.RefObject<HTMLDivElement>}
+        onOpenPalette={() => setPaletteOpen(true)}
+        density={density}
+        onToggleDensity={toggleDensity}
+        totalPeople={colaboradores.length}
       />
+
+      {/* Focus branch breadcrumb */}
+      {focusedBranchId && focusBreadcrumb.length > 0 && (
+        <div
+          className="absolute top-14 left-0 right-0 z-20 pointer-events-none"
+        >
+          <div
+            className="mx-auto max-w-[1600px] px-4 py-2 flex items-center gap-1.5 flex-wrap pointer-events-auto text-[11px]"
+            style={{
+              background: "rgba(10,30,60,0.5)",
+              backdropFilter: "blur(10px)",
+              borderBottom: "1px solid rgba(255,255,255,0.06)",
+            }}
+          >
+            <button
+              onClick={() => focusBranch(null)}
+              className="flex items-center gap-1 text-white/60 hover:text-white px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors"
+              title="Voltar à raiz (Esc)"
+            >
+              <Home className="w-3 h-3" />
+              Raiz
+            </button>
+            {focusBreadcrumb.map((person, idx) => {
+              const isLast = idx === focusBreadcrumb.length - 1;
+              return (
+                <div key={person.id} className="flex items-center gap-1">
+                  <ChevronRight className="w-3 h-3 text-white/30" />
+                  <button
+                    onClick={() => !isLast && focusBranch(person.id)}
+                    disabled={isLast}
+                    className={
+                      isLast
+                        ? "text-white font-medium px-1.5 py-0.5"
+                        : "text-white/60 hover:text-white px-1.5 py-0.5 rounded hover:bg-white/10 transition-colors"
+                    }
+                  >
+                    {person.nome}
+                  </button>
+                </div>
+              );
+            })}
+            <button
+              onClick={() => focusBranch(null)}
+              className="ml-auto text-white/40 hover:text-white p-1 rounded hover:bg-white/10"
+              title="Sair do foco"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Canvas */}
       <div
         ref={containerRef}
         className="relative z-10 flex-1 overflow-hidden select-none pt-14"
-        style={{ cursor: effectiveViewMode === "tree" ? (isDragging ? "grabbing" : "grab") : "default" }}
-        onMouseDown={effectiveViewMode === "tree" ? handleMouseDown : undefined}
-        onMouseMove={effectiveViewMode === "tree" ? handleMouseMove : undefined}
-        onMouseUp={effectiveViewMode === "tree" ? handleMouseUp : undefined}
-        onMouseLeave={effectiveViewMode === "tree" ? handleMouseUp : undefined}
+        style={{
+          cursor:
+            effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+              ? isDragging
+                ? "grabbing"
+                : "grab"
+              : "default",
+        }}
+        onMouseDown={
+          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+            ? handleMouseDown
+            : undefined
+        }
+        onMouseMove={
+          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+            ? handleMouseMove
+            : undefined
+        }
+        onMouseUp={
+          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+            ? handleMouseUp
+            : undefined
+        }
+        onMouseLeave={
+          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+            ? handleMouseUp
+            : undefined
+        }
       >
         {noResults ? (
           /* Empty state */
@@ -141,6 +341,29 @@ export default function OrgChart() {
               searchMatch={searchMatch}
             />
           </div>
+        ) : effectiveViewMode === "tree-h" ? (
+          <div
+            className="absolute inset-0 flex items-center pl-16 overflow-auto"
+            style={{
+              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+              transformOrigin: "left center",
+              transition: isDragging ? "none" : "transform 0.15s ease-out",
+            }}
+          >
+            <OrgTreeNode
+              person={root}
+              byId={byId}
+              onSelect={handleSelectPerson}
+              selectedId={selectedPerson?.id || null}
+              highlightDept={highlightDept}
+              highlightPath={highlightPath}
+              showDesligados={showDesligados}
+              searchMatch={searchMatch}
+              orientation="horizontal"
+              density={density}
+              onFocusBranch={focusBranch}
+            />
+          </div>
         ) : (
           <div
             className="absolute inset-0 flex items-start justify-center pt-8"
@@ -159,6 +382,9 @@ export default function OrgChart() {
               highlightPath={highlightPath}
               showDesligados={showDesligados}
               searchMatch={searchMatch}
+              orientation="vertical"
+              density={density}
+              onFocusBranch={focusBranch}
             />
           </div>
         )}
@@ -181,6 +407,20 @@ export default function OrgChart() {
           />
         )}
       </AnimatePresence>
+
+      {/* Command palette */}
+      <CommandPalette
+        open={paletteOpen}
+        onOpenChange={setPaletteOpen}
+        colaboradores={colaboradores}
+        departments={departments}
+        onSelectPerson={handleSelectPerson}
+        onFilterDept={setHighlightDept}
+        onFocusBranch={focusBranch}
+      />
+
+      {/* Shortcuts help overlay */}
+      <ShortcutsHelp />
     </div>
   );
 }

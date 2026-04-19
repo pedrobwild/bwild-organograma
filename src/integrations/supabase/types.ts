@@ -75,11 +75,14 @@ export type Database = {
           foto_url: string | null
           funcoes: string[]
           id: string
+          job_description: Json
+          missao: string | null
           motivo_desligamento: string | null
           nivel: number
           nome: string
           observacoes: string | null
           salario_base: number | null
+          senioridade: string | null
           status: string
           superior_id: string | null
           telefone: string | null
@@ -109,11 +112,14 @@ export type Database = {
           foto_url?: string | null
           funcoes?: string[]
           id: string
+          job_description?: Json
+          missao?: string | null
           motivo_desligamento?: string | null
           nivel?: number
           nome: string
           observacoes?: string | null
           salario_base?: number | null
+          senioridade?: string | null
           status?: string
           superior_id?: string | null
           telefone?: string | null
@@ -143,11 +149,14 @@ export type Database = {
           foto_url?: string | null
           funcoes?: string[]
           id?: string
+          job_description?: Json
+          missao?: string | null
           motivo_desligamento?: string | null
           nivel?: number
           nome?: string
           observacoes?: string | null
           salario_base?: number | null
+          senioridade?: string | null
           status?: string
           superior_id?: string | null
           telefone?: string | null
