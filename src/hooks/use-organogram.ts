@@ -56,15 +56,39 @@ export function useOrganogram() {
   }, [deptColorRows]);
 
   const byId = useMemo(() => buildByIdMap(colaboradores), [colaboradores]);
-  const root = useMemo(() => getRootNode(colaboradores), [colaboradores]);
+  const rawRoot = useMemo(() => getRootNode(colaboradores), [colaboradores]);
   const departments = useMemo(() => getDepartments(colaboradores), [colaboradores]);
 
   const [selectedPerson, setSelectedPerson] = useState<Colaborador | null>(null);
   const [highlightDept, setHighlightDept] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [showDesligados, setShowDesligados] = useState(false);
-  const [viewMode, setViewMode] = useState<"tree" | "list">("tree");
+  const [viewMode, setViewMode] = useState<"tree" | "tree-h" | "list">("tree");
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [focusedBranchId, setFocusedBranchId] = useState<string | null>(null);
+  const [density, setDensity] = useState<"compact" | "comfortable">("comfortable");
+
+  // When a branch is focused, use that person as the root instead
+  const root = useMemo(() => {
+    if (focusedBranchId) {
+      const focused = byId.get(focusedBranchId);
+      if (focused) return focused;
+    }
+    return rawRoot;
+  }, [focusedBranchId, byId, rawRoot]);
+
+  // Breadcrumb trail to the focused branch (ancestors from global root → focused)
+  const focusBreadcrumb = useMemo(() => {
+    if (!focusedBranchId) return [] as Colaborador[];
+    const chain: Colaborador[] = [];
+    let curr = byId.get(focusedBranchId);
+    while (curr) {
+      chain.unshift(curr);
+      curr = curr.superior ? byId.get(curr.superior) : undefined;
+    }
+    return chain;
+  }, [focusedBranchId, byId]);
 
   const [zoom, setZoom] = useState(INITIAL_ZOOM);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -115,6 +139,16 @@ export function useOrganogram() {
 
   const handleSelectPerson = useCallback((person: Colaborador) => {
     setSelectedPerson((prev) => (prev?.id === person.id ? null : person));
+  }, []);
+
+  const focusBranch = useCallback((id: string | null) => {
+    setFocusedBranchId(id);
+    setPan({ x: 0, y: 0 });
+    setZoom(INITIAL_ZOOM);
+  }, []);
+
+  const toggleDensity = useCallback(() => {
+    setDensity((d) => (d === "compact" ? "comfortable" : "compact"));
   }, []);
 
   const toggleFullscreen = useCallback(() => {
@@ -217,5 +251,13 @@ export function useOrganogram() {
     searchMatch,
     isFullscreen,
     toggleFullscreen,
+    paletteOpen,
+    setPaletteOpen,
+    focusedBranchId,
+    focusBranch,
+    focusBreadcrumb,
+    density,
+    setDensity,
+    toggleDensity,
   };
 }

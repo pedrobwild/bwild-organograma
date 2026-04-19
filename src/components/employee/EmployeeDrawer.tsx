@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/use-auth";
 
 import { TabDadosPessoais } from "./tabs/TabDadosPessoais";
 import { TabDadosProfissionais } from "./tabs/TabDadosProfissionais";
+import { TabJobDescription } from "./tabs/TabJobDescription";
 import { TabRemuneracao } from "./tabs/TabRemuneracao";
 import { TabDocumentos } from "./tabs/TabDocumentos";
 import { TabHistorico } from "./tabs/TabHistorico";
@@ -132,8 +133,9 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
               <p className="text-sm text-muted-foreground">Carregando dados...</p>
             </div>
           ) : (
-            <Tabs defaultValue="pessoais" className="h-full flex flex-col">
+            <Tabs defaultValue="jd" className="h-full flex flex-col">
               <TabsList className="mx-8 mt-4 mb-0 justify-start bg-slate-100 p-1 rounded-xl flex-shrink-0 flex-wrap">
+                <TabsTrigger value="jd" className="text-xs rounded-lg">Descrição de Cargo</TabsTrigger>
                 <TabsTrigger value="pessoais" className="text-xs rounded-lg">Pessoais</TabsTrigger>
                 <TabsTrigger value="profissionais" className="text-xs rounded-lg">Profissionais</TabsTrigger>
                 <TabsTrigger value="remuneracao" className="text-xs rounded-lg">Remuneração</TabsTrigger>
@@ -144,6 +146,9 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
               </TabsList>
 
               <div className="flex-1 overflow-y-auto px-8 py-6">
+                <TabsContent value="jd" className="mt-0">
+                  <TabJobDescription data={fullData} person={person} editing={editing} colaboradorId={person.id} />
+                </TabsContent>
                 <TabsContent value="pessoais" className="mt-0">
                   <TabDadosPessoais data={fullData} editing={editing} colaboradorId={person.id} />
                 </TabsContent>

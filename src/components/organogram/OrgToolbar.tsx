@@ -1,12 +1,17 @@
 import { useCallback } from "react";
 import {
+  Command as CommandIcon,
   Download,
+  LayoutGrid,
   List,
   Maximize,
   Maximize2,
   Minimize,
+  MoveHorizontal,
   Network,
+  Rows3,
   Search,
+  Users,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
@@ -27,11 +32,15 @@ interface OrgToolbarProps {
   onSearchChange: (q: string) => void;
   showDesligados: boolean;
   onToggleDesligados: (v: boolean) => void;
-  viewMode: "tree" | "list";
-  onViewModeChange: (v: "tree" | "list") => void;
+  viewMode: "tree" | "tree-h" | "list";
+  onViewModeChange: (v: "tree" | "tree-h" | "list") => void;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
   chartRef: React.RefObject<HTMLDivElement>;
+  onOpenPalette?: () => void;
+  density?: "compact" | "comfortable";
+  onToggleDensity?: () => void;
+  totalPeople?: number;
 }
 
 export function OrgToolbar({
@@ -48,6 +57,10 @@ export function OrgToolbar({
   isFullscreen,
   onToggleFullscreen,
   chartRef,
+  onOpenPalette,
+  density,
+  onToggleDensity,
+  totalPeople,
 }: OrgToolbarProps) {
   const handleExport = useCallback(async () => {
     const el = chartRef.current;
@@ -79,6 +92,25 @@ export function OrgToolbar({
           borderBottom: "1px solid rgba(255,255,255,0.06)",
         }}
       >
+        {/* Command palette launcher */}
+        {onOpenPalette && (
+          <button
+            onClick={onOpenPalette}
+            className="hidden md:flex items-center gap-2 h-8 px-3 rounded-md text-[11px] text-white/60 hover:text-white transition-colors"
+            style={{
+              background: "rgba(255,255,255,0.05)",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+            title="Abrir paleta de comandos (⌘K)"
+          >
+            <CommandIcon className="w-3.5 h-3.5" />
+            <span>Comandos</span>
+            <kbd className="ml-1 px-1.5 py-0.5 rounded text-[9px] font-mono bg-white/10 border border-white/10">
+              ⌘K
+            </kbd>
+          </button>
+        )}
+
         {/* Search */}
         <div className="relative flex-1 min-w-[200px] max-w-[320px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/40 pointer-events-none" />
@@ -86,9 +118,24 @@ export function OrgToolbar({
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             placeholder="Buscar colaborador..."
-            className="pl-9 h-8 text-xs bg-white/8 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-white/20"
+            className="pl-9 pr-8 h-8 text-xs bg-white/8 border-white/10 text-white placeholder:text-white/30 focus-visible:ring-white/20"
           />
+          <kbd className="absolute right-2 top-1/2 -translate-y-1/2 text-[9px] text-white/30 font-mono pointer-events-none">
+            /
+          </kbd>
         </div>
+
+        {/* Stats badge */}
+        {typeof totalPeople === "number" && totalPeople > 0 && (
+          <div
+            className="hidden md:flex items-center gap-1.5 h-7 px-2.5 rounded-full text-[10px] font-semibold text-white/60"
+            style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)" }}
+            title="Total de colaboradores"
+          >
+            <Users className="w-3 h-3" />
+            {totalPeople}
+          </div>
+        )}
 
         {/* Desligados toggle */}
         <div className="flex items-center gap-2">
@@ -118,9 +165,23 @@ export function OrgToolbar({
                 ? "bg-white/15 text-white"
                 : "text-white/40 hover:text-white/60"
             )}
+            title="Árvore vertical (T)"
           >
             <Network className="w-3 h-3" />
             Árvore
+          </button>
+          <button
+            onClick={() => onViewModeChange("tree-h")}
+            className={cn(
+              "flex items-center gap-1 px-2.5 py-1 rounded-md text-[11px] font-medium transition-all",
+              viewMode === "tree-h"
+                ? "bg-white/15 text-white"
+                : "text-white/40 hover:text-white/60"
+            )}
+            title="Árvore horizontal (H)"
+          >
+            <MoveHorizontal className="w-3 h-3" />
+            Horizontal
           </button>
           <button
             onClick={() => onViewModeChange("list")}
@@ -130,11 +191,29 @@ export function OrgToolbar({
                 ? "bg-white/15 text-white"
                 : "text-white/40 hover:text-white/60"
             )}
+            title="Lista hierárquica (L)"
           >
             <List className="w-3 h-3" />
             Lista
           </button>
         </div>
+
+        {/* Density toggle */}
+        {onToggleDensity && viewMode !== "list" && (
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onToggleDensity}
+            className="w-7 h-7 text-white/60 hover:bg-white/10 hover:text-white"
+            title={density === "compact" ? "Modo confortável (D)" : "Modo compacto (D)"}
+          >
+            {density === "compact" ? (
+              <LayoutGrid className="w-3.5 h-3.5" />
+            ) : (
+              <Rows3 className="w-3.5 h-3.5" />
+            )}
+          </Button>
+        )}
 
         {/* Zoom controls */}
         <div

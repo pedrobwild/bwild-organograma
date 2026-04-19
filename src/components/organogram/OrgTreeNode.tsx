@@ -1,6 +1,6 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, ChevronRight, Focus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getDeptColor } from "@/lib/deptColors";
 import { getChildren } from "@/lib/organogram";
@@ -16,6 +16,9 @@ interface OrgTreeNodeProps {
   highlightPath: Set<string>;
   showDesligados: boolean;
   searchMatch: Set<string> | null;
+  orientation?: "vertical" | "horizontal";
+  density?: "compact" | "comfortable";
+  onFocusBranch?: (id: string) => void;
 }
 
 export function OrgTreeNode({
@@ -27,6 +30,9 @@ export function OrgTreeNode({
   highlightPath,
   showDesligados,
   searchMatch,
+  orientation = "vertical",
+  density = "comfortable",
+  onFocusBranch,
 }: OrgTreeNodeProps) {
   const [collapsed, setCollapsed] = useState(false);
   const colors = getDeptColor(person.departamento);
@@ -51,10 +57,106 @@ export function OrgTreeNode({
 
   const isInPath = highlightPath.size > 0 && highlightPath.has(person.id);
   const isPJ = person.tipo_contrato === "PJ";
+  const isHorizontal = orientation === "horizontal";
+  const gapClass = density === "compact" ? "gap-2" : "gap-5";
+
+  if (isHorizontal) {
+    return (
+      <div className="flex items-center">
+        <div className="relative group">
+          <OrgNodeCard
+            person={person}
+            byId={byId}
+            onSelect={onSelect}
+            selectedId={selectedId}
+            highlightDept={highlightDept}
+            highlightPath={highlightPath}
+            level={person.nivel}
+          />
+
+          {onFocusBranch && visibleChildren.length > 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onFocusBranch(person.id);
+              }}
+              title="Focar nesta ramificação"
+              className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white shadow-md border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+              style={{ borderColor: `${colors.bg}33`, color: colors.bg }}
+            >
+              <Focus className="w-3 h-3" />
+            </button>
+          )}
+
+          {visibleChildren.length > 0 && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setCollapsed((p) => !p);
+              }}
+              className="absolute top-1/2 -right-3 z-10 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-full border bg-white shadow-md transition-all hover:scale-110"
+              style={{
+                borderColor: `${colors.bg}33`,
+                color: colors.bg,
+              }}
+            >
+              <ChevronRight
+                className={cn(
+                  "w-3 h-3 transition-transform duration-300",
+                  collapsed && "rotate-180"
+                )}
+              />
+            </button>
+          )}
+        </div>
+
+        <AnimatePresence initial={false}>
+          {!collapsed && visibleChildren.length > 0 && (
+            <motion.div
+              key="children-h"
+              initial={{ opacity: 0, width: 0 }}
+              animate={{ opacity: 1, width: "auto" }}
+              exit={{ opacity: 0, width: 0 }}
+              transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              className="flex items-center overflow-visible ml-10"
+            >
+              {/* Horizontal connector line */}
+              <div
+                className="h-px flex-shrink-0"
+                style={{
+                  width: 28,
+                  background: isInPath ? "#3b82f6" : colors.bg,
+                  marginRight: 8,
+                }}
+              />
+              <div className={cn("flex flex-col", gapClass)}>
+                {visibleChildren.map((child) => (
+                  <OrgTreeNode
+                    key={child.id}
+                    person={child}
+                    byId={byId}
+                    onSelect={onSelect}
+                    selectedId={selectedId}
+                    highlightDept={highlightDept}
+                    highlightPath={highlightPath}
+                    showDesligados={showDesligados}
+                    searchMatch={searchMatch}
+                    orientation="horizontal"
+                    density={density}
+                    onFocusBranch={onFocusBranch}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative">
+      <div className="relative group">
         <OrgNodeCard
           person={person}
           byId={byId}
@@ -64,6 +166,21 @@ export function OrgTreeNode({
           highlightPath={highlightPath}
           level={person.nivel}
         />
+
+        {/* Focus-branch button (shown on hover) */}
+        {onFocusBranch && visibleChildren.length > 0 && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onFocusBranch(person.id);
+            }}
+            title="Focar nesta ramificação"
+            className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-white shadow-md border flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+            style={{ borderColor: `${colors.bg}33`, color: colors.bg }}
+          >
+            <Focus className="w-3 h-3" />
+          </button>
+        )}
 
         {/* Collapse toggle */}
         {visibleChildren.length > 0 && (
@@ -111,7 +228,7 @@ export function OrgTreeNode({
             <div
               className={cn(
                 "flex items-start",
-                visibleChildren.length > 1 ? "gap-5" : ""
+                visibleChildren.length > 1 ? gapClass : ""
               )}
             >
               {visibleChildren.map((child) => (
@@ -125,6 +242,9 @@ export function OrgTreeNode({
                   highlightPath={highlightPath}
                   showDesligados={showDesligados}
                   searchMatch={searchMatch}
+                  orientation={orientation}
+                  density={density}
+                  onFocusBranch={onFocusBranch}
                 />
               ))}
             </div>
