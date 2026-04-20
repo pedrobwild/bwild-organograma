@@ -104,6 +104,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
           <ReadOnlyField label="Carga horária" value={data?.carga_horaria} />
           <ReadOnlyField label="Data de início" value={data?.data_inicio ? `${new Date(data.data_inicio).toLocaleDateString("pt-BR")}${tempo ? ` (${tempo})` : ""}` : null} />
           <ReadOnlyField label="Superior direto" value={person.superior ? allColaboradores.find(c => c.id === person.superior)?.nome : null} />
+          <ReadOnlyField label="Nível hierárquico (linha do organograma)" value={typeof data?.nivel === "number" ? String(data.nivel) : null} />
           <ReadOnlyField label="Email corporativo" value={data?.email_corporativo} />
           <ReadOnlyField label="Funções" value={data?.funcoes?.join(", ")} span={2} />
         </div>
