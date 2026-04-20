@@ -273,7 +273,14 @@ export default function OrgChart() {
         density={density}
         onToggleDensity={toggleDensity}
         totalPeople={colaboradores.length}
+        canEdit={isAdmin && !isMobile && viewMode !== "list"}
+        editMode={editMode}
+        onToggleEditMode={toggleEditMode}
       />
+
+      <AnimatePresence>
+        {editMode && <EditModeBanner onExit={() => setEditMode(false)} />}
+      </AnimatePresence>
 
       {focusedBranchId && focusBreadcrumb.length > 0 && (
         <div className="absolute top-14 left-0 right-0 z-20 pointer-events-none">
