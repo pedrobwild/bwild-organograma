@@ -166,6 +166,10 @@ export default function OrgChart() {
 
       if (e.key === "Escape") {
         if (paletteOpen) return;
+        if (editMode) {
+          setEditMode(false);
+          return;
+        }
         if (selectedPerson) {
           closeSidebar();
           return;
@@ -181,6 +185,9 @@ export default function OrgChart() {
       }
 
       if (isTyping(e.target)) return;
+
+      // While editing structure, suppress layout-changing shortcuts to avoid breaking drag
+      if (editMode) return;
 
       switch (e.key) {
         case "+":
