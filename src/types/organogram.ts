@@ -10,6 +10,7 @@ export interface Colaborador {
   subordinados: string[];
   status: string;
   tipo_contrato: string | null;
+  cor_card?: string | null;
 }
 
 export interface OrganogramaData {
