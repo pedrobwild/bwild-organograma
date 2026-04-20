@@ -71,6 +71,7 @@ export function TabDadosPessoais({ data, editing, colaboradorId }: Props) {
         <div className="grid grid-cols-2 gap-4">
           <ReadOnlyField label="Nome completo" value={data?.nome} span={2} />
           <ReadOnlyField label="CPF" value={data?.cpf} />
+          <ReadOnlyField label="CNPJ" value={data?.cnpj} />
           <ReadOnlyField label="Data de nascimento" value={data?.data_nascimento ? `${new Date(data.data_nascimento).toLocaleDateString("pt-BR")}${age !== null ? ` (${age} anos)` : ""}` : null} />
           <ReadOnlyField label="Email pessoal" value={data?.email_pessoal} />
           <ReadOnlyField label="Telefone" value={data?.telefone} />
@@ -92,6 +93,9 @@ export function TabDadosPessoais({ data, editing, colaboradorId }: Props) {
         </FieldRow>
         <FieldRow label="CPF">
           <Input value={form.cpf} onChange={(e) => setForm((p) => ({ ...p, cpf: e.target.value }))} placeholder="000.000.000-00" />
+        </FieldRow>
+        <FieldRow label="CNPJ">
+          <Input value={form.cnpj} onChange={(e) => setForm((p) => ({ ...p, cnpj: e.target.value }))} placeholder="00.000.000/0000-00" />
         </FieldRow>
         <FieldRow label="Data de nascimento">
           <Input type="date" value={form.data_nascimento} onChange={(e) => setForm((p) => ({ ...p, data_nascimento: e.target.value }))} />
