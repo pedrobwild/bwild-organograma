@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, ChevronRight, Focus, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, Focus, GripVertical, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getDeptColor } from "@/lib/deptColors";
 import { getInitials } from "@/lib/organogram";
@@ -19,6 +19,9 @@ interface OrgTreeCanvasProps {
   density: "compact" | "comfortable";
   onSelect: (person: Colaborador) => void;
   onFocusBranch?: (id: string) => void;
+  editMode?: boolean;
+  onReassign?: (movedId: string, newSuperiorId: string | null) => void;
+  zoom?: number;
 }
 
 const NODE_W = 264;
@@ -41,8 +44,13 @@ export function OrgTreeCanvas({
   density,
   onSelect,
   onFocusBranch,
+  editMode = false,
+  onReassign,
+  zoom = 1,
 }: OrgTreeCanvasProps) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [hoverTargetId, setHoverTargetId] = useState<string | null>(null);
 
   const NODE_H = density === "compact" ? NODE_H_COMPACT : NODE_H_COMFORTABLE;
   const H_GAP = density === "compact" ? H_GAP_COMPACT : H_GAP_COMFORTABLE;
@@ -80,6 +88,14 @@ export function OrgTreeCanvas({
     });
   }, [byId]);
 
+  // Reset drag state when leaving edit mode
+  useEffect(() => {
+    if (!editMode) {
+      setDraggingId(null);
+      setHoverTargetId(null);
+    }
+  }, [editMode]);
+
   const toggleCollapse = (id: string) => {
     setCollapsed((prev) => {
       const next = new Set(prev);
@@ -89,7 +105,7 @@ export function OrgTreeCanvas({
     });
   };
 
-  // Pre-compute who has children (in the original tree) so collapsed nodes still show toggle
+  // Pre-compute who has children
   const allHasChildren = useMemo(() => {
     const set = new Set<string>();
     for (const c of byId.values()) {
@@ -103,6 +119,42 @@ export function OrgTreeCanvas({
     }
     return set;
   }, [byId, showDesligados]);
+
+  // Descendants of dragging node — invalid as drop targets
+  const invalidTargets = useMemo(() => {
+    if (!draggingId) return new Set<string>();
+    const set = new Set<string>([draggingId]);
+    const queue = [draggingId];
+    while (queue.length) {
+      const curr = queue.shift()!;
+      const node = byId.get(curr);
+      if (node) {
+        for (const sid of node.subordinados) {
+          if (!set.has(sid)) {
+            set.add(sid);
+            queue.push(sid);
+          }
+        }
+      }
+    }
+    return set;
+  }, [draggingId, byId]);
+
+  const handleDragStart = (id: string) => {
+    setDraggingId(id);
+  };
+
+  const handleDragEnd = () => {
+    if (draggingId && hoverTargetId && onReassign) {
+      const moved = byId.get(draggingId);
+      const target = byId.get(hoverTargetId);
+      if (moved && target && moved.superior !== target.id && !invalidTargets.has(target.id)) {
+        onReassign(draggingId, target.id);
+      }
+    }
+    setDraggingId(null);
+    setHoverTargetId(null);
+  };
 
   return (
     <div className="relative" style={{ width: layout.width, height: layout.height }}>
@@ -158,6 +210,10 @@ export function OrgTreeCanvas({
           const isSearchMatch = searchMatchIds?.has(person.id) ?? false;
           const dim = !!highlightDept && person.departamento !== highlightDept && !isInPath;
 
+          const isDragging = draggingId === person.id;
+          const isInvalidTarget = editMode && draggingId !== null && invalidTargets.has(person.id);
+          const isHoverTarget = hoverTargetId === person.id && !isInvalidTarget;
+
           return (
             <motion.div
               key={person.id}
@@ -165,18 +221,37 @@ export function OrgTreeCanvas({
               layoutId={`node-${person.id}`}
               initial={{ opacity: 0, scale: 0.94 }}
               animate={{
-                opacity: dim ? 0.35 : 1,
+                opacity: dim ? 0.35 : isDragging ? 0.5 : 1,
                 scale: 1,
                 filter: dim ? "saturate(0.4)" : "none",
               }}
               exit={{ opacity: 0, scale: 0.94 }}
               transition={{ type: "spring", damping: 28, stiffness: 260 }}
+              drag={editMode}
+              dragMomentum={false}
+              dragElastic={0}
+              dragSnapToOrigin
+              dragTransition={{ bounceStiffness: 600, bounceDamping: 30 }}
+              onDragStart={() => handleDragStart(person.id)}
+              onDragEnd={handleDragEnd}
+              whileDrag={{ scale: 1.05, zIndex: 50, cursor: "grabbing" }}
+              onMouseEnter={() => {
+                if (editMode && draggingId && draggingId !== person.id) {
+                  setHoverTargetId(person.id);
+                }
+              }}
+              onMouseLeave={() => {
+                if (editMode && hoverTargetId === person.id) {
+                  setHoverTargetId(null);
+                }
+              }}
               style={{
                 position: "absolute",
                 left: n.x,
                 top: n.y,
                 width: NODE_W,
                 height: NODE_H,
+                zIndex: isDragging ? 50 : isHoverTarget ? 20 : 1,
               }}
               className="group"
             >
@@ -189,9 +264,13 @@ export function OrgTreeCanvas({
                 hasChildren={hasChildren}
                 isCollapsed={isCollapsed}
                 orientation={orientation}
-                onClick={() => onSelect(person)}
+                editMode={editMode}
+                isHoverTarget={isHoverTarget}
+                isInvalidTarget={isInvalidTarget}
+                isDragging={isDragging}
+                onClick={editMode ? undefined : () => onSelect(person)}
                 onToggleCollapse={() => toggleCollapse(person.id)}
-                onFocus={onFocusBranch ? () => onFocusBranch(person.id) : undefined}
+                onFocus={onFocusBranch && !editMode ? () => onFocusBranch(person.id) : undefined}
               />
             </motion.div>
           );
@@ -210,7 +289,11 @@ interface OrgCanvasCardProps {
   hasChildren: boolean;
   isCollapsed: boolean;
   orientation: Orientation;
-  onClick: () => void;
+  editMode: boolean;
+  isHoverTarget: boolean;
+  isInvalidTarget: boolean;
+  isDragging: boolean;
+  onClick?: () => void;
   onToggleCollapse: () => void;
   onFocus?: () => void;
 }
@@ -224,6 +307,10 @@ function OrgCanvasCard({
   hasChildren,
   isCollapsed,
   orientation,
+  editMode,
+  isHoverTarget,
+  isInvalidTarget,
+  isDragging,
   onClick,
   onToggleCollapse,
   onFocus,
@@ -237,34 +324,46 @@ function OrgCanvasCard({
 
   return (
     <div
-      role="button"
-      tabIndex={0}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : -1}
       onClick={onClick}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
+        if (onClick && (e.key === "Enter" || e.key === " ")) {
           e.preventDefault();
           onClick();
         }
       }}
       data-node-card
       className={cn(
-        "relative w-full h-full flex items-center gap-3 pl-4 pr-3 rounded-xl cursor-pointer select-none",
+        "relative w-full h-full flex items-center gap-3 pl-4 pr-3 rounded-xl select-none",
         "bg-white shadow-sm transition-all duration-200",
-        "hover:shadow-lg hover:-translate-y-0.5",
+        editMode ? "cursor-grab active:cursor-grabbing" : "cursor-pointer hover:shadow-lg hover:-translate-y-0.5",
         "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-400",
         isSelected && "shadow-lg -translate-y-0.5",
         isInPath && "ring-2 ring-blue-400",
         isSearchMatch && !isSelected && "ring-2 ring-amber-400",
+        isHoverTarget && "ring-4 ring-emerald-400 shadow-2xl",
+        isInvalidTarget && "ring-2 ring-red-400 opacity-50",
+        isDragging && "shadow-2xl",
       )}
       style={{
         borderLeft: `4px solid ${colors.bg}`,
-        ...(isSelected
+        ...(isSelected && !isHoverTarget
           ? { boxShadow: `0 0 0 2px ${colors.bg}, 0 10px 30px -10px ${colors.bg}66` }
+          : {}),
+        ...(isHoverTarget
+          ? { boxShadow: "0 0 0 3px #10b981, 0 20px 40px -10px rgba(16,185,129,0.5)" }
           : {}),
       }}
     >
+      {editMode && (
+        <div className="absolute left-1 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
+          <GripVertical className="w-3.5 h-3.5" />
+        </div>
+      )}
+
       <div
-        className="flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center font-semibold text-white"
+        className={cn("flex-shrink-0 rounded-lg overflow-hidden flex items-center justify-center font-semibold text-white", editMode && "ml-2")}
         style={{
           width: avatarSize,
           height: avatarSize,
@@ -314,7 +413,25 @@ function OrgCanvasCard({
         )}
       </div>
 
-      {onFocus && (
+      {isHoverTarget && (
+        <div
+          className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] font-bold text-white whitespace-nowrap"
+          style={{ background: "#10b981", boxShadow: "0 4px 12px rgba(16,185,129,0.4)" }}
+        >
+          Soltar aqui = novo superior
+        </div>
+      )}
+
+      {isInvalidTarget && !isDragging && (
+        <div
+          className="absolute -top-3 left-1/2 -translate-x-1/2 px-2 py-0.5 rounded-full text-[10px] font-bold text-white whitespace-nowrap"
+          style={{ background: "#ef4444" }}
+        >
+          Inválido (criaria ciclo)
+        </div>
+      )}
+
+      {!editMode && onFocus && (
         <button
           onClick={(e) => {
             e.stopPropagation();
@@ -332,7 +449,7 @@ function OrgCanvasCard({
         </button>
       )}
 
-      {hasChildren && (
+      {!editMode && hasChildren && (
         <button
           onClick={(e) => {
             e.stopPropagation();
