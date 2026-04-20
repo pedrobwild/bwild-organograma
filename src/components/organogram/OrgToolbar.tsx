@@ -256,6 +256,25 @@ export function OrgToolbar({
           </Button>
         </div>
 
+        {/* Edit structure (admins only) */}
+        {canEdit && onToggleEditMode && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onToggleEditMode}
+            className={cn(
+              "h-7 px-2.5 text-[11px] gap-1.5 transition-all",
+              editMode
+                ? "bg-amber-500 text-white hover:bg-amber-600"
+                : "text-white/60 hover:bg-white/10 hover:text-white",
+            )}
+            title={editMode ? "Sair do modo edição" : "Editar estrutura (drag-and-drop)"}
+          >
+            <GitBranch className="w-3 h-3" />
+            {editMode ? "Editando" : "Editar"}
+          </Button>
+        )}
+
         {/* Fullscreen */}
         <Button
           variant="ghost"
