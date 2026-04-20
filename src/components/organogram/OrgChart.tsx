@@ -57,10 +57,42 @@ export default function OrgChart() {
     focusBreadcrumb,
     density,
     toggleDensity,
+    editMode,
+    toggleEditMode,
+    setEditMode,
   } = useOrganogram();
 
+  const { isAdmin } = useAuth();
+  const updateColaborador = useUpdateColaborador();
   const isMobile = useIsMobile();
   const effectiveViewMode = isMobile ? "list" : viewMode;
+
+  // Disable edit mode automatically on mobile or list view
+  useEffect(() => {
+    if (editMode && (isMobile || viewMode === "list")) {
+      setEditMode(false);
+    }
+  }, [editMode, isMobile, viewMode, setEditMode]);
+
+  const handleReassign = async (movedId: string, newSuperiorId: string | null) => {
+    const moved = byId.get(movedId);
+    const newSup = newSuperiorId ? byId.get(newSuperiorId) : null;
+    if (!moved) return;
+    try {
+      await updateColaborador.mutateAsync({
+        id: movedId,
+        superior_id: newSuperiorId,
+        nivel: newSup ? newSup.nivel + 1 : 0,
+      });
+      toast.success(
+        newSup
+          ? `${moved.nome} agora reporta a ${newSup.nome}`
+          : `${moved.nome} foi movido para a raiz`,
+      );
+    } catch {
+      toast.error("Erro ao atualizar hierarquia");
+    }
+  };
 
   // Sync dynamic dept colors
   useEffect(() => {
