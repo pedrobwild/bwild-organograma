@@ -460,7 +460,6 @@ export default function OrgChart() {
                 onFocusBranch={focusBranch}
                 editMode={editMode}
                 onReassign={handleReassign}
-                zoom={zoom}
               />
             </div>
           </div>

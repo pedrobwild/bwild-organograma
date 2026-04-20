@@ -21,7 +21,6 @@ interface OrgTreeCanvasProps {
   onFocusBranch?: (id: string) => void;
   editMode?: boolean;
   onReassign?: (movedId: string, newSuperiorId: string | null) => void;
-  zoom?: number;
 }
 
 const NODE_W = 264;
@@ -46,7 +45,6 @@ export function OrgTreeCanvas({
   onFocusBranch,
   editMode = false,
   onReassign,
-  zoom = 1,
 }: OrgTreeCanvasProps) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [draggingId, setDraggingId] = useState<string | null>(null);
