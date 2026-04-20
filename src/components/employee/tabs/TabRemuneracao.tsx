@@ -118,7 +118,21 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
         )}
       </section>
 
-      {/* Benefícios */}
+      {/* Chave PIX */}
+      <section>
+        <h3 className="text-sm font-semibold text-slate-800 mb-3">Chave PIX</h3>
+        {editing ? (
+          <div className="flex items-end gap-3">
+            <FieldRow label="Chave">
+              <Input value={chavePix} onChange={(e) => setChavePix(e.target.value)} placeholder="CPF, e-mail, telefone ou chave aleatória" />
+            </FieldRow>
+            <Button size="sm" variant="outline" onClick={savePix} className="mb-0.5">Salvar</Button>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-700">{data?.chave_pix || "—"}</p>
+        )}
+      </section>
+
       <section>
         <h3 className="text-sm font-semibold text-slate-800 mb-3">Benefícios</h3>
         {beneficios.length > 0 ? (
