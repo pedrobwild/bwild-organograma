@@ -35,10 +35,23 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
   const [editing, setEditing] = useState(false);
   const [showHierarchyEdit, setShowHierarchyEdit] = useState(false);
   const { data: fullData, isLoading } = useColaboradorFull(person.id);
-  const colors = getDeptColor(person.departamento);
+  const updateColab = useUpdateColaborador();
+  const deptColors = getDeptColor(person.departamento);
+  const customBg = person.cor_card?.trim() || null;
+  const colors = customBg ? { ...deptColors, bg: customBg } : deptColors;
   const initials = getInitials(person.nome);
+  const [pickerColor, setPickerColor] = useState(customBg || deptColors.bg);
 
   const status = fullData?.status ?? "ativo";
+
+  const handleSaveColor = async (bg: string | null) => {
+    try {
+      await updateColab.mutateAsync({ id: person.id, cor_card: bg });
+      toast.success(bg ? "Cor do card atualizada!" : "Cor do card resetada para o padrão do departamento.");
+    } catch (err: any) {
+      toast.error(`Erro ao salvar cor: ${err?.message ?? "desconhecido"}`);
+    }
+  };
 
   return (
     <>
