@@ -258,23 +258,38 @@ export function OrgToolbar({
           </Button>
         </div>
 
-        {/* Edit structure (admins only) */}
+        {/* Edit structure (admins only) — destacado */}
         {canEdit && onToggleEditMode && (
           <Button
             variant="ghost"
             size="sm"
-            onClick={onToggleEditMode}
+            onClick={isAdmin ? onToggleEditMode : undefined}
+            disabled={!isAdmin}
             className={cn(
-              "h-7 px-2.5 text-[11px] gap-1.5 transition-all",
+              "h-8 px-3 text-[11px] font-semibold gap-1.5 transition-all rounded-md",
               editMode
-                ? "text-white hover:opacity-90"
-                : "text-white/60 hover:bg-white/10 hover:text-white",
+                ? "text-white shadow-lg"
+                : isAdmin
+                  ? "text-white border border-white/20 hover:border-white/40 hover:bg-white/10"
+                  : "text-white/30 border border-white/10 cursor-not-allowed",
             )}
-            style={editMode ? { background: "rgb(245,158,11)" } : undefined}
-            title={editMode ? "Sair do modo edição" : "Editar estrutura (drag-and-drop)"}
+            style={
+              editMode
+                ? { background: "rgb(245,158,11)", boxShadow: "0 4px 14px -4px rgba(245,158,11,0.5)" }
+                : isAdmin
+                  ? { background: "rgba(245,158,11,0.12)" }
+                  : undefined
+            }
+            title={
+              !isAdmin
+                ? "Apenas administradores podem editar a estrutura"
+                : editMode
+                  ? "Sair do modo edição (Esc)"
+                  : "Editar estrutura do organograma (drag-and-drop)"
+            }
           >
-            <GitBranch className="w-3 h-3" />
-            {editMode ? "Editando" : "Editar"}
+            <GitBranch className="w-3.5 h-3.5" />
+            {editMode ? "Editando estrutura" : "Editar estrutura"}
           </Button>
         )}
 
