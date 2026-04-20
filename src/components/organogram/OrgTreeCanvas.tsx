@@ -21,6 +21,7 @@ interface OrgTreeCanvasProps {
   onFocusBranch?: (id: string) => void;
   editMode?: boolean;
   onReassign?: (movedId: string, newSuperiorId: string | null) => void;
+  onChangeNivel?: (id: string, delta: number) => void;
 }
 
 const NODE_W = 264;
