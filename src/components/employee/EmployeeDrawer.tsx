@@ -249,8 +249,6 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
                 <TabsTrigger value="remuneracao" className="text-xs rounded-lg">Remuneração</TabsTrigger>
                 <TabsTrigger value="documentos" className="text-xs rounded-lg">Documentos</TabsTrigger>
                 <TabsTrigger value="historico" className="text-xs rounded-lg">Histórico</TabsTrigger>
-                <TabsTrigger value="bancarios" className="text-xs rounded-lg">Bancários</TabsTrigger>
-                <TabsTrigger value="onboarding" className="text-xs rounded-lg">Onboarding</TabsTrigger>
               </TabsList>
 
               <div className="flex-1 overflow-y-auto px-8 py-6">
