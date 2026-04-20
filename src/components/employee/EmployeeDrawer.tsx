@@ -30,6 +30,21 @@ interface EmployeeDrawerProps {
   onClose: () => void;
 }
 
+const PRESET_SWATCHES = [
+  "#1B4F72", // azul profundo
+  "#1A5276", // azul aço
+  "#2874A6", // azul médio
+  "#117A65", // verde esmeralda
+  "#148F77", // verde teal
+  "#B9770E", // âmbar
+  "#CA6F1E", // laranja queimado
+  "#922B21", // vinho
+  "#6C3483", // roxo
+  "#34495E", // grafite
+  "#7B7D7D", // cinza neutro
+  "#0E6655", // verde floresta
+];
+
 export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDrawerProps) {
   const { isAdmin } = useAuth();
   const [editing, setEditing] = useState(false);
@@ -122,6 +137,24 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
                           onChange={(e) => setPickerColor(e.target.value)}
                           className="flex-1 h-10 px-2 rounded border text-xs font-mono bg-background text-foreground"
                         />
+                      </div>
+                      <div className="space-y-1.5">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Paleta sugerida</p>
+                        <div className="grid grid-cols-6 gap-1.5">
+                          {PRESET_SWATCHES.map((swatch) => {
+                            const isActive = pickerColor.toLowerCase() === swatch.toLowerCase();
+                            return (
+                              <button
+                                key={swatch}
+                                type="button"
+                                onClick={() => setPickerColor(swatch)}
+                                title={swatch}
+                                className={`w-full aspect-square rounded-md border-2 transition-transform hover:scale-110 ${isActive ? "border-foreground ring-2 ring-foreground/20" : "border-border"}`}
+                                style={{ background: swatch }}
+                              />
+                            );
+                          })}
+                        </div>
                       </div>
                       <div
                         className="rounded-lg p-3 text-xs font-medium text-white text-center"
