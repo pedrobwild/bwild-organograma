@@ -154,6 +154,16 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
             </SelectContent>
           </Select>
         </FieldRow>
+        <FieldRow label="Nível hierárquico (linha do organograma)">
+          <Input
+            type="number"
+            min={0}
+            step={1}
+            value={form.nivel}
+            onChange={(e) => setForm(p => ({ ...p, nivel: Number(e.target.value) || 0 }))}
+            placeholder="0 = topo"
+          />
+        </FieldRow>
         <FieldRow label="Email corporativo" span={2}>
           <Input type="email" value={form.email_corporativo} onChange={(e) => setForm(p => ({ ...p, email_corporativo: e.target.value }))} />
         </FieldRow>
