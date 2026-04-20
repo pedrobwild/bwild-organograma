@@ -154,14 +154,14 @@ export default function OrgChart() {
     }
   }, [deptColorMap]);
 
-  // Derive roots: focused branch overrides global root
+  // Derive roots: focused branch overrides; otherwise mostra todas as raízes
   const canvasRoots = useMemo(() => {
     if (focusedBranchId) {
       const focused = byId.get(focusedBranchId);
       if (focused) return [focused];
     }
-    return root ? [root] : [];
-  }, [focusedBranchId, byId, root]);
+    return roots && roots.length > 0 ? roots : root ? [root] : [];
+  }, [focusedBranchId, byId, root, roots]);
 
   // Highlight path as a Set (or null when no selection)
   const highlightPathOrNull = useMemo(() => {
