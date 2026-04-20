@@ -118,7 +118,7 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
                       Cor do card
                     </Button>
                   </PopoverTrigger>
-                  <PopoverContent className="w-72 p-4" align="end">
+                  <PopoverContent className="w-72 p-4 z-[60]" align="end" sideOffset={8}>
                     <div className="space-y-3">
                       <div>
                         <p className="text-sm font-semibold text-card-foreground">Cor do card</p>
