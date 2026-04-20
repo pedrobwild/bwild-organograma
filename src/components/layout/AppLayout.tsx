@@ -1,11 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   BarChart3,
-  Car,
-  FolderOpen,
+  LogIn,
   LogOut,
   Network,
-  Percent,
+  ShieldCheck,
   Users,
 } from "lucide-react";
 import {
@@ -30,6 +29,7 @@ const NAV_ITEMS = [
   { title: "Organograma", url: "/", icon: Network, adminOnly: false },
   { title: "Dashboard", url: "/dashboard", icon: BarChart3, adminOnly: true },
   { title: "Colaboradores", url: "/admin", icon: Users, adminOnly: true },
+  { title: "Usuários", url: "/admin/usuarios", icon: ShieldCheck, adminOnly: true },
 ];
 
 interface AppLayoutProps {
@@ -40,9 +40,24 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, fullScreen = false }: AppLayoutProps) {
   const { user, isAdmin, signOut } = useAuth();
+  const navigate = useNavigate();
 
+  // Public mode: no sidebar, but always show a floating "Entrar" button so
+  // the user has a path to authenticate (otherwise the org chart is a dead end).
   if (!user) {
-    return <>{children}</>;
+    return (
+      <>
+        {children}
+        <Button
+          onClick={() => navigate("/login")}
+          size="sm"
+          className="fixed top-3 right-4 z-50 gap-1.5 shadow-lg"
+        >
+          <LogIn className="w-4 h-4" />
+          Entrar
+        </Button>
+      </>
+    );
   }
 
   return (
