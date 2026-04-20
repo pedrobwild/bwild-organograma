@@ -297,6 +297,7 @@ export function OrgTreeCanvas({
                 onClick={editMode ? undefined : () => onSelect(person)}
                 onToggleCollapse={() => toggleCollapse(person.id)}
                 onFocus={onFocusBranch && !editMode ? () => onFocusBranch(person.id) : undefined}
+                onChangeNivel={onChangeNivel ? (delta) => onChangeNivel(person.id, delta) : undefined}
               />
             </motion.div>
           );
