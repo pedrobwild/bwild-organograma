@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
-import { ChevronDown, ChevronRight, Focus, GripVertical, Plus } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Focus, GripVertical, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getDeptColor } from "@/lib/deptColors";
 import { getInitials } from "@/lib/organogram";
