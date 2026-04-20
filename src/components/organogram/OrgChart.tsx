@@ -332,32 +332,34 @@ export default function OrgChart() {
 
       <div
         ref={containerRef}
-        className="relative z-10 flex-1 overflow-hidden select-none pt-14"
+        className={`relative z-10 flex-1 overflow-hidden select-none ${editMode ? "pt-24" : "pt-14"}`}
         style={{
           cursor:
-            effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
-              ? isDragging
-                ? "grabbing"
-                : "grab"
-              : "default",
+            editMode
+              ? "default"
+              : effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+                ? isDragging
+                  ? "grabbing"
+                  : "grab"
+                : "default",
         }}
         onMouseDown={
-          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+          !editMode && (effectiveViewMode === "tree" || effectiveViewMode === "tree-h")
             ? handleMouseDown
             : undefined
         }
         onMouseMove={
-          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+          !editMode && (effectiveViewMode === "tree" || effectiveViewMode === "tree-h")
             ? handleMouseMove
             : undefined
         }
         onMouseUp={
-          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+          !editMode && (effectiveViewMode === "tree" || effectiveViewMode === "tree-h")
             ? handleMouseUp
             : undefined
         }
         onMouseLeave={
-          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+          !editMode && (effectiveViewMode === "tree" || effectiveViewMode === "tree-h")
             ? handleMouseUp
             : undefined
         }
@@ -420,6 +422,9 @@ export default function OrgChart() {
                 density={density}
                 onSelect={handleSelectPerson}
                 onFocusBranch={focusBranch}
+                editMode={editMode}
+                onReassign={handleReassign}
+                zoom={zoom}
               />
             </div>
           </div>
