@@ -33,13 +33,24 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
   const upsertVeiculo = useUpsertVeiculo();
 
   const [salario, setSalario] = useState("");
-  useEffect(() => { setSalario(data?.salario_base?.toString() ?? ""); }, [data]);
+  const [chavePix, setChavePix] = useState("");
+  useEffect(() => {
+    setSalario(data?.salario_base?.toString() ?? "");
+    setChavePix(data?.chave_pix ?? "");
+  }, [data]);
 
   const saveSalario = async () => {
     try {
       await update.mutateAsync({ id: colaboradorId, salario_base: salario ? parseFloat(salario) : null } as any);
       toast.success("Salário atualizado!");
     } catch { toast.error("Erro ao salvar salário."); }
+  };
+
+  const savePix = async () => {
+    try {
+      await update.mutateAsync({ id: colaboradorId, chave_pix: chavePix || null } as any);
+      toast.success("Chave PIX atualizada!");
+    } catch { toast.error("Erro ao salvar chave PIX."); }
   };
 
   // New beneficio
