@@ -486,6 +486,7 @@ export default function OrgChart() {
                 onFocusBranch={focusBranch}
                 editMode={editMode}
                 onReassign={handleReassign}
+                onChangeNivel={handleChangeNivel}
               />
             </div>
           </div>
