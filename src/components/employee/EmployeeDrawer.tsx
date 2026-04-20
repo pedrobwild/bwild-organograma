@@ -123,6 +123,24 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
                           className="flex-1 h-10 px-2 rounded border text-xs font-mono bg-background text-foreground"
                         />
                       </div>
+                      <div className="space-y-1.5">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Paleta sugerida</p>
+                        <div className="grid grid-cols-6 gap-1.5">
+                          {PRESET_SWATCHES.map((swatch) => {
+                            const isActive = pickerColor.toLowerCase() === swatch.toLowerCase();
+                            return (
+                              <button
+                                key={swatch}
+                                type="button"
+                                onClick={() => setPickerColor(swatch)}
+                                title={swatch}
+                                className={`w-full aspect-square rounded-md border-2 transition-transform hover:scale-110 ${isActive ? "border-foreground ring-2 ring-foreground/20" : "border-border"}`}
+                                style={{ background: swatch }}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
                       <div
                         className="rounded-lg p-3 text-xs font-medium text-white text-center"
                         style={{ background: pickerColor }}
