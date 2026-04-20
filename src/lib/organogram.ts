@@ -5,7 +5,12 @@ export function buildByIdMap(colaboradores: Colaborador[]) {
 }
 
 export function getRootNode(colaboradores: Colaborador[]) {
-  return colaboradores.find((colaborador) => colaborador.nivel === 0) ?? null;
+  // Raiz real = quem não tem superior. Se houver múltiplos, prefere o de menor nível.
+  const semSuperior = colaboradores.filter((c) => !c.superior);
+  if (semSuperior.length > 0) {
+    return [...semSuperior].sort((a, b) => a.nivel - b.nivel)[0];
+  }
+  return [...colaboradores].sort((a, b) => a.nivel - b.nivel)[0] ?? null;
 }
 
 export function getDepartments(colaboradores: Colaborador[]) {
