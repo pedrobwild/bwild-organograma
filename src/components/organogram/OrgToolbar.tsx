@@ -43,6 +43,7 @@ interface OrgToolbarProps {
   onToggleDensity?: () => void;
   totalPeople?: number;
   canEdit?: boolean;
+  isAdmin?: boolean;
   editMode?: boolean;
   onToggleEditMode?: () => void;
 }
