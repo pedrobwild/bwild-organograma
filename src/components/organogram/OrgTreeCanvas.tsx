@@ -46,6 +46,7 @@ export function OrgTreeCanvas({
   onFocusBranch,
   editMode = false,
   onReassign,
+  onChangeNivel,
 }: OrgTreeCanvasProps) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [draggingId, setDraggingId] = useState<string | null>(null);
