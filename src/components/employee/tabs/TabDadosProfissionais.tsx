@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Colaborador } from "@/types/organogram";
 import { FieldRow, ReadOnlyField } from "../FieldHelpers";
+import { TabSaveActions } from "../TabSaveActions";
 import { Camera } from "lucide-react";
 
 interface Props {
@@ -117,7 +118,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold text-slate-800">Dados Profissionais</h3>
         {editing && (
-          <label className="flex items-center gap-1.5 text-xs text-blue-600 hover:underline cursor-pointer">
+          <label className="flex items-center gap-1.5 text-xs text-primary hover:underline cursor-pointer">
             <Camera className="w-3.5 h-3.5" /> Alterar foto
             <input type="file" accept="image/*" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePhotoUpload(f); }} />
           </label>
@@ -175,7 +176,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
           />
         </FieldRow>
       </div>
-      <button onClick={save} className="text-xs text-blue-600 hover:underline mt-2">Salvar dados profissionais</button>
+      <TabSaveActions onSave={save} saving={update.isPending} label="Salvar dados profissionais" />
     </div>
   );
 }

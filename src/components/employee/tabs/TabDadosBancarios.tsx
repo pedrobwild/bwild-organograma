@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useUpdateColaborador } from "@/hooks/use-colaboradores";
 import { toast } from "sonner";
 import { FieldRow, ReadOnlyField } from "../FieldHelpers";
+import { TabSaveActions } from "../TabSaveActions";
 
 interface Props {
   data: any;
@@ -95,7 +96,7 @@ export function TabDadosBancarios({ data, editing, colaboradorId }: Props) {
           <Input value={form.chave_pix} onChange={(e) => setForm(p => ({ ...p, chave_pix: e.target.value }))} />
         </FieldRow>
       </div>
-      <button onClick={save} className="text-xs text-blue-600 hover:underline mt-2">Salvar dados bancários</button>
+      <TabSaveActions onSave={save} saving={update.isPending} label="Salvar dados bancários" />
     </div>
   );
 }

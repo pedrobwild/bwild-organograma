@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useUpdateColaborador } from "@/hooks/use-colaboradores";
 import { toast } from "sonner";
 import { FieldRow, ReadOnlyField } from "../FieldHelpers";
+import { TabSaveActions } from "../TabSaveActions";
 
 interface Props {
   data: any;
@@ -113,7 +113,7 @@ export function TabDadosPessoais({ data, editing, colaboradorId }: Props) {
           <Input value={form.cep} onChange={(e) => setForm((p) => ({ ...p, cep: e.target.value }))} />
         </FieldRow>
       </div>
-      <button onClick={save} className="text-xs text-blue-600 hover:underline mt-2">Salvar dados pessoais</button>
+      <TabSaveActions onSave={save} saving={update.isPending} label="Salvar dados pessoais" />
     </div>
   );
 }
