@@ -57,6 +57,11 @@ export function useOrganogram() {
 
   const byId = useMemo(() => buildByIdMap(colaboradores), [colaboradores]);
   const rawRoot = useMemo(() => getRootNode(colaboradores), [colaboradores]);
+  // Todas as pessoas sem superior (raízes desconectadas devem aparecer também)
+  const rawRoots = useMemo(
+    () => colaboradores.filter((c) => !c.superior),
+    [colaboradores]
+  );
   const departments = useMemo(() => getDepartments(colaboradores), [colaboradores]);
 
   const [selectedPerson, setSelectedPerson] = useState<Colaborador | null>(null);
@@ -223,6 +228,7 @@ export function useOrganogram() {
     colaboradores,
     byId,
     root,
+    roots: rawRoots,
     departments,
     selectedPerson,
     highlightDept,
