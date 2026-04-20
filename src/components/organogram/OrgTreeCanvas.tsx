@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
-import { ChevronDown, ChevronRight, Focus, GripVertical, Plus } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronDown, ChevronRight, Focus, GripVertical, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getDeptColor } from "@/lib/deptColors";
 import { getInitials } from "@/lib/organogram";
@@ -21,6 +21,7 @@ interface OrgTreeCanvasProps {
   onFocusBranch?: (id: string) => void;
   editMode?: boolean;
   onReassign?: (movedId: string, newSuperiorId: string | null) => void;
+  onChangeNivel?: (id: string, delta: number) => void;
 }
 
 const NODE_W = 264;
@@ -45,6 +46,7 @@ export function OrgTreeCanvas({
   onFocusBranch,
   editMode = false,
   onReassign,
+  onChangeNivel,
 }: OrgTreeCanvasProps) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -295,6 +297,7 @@ export function OrgTreeCanvas({
                 onClick={editMode ? undefined : () => onSelect(person)}
                 onToggleCollapse={() => toggleCollapse(person.id)}
                 onFocus={onFocusBranch && !editMode ? () => onFocusBranch(person.id) : undefined}
+                onChangeNivel={onChangeNivel ? (delta) => onChangeNivel(person.id, delta) : undefined}
               />
             </motion.div>
           );
@@ -320,6 +323,7 @@ interface OrgCanvasCardProps {
   onClick?: () => void;
   onToggleCollapse: () => void;
   onFocus?: () => void;
+  onChangeNivel?: (delta: number) => void;
 }
 
 function OrgCanvasCard({
@@ -338,6 +342,7 @@ function OrgCanvasCard({
   onClick,
   onToggleCollapse,
   onFocus,
+  onChangeNivel,
 }: OrgCanvasCardProps) {
   const colors = getDeptColor(person.departamento);
   const initials = getInitials(person.nome);
@@ -383,6 +388,39 @@ function OrgCanvasCard({
       {editMode && (
         <div className="absolute left-1 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none">
           <GripVertical className="w-3.5 h-3.5" />
+        </div>
+      )}
+
+      {editMode && onChangeNivel && (
+        <div
+          className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-1 z-20"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onChangeNivel(-1);
+            }}
+            className="w-6 h-6 rounded-md bg-white shadow border border-slate-200 flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-colors"
+            title="Subir nível (linha mais acima)"
+          >
+            <ArrowUp className="w-3.5 h-3.5 text-slate-700" />
+          </button>
+          <div className="text-[9px] font-bold text-slate-500 text-center leading-none">
+            N{person.nivel}
+          </div>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onChangeNivel(1);
+            }}
+            className="w-6 h-6 rounded-md bg-white shadow border border-slate-200 flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-colors"
+            title="Descer nível (linha mais abaixo)"
+          >
+            <ArrowDown className="w-3.5 h-3.5 text-slate-700" />
+          </button>
         </div>
       )}
 
