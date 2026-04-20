@@ -344,7 +344,11 @@ function OrgCanvasCard({
   onFocus,
   onChangeNivel,
 }: OrgCanvasCardProps) {
-  const colors = getDeptColor(person.departamento);
+  const deptColors = getDeptColor(person.departamento);
+  const customBg = person.cor_card?.trim() || null;
+  const colors = customBg
+    ? { ...deptColors, bg: customBg, light: `${customBg}1f`, border: `${customBg}4d` }
+    : deptColors;
   const initials = getInitials(person.nome);
   const isDesligado = person.status === "desligado";
   const isPJ = person.tipo_contrato === "PJ";

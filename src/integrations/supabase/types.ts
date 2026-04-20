@@ -62,6 +62,7 @@ export type Database = {
           chave_pix: string | null
           cidade: string | null
           conta: string | null
+          cor_card: string | null
           cpf: string | null
           created_at: string
           data_desligamento: string | null
@@ -99,6 +100,7 @@ export type Database = {
           chave_pix?: string | null
           cidade?: string | null
           conta?: string | null
+          cor_card?: string | null
           cpf?: string | null
           created_at?: string
           data_desligamento?: string | null
@@ -136,6 +138,7 @@ export type Database = {
           chave_pix?: string | null
           cidade?: string | null
           conta?: string | null
+          cor_card?: string | null
           cpf?: string | null
           created_at?: string
           data_desligamento?: string | null
