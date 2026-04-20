@@ -74,6 +74,13 @@ export default function OrgChart() {
     }
   }, [editMode, isMobile, viewMode, setEditMode]);
 
+  // Close drawer when entering edit mode (otherwise it overlaps the canvas)
+  useEffect(() => {
+    if (editMode && selectedPerson) {
+      closeSidebar();
+    }
+  }, [editMode, selectedPerson, closeSidebar]);
+
   const handleReassign = async (movedId: string, newSuperiorId: string | null) => {
     const moved = byId.get(movedId);
     const newSup = newSuperiorId ? byId.get(newSuperiorId) : null;
