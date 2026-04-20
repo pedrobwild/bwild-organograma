@@ -1,11 +1,11 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
 import { ChevronRight, Home, Search, X } from "lucide-react";
 import { useOrganogram } from "@/hooks/use-organogram";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { setDeptColorMap } from "@/lib/deptColors";
 import { DepartmentLegend } from "./DepartmentLegend";
-import { OrgTreeNode } from "./OrgTreeNode";
+import { OrgTreeCanvas } from "./OrgTreeCanvas";
 import { OrgListView } from "./OrgListView";
 import { OrgToolbar } from "./OrgToolbar";
 import { EmployeeDrawer } from "@/components/employee/EmployeeDrawer";
@@ -65,6 +65,21 @@ export default function OrgChart() {
     }
   }, [deptColorMap]);
 
+  // Derive roots: focused branch overrides global root
+  const canvasRoots = useMemo(() => {
+    if (focusedBranchId) {
+      const focused = byId.get(focusedBranchId);
+      if (focused) return [focused];
+    }
+    return root ? [root] : [];
+  }, [focusedBranchId, byId, root]);
+
+  // Highlight path as a Set (or null when no selection)
+  const highlightPathOrNull = useMemo(() => {
+    if (!selectedPerson) return null;
+    return highlightPath;
+  }, [selectedPerson, highlightPath]);
+
   // Global keyboard shortcuts
   useEffect(() => {
     const isTyping = (target: EventTarget | null) => {
@@ -80,16 +95,14 @@ export default function OrgChart() {
     };
 
     const onKey = (e: KeyboardEvent) => {
-      // ⌘K / Ctrl+K - open palette (always, even when typing)
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
         setPaletteOpen(true);
         return;
       }
 
-      // Escape - close open panels
       if (e.key === "Escape") {
-        if (paletteOpen) return; // palette handles its own
+        if (paletteOpen) return;
         if (selectedPerson) {
           closeSidebar();
           return;
@@ -104,7 +117,6 @@ export default function OrgChart() {
         }
       }
 
-      // Skip shortcuts while typing
       if (isTyping(e.target)) return;
 
       switch (e.key) {
@@ -190,7 +202,6 @@ export default function OrgChart() {
     );
   }
 
-  // Check if search yields no results
   const noResults = searchMatch !== null && searchMatch.size === 0;
 
   return (
@@ -203,13 +214,11 @@ export default function OrgChart() {
         backgroundPosition: "center",
       }}
     >
-      {/* Overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{ background: "linear-gradient(180deg, rgba(10,30,60,0.55) 0%, rgba(10,30,60,0.35) 100%)" }}
       />
 
-      {/* Toolbar */}
       <OrgToolbar
         zoom={zoom}
         onZoomIn={zoomIn}
@@ -230,11 +239,8 @@ export default function OrgChart() {
         totalPeople={colaboradores.length}
       />
 
-      {/* Focus branch breadcrumb */}
       {focusedBranchId && focusBreadcrumb.length > 0 && (
-        <div
-          className="absolute top-14 left-0 right-0 z-20 pointer-events-none"
-        >
+        <div className="absolute top-14 left-0 right-0 z-20 pointer-events-none">
           <div
             className="mx-auto max-w-[1600px] px-4 py-2 flex items-center gap-1.5 flex-wrap pointer-events-auto text-[11px]"
             style={{
@@ -281,7 +287,6 @@ export default function OrgChart() {
         </div>
       )}
 
-      {/* Canvas */}
       <div
         ref={containerRef}
         className="relative z-10 flex-1 overflow-hidden select-none pt-14"
@@ -315,7 +320,6 @@ export default function OrgChart() {
         }
       >
         {noResults ? (
-          /* Empty state */
           <div className="flex flex-col items-center justify-center h-full gap-4">
             <div
               className="w-20 h-20 rounded-full flex items-center justify-center"
@@ -341,63 +345,50 @@ export default function OrgChart() {
               searchMatch={searchMatch}
             />
           </div>
-        ) : effectiveViewMode === "tree-h" ? (
-          <div
-            className="absolute inset-0 flex items-center pl-16 overflow-auto"
-            style={{
-              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-              transformOrigin: "left center",
-              transition: isDragging ? "none" : "transform 0.15s ease-out",
-            }}
-          >
-            <OrgTreeNode
-              person={root}
-              byId={byId}
-              onSelect={handleSelectPerson}
-              selectedId={selectedPerson?.id || null}
-              highlightDept={highlightDept}
-              highlightPath={highlightPath}
-              showDesligados={showDesligados}
-              searchMatch={searchMatch}
-              orientation="horizontal"
-              density={density}
-              onFocusBranch={focusBranch}
-            />
-          </div>
         ) : (
           <div
-            className="absolute inset-0 flex items-start justify-center pt-8"
+            className="absolute inset-0 overflow-hidden flex"
             style={{
-              transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
-              transformOrigin: "top center",
-              transition: isDragging ? "none" : "transform 0.15s ease-out",
+              justifyContent: effectiveViewMode === "tree" ? "center" : "flex-start",
+              alignItems: effectiveViewMode === "tree" ? "flex-start" : "center",
+              paddingTop: effectiveViewMode === "tree" ? 32 : 0,
+              paddingLeft: effectiveViewMode === "tree-h" ? 64 : 0,
             }}
           >
-            <OrgTreeNode
-              person={root}
-              byId={byId}
-              onSelect={handleSelectPerson}
-              selectedId={selectedPerson?.id || null}
-              highlightDept={highlightDept}
-              highlightPath={highlightPath}
-              showDesligados={showDesligados}
-              searchMatch={searchMatch}
-              orientation="vertical"
-              density={density}
-              onFocusBranch={focusBranch}
-            />
+            {/* Single transform wrapper: SVG + cards share the same coordinate system */}
+            <div
+              style={{
+                transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})`,
+                transformOrigin:
+                  effectiveViewMode === "tree" ? "top center" : "left center",
+                transition: isDragging ? "none" : "transform 0.18s ease-out",
+                willChange: "transform",
+              }}
+            >
+              <OrgTreeCanvas
+                roots={canvasRoots}
+                byId={byId}
+                selectedId={selectedPerson?.id || null}
+                highlightDept={highlightDept}
+                highlightPath={highlightPathOrNull}
+                searchMatchIds={searchMatch}
+                showDesligados={showDesligados}
+                orientation={effectiveViewMode === "tree-h" ? "horizontal" : "vertical"}
+                density={density}
+                onSelect={handleSelectPerson}
+                onFocusBranch={focusBranch}
+              />
+            </div>
           </div>
         )}
       </div>
 
-      {/* Floating legend */}
       <DepartmentLegend
         departments={departments}
         highlightDept={highlightDept}
         onChange={setHighlightDept}
       />
 
-      {/* Employee drawer */}
       <AnimatePresence>
         {selectedPerson && (
           <EmployeeDrawer
@@ -408,7 +399,6 @@ export default function OrgChart() {
         )}
       </AnimatePresence>
 
-      {/* Command palette */}
       <CommandPalette
         open={paletteOpen}
         onOpenChange={setPaletteOpen}
@@ -419,7 +409,6 @@ export default function OrgChart() {
         onFocusBranch={focusBranch}
       />
 
-      {/* Shortcuts help overlay */}
       <ShortcutsHelp />
     </div>
   );
