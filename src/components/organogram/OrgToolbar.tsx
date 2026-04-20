@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import {
   Command as CommandIcon,
   Download,
+  GitBranch,
   LayoutGrid,
   List,
   Maximize,
@@ -41,6 +42,9 @@ interface OrgToolbarProps {
   density?: "compact" | "comfortable";
   onToggleDensity?: () => void;
   totalPeople?: number;
+  canEdit?: boolean;
+  editMode?: boolean;
+  onToggleEditMode?: () => void;
 }
 
 export function OrgToolbar({
@@ -61,6 +65,9 @@ export function OrgToolbar({
   density,
   onToggleDensity,
   totalPeople,
+  canEdit,
+  editMode,
+  onToggleEditMode,
 }: OrgToolbarProps) {
   const handleExport = useCallback(async () => {
     const el = chartRef.current;
