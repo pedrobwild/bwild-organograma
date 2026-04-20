@@ -323,6 +323,7 @@ interface OrgCanvasCardProps {
   onClick?: () => void;
   onToggleCollapse: () => void;
   onFocus?: () => void;
+  onChangeNivel?: (delta: number) => void;
 }
 
 function OrgCanvasCard({
