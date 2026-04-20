@@ -91,22 +91,41 @@ export default function Admin() {
   };
 
   const handleCreateColab = async () => {
-    const slug = newForm.id || newForm.nome.toLowerCase().replace(/\s+/g, "-").replace(/[^a-z0-9-]/g, "");
+    if (!newForm.nome.trim() || !newForm.cargo.trim() || !newForm.departamento.trim()) {
+      toast.error("Preencha nome, cargo e departamento.");
+      return;
+    }
+    const baseSlug =
+      newForm.id ||
+      newForm.nome
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, "-")
+        .replace(/[^a-z0-9-]/g, "");
+    const slug = baseSlug || `colab-${Date.now()}`;
     try {
       await createColab.mutateAsync({
         id: slug,
         nome: newForm.nome,
         cargo: newForm.cargo,
         departamento: newForm.departamento,
-        nivel: parseInt(newForm.nivel),
+        nivel: parseInt(newForm.nivel) || 0,
         funcoes: newForm.funcoes.split("\n").filter(Boolean),
         superior_id: newForm.superior_id || null,
       });
       toast.success("Colaborador criado!");
       setNewColabOpen(false);
       setNewForm({ id: "", nome: "", cargo: "", departamento: "", nivel: "0", superior_id: "", funcoes: "" });
-    } catch {
-      toast.error("Erro ao criar colaborador.");
+    } catch (err: any) {
+      console.error("Erro ao criar colaborador:", err);
+      const msg = err?.message ?? "Erro desconhecido.";
+      if (msg.includes("duplicate") || err?.code === "23505") {
+        toast.error(`Já existe um colaborador com o ID "${slug}". Informe um ID diferente.`);
+      } else {
+        toast.error(`Erro ao criar colaborador: ${msg}`);
+      }
     }
   };
 
