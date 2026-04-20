@@ -81,6 +81,24 @@ export default function OrgChart() {
     }
   }, [editMode, selectedPerson, closeSidebar]);
 
+  const handleChangeNivel = async (id: string, delta: number) => {
+    const person = byId.get(id);
+    if (!person) return;
+    const superior = person.superior ? byId.get(person.superior) : null;
+    const minLevel = superior ? superior.nivel + 1 : 0;
+    const newLevel = Math.max(minLevel, person.nivel + delta);
+    if (newLevel === person.nivel) {
+      if (delta < 0) toast.info(`Nível mínimo permitido: ${minLevel} (logo abaixo do superior)`);
+      return;
+    }
+    try {
+      await updateColaborador.mutateAsync({ id, nivel: newLevel });
+      toast.success(`${person.nome} agora está no nível ${newLevel}`);
+    } catch {
+      toast.error("Erro ao alterar nível");
+    }
+  };
+
   const handleReassign = async (movedId: string, newSuperiorId: string | null) => {
     const moved = byId.get(movedId);
     const newSup = newSuperiorId ? byId.get(newSuperiorId) : null;
