@@ -26,6 +26,7 @@ export function TabDadosPessoais({ data, editing, colaboradorId }: Props) {
   const [form, setForm] = useState({
     nome: "",
     cpf: "",
+    cnpj: "",
     data_nascimento: "",
     email_pessoal: "",
     telefone: "",
@@ -40,6 +41,7 @@ export function TabDadosPessoais({ data, editing, colaboradorId }: Props) {
       setForm({
         nome: data.nome ?? "",
         cpf: data.cpf ?? "",
+        cnpj: data.cnpj ?? "",
         data_nascimento: data.data_nascimento ?? "",
         email_pessoal: data.email_pessoal ?? "",
         telefone: data.telefone ?? "",
