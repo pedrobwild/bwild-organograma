@@ -30,6 +30,21 @@ interface EmployeeDrawerProps {
   onClose: () => void;
 }
 
+const PRESET_SWATCHES = [
+  "#1B4F72", // azul profundo
+  "#1A5276", // azul aço
+  "#2874A6", // azul médio
+  "#117A65", // verde esmeralda
+  "#148F77", // verde teal
+  "#B9770E", // âmbar
+  "#CA6F1E", // laranja queimado
+  "#922B21", // vinho
+  "#6C3483", // roxo
+  "#34495E", // grafite
+  "#7B7D7D", // cinza neutro
+  "#0E6655", // verde floresta
+];
+
 export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDrawerProps) {
   const { isAdmin } = useAuth();
   const [editing, setEditing] = useState(false);
