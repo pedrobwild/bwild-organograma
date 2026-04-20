@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { GitBranch, X } from "lucide-react";
+import { GitBranch, Palette, X, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { toast } from "sonner";
 import { Colaborador } from "@/types/organogram";
 import { getDeptColor } from "@/lib/deptColors";
 import { getInitials } from "@/lib/organogram";
 import { useColaboradorFull } from "@/hooks/use-hr-data";
+import { useUpdateColaborador } from "@/hooks/use-colaboradores";
 import { useAuth } from "@/hooks/use-auth";
 
 import { TabDadosPessoais } from "./tabs/TabDadosPessoais";
