@@ -260,6 +260,8 @@ export default function OrgChart() {
     toggleFullscreen,
     setViewMode,
     toggleDensity,
+    editMode,
+    setEditMode,
   ]);
 
   if (isLoading || !root) {
