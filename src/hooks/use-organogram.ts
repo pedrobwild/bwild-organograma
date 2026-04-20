@@ -228,6 +228,7 @@ export function useOrganogram() {
     colaboradores,
     byId,
     root,
+    roots: rawRoots,
     departments,
     selectedPerson,
     highlightDept,
