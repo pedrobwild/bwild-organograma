@@ -316,7 +316,8 @@ export default function OrgChart() {
         density={density}
         onToggleDensity={toggleDensity}
         totalPeople={colaboradores.length}
-        canEdit={isAdmin && !isMobile && viewMode !== "list"}
+        canEdit={!isMobile && viewMode !== "list"}
+        isAdmin={isAdmin}
         editMode={editMode}
         onToggleEditMode={toggleEditMode}
       />
