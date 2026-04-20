@@ -393,33 +393,38 @@ function OrgCanvasCard({
 
       {editMode && onChangeNivel && (
         <div
-          className="absolute right-1 top-1/2 -translate-y-1/2 flex flex-col gap-1 z-20"
+          className="absolute -right-9 top-1/2 -translate-y-1/2 flex flex-col items-center gap-1 z-30"
           onPointerDown={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
         >
           <button
             type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               onChangeNivel(-1);
             }}
-            className="w-6 h-6 rounded-md bg-white shadow border border-slate-200 flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-colors"
+            className="w-7 h-7 rounded-full bg-amber-500 shadow-lg border-2 border-white flex items-center justify-center hover:bg-amber-600 hover:scale-110 transition-all"
             title="Subir nível (linha mais acima)"
           >
-            <ArrowUp className="w-3.5 h-3.5 text-slate-700" />
+            <ArrowUp className="w-3.5 h-3.5 text-white" strokeWidth={3} />
           </button>
-          <div className="text-[9px] font-bold text-slate-500 text-center leading-none">
+          <div className="text-[10px] font-bold text-amber-700 bg-white px-1.5 py-0.5 rounded shadow border border-amber-200 leading-none">
             N{person.nivel}
           </div>
           <button
             type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => {
               e.stopPropagation();
               onChangeNivel(1);
             }}
-            className="w-6 h-6 rounded-md bg-white shadow border border-slate-200 flex items-center justify-center hover:bg-slate-50 hover:border-slate-300 transition-colors"
+            className="w-7 h-7 rounded-full bg-amber-500 shadow-lg border-2 border-white flex items-center justify-center hover:bg-amber-600 hover:scale-110 transition-all"
             title="Descer nível (linha mais abaixo)"
           >
-            <ArrowDown className="w-3.5 h-3.5 text-slate-700" />
+            <ArrowDown className="w-3.5 h-3.5 text-white" strokeWidth={3} />
           </button>
         </div>
       )}
