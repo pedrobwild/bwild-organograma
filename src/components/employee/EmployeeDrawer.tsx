@@ -92,6 +92,65 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
                   <GitBranch className="w-3.5 h-3.5" />
                   Hierarquia
                 </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="text-white/80 hover:text-white hover:bg-white/15 text-xs gap-1"
+                    >
+                      <Palette className="w-3.5 h-3.5" />
+                      Cor do card
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-72 p-4" align="end">
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-sm font-semibold text-card-foreground">Cor do card</p>
+                        <p className="text-xs text-muted-foreground">Personalize a cor deste colaborador no organograma.</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="color"
+                          value={pickerColor}
+                          onChange={(e) => setPickerColor(e.target.value)}
+                          className="w-12 h-10 rounded border cursor-pointer flex-shrink-0"
+                        />
+                        <input
+                          type="text"
+                          value={pickerColor}
+                          onChange={(e) => setPickerColor(e.target.value)}
+                          className="flex-1 h-10 px-2 rounded border text-xs font-mono bg-background text-foreground"
+                        />
+                      </div>
+                      <div
+                        className="rounded-lg p-3 text-xs font-medium text-white text-center"
+                        style={{ background: pickerColor }}
+                      >
+                        Pré-visualização
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" className="flex-1" onClick={() => handleSaveColor(pickerColor)} disabled={updateColab.isPending}>
+                          Salvar
+                        </Button>
+                        {customBg && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setPickerColor(deptColors.bg);
+                              handleSaveColor(null);
+                            }}
+                            disabled={updateColab.isPending}
+                            title="Resetar para cor do departamento"
+                          >
+                            <RotateCcw className="w-3.5 h-3.5" />
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  </PopoverContent>
+                </Popover>
                 <Button
                   variant="ghost"
                   size="sm"
