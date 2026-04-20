@@ -21,6 +21,7 @@ export default function OrgChart() {
     colaboradores,
     byId,
     root,
+    roots,
     departments,
     selectedPerson,
     highlightDept,
