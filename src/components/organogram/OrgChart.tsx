@@ -78,12 +78,39 @@ export default function OrgChart() {
     const moved = byId.get(movedId);
     const newSup = newSuperiorId ? byId.get(newSuperiorId) : null;
     if (!moved) return;
+
+    const newLevel = newSup ? newSup.nivel + 1 : 0;
+    const oldLevel = moved.nivel;
+    const delta = newLevel - oldLevel;
+
+    // Collect descendants of moved node so we can shift their nivel by the same delta
+    const descendantUpdates: { id: string; nivel: number }[] = [];
+    if (delta !== 0) {
+      const queue: string[] = [...moved.subordinados];
+      while (queue.length) {
+        const curr = queue.shift()!;
+        const node = byId.get(curr);
+        if (!node) continue;
+        descendantUpdates.push({ id: node.id, nivel: node.nivel + delta });
+        for (const sid of node.subordinados) queue.push(sid);
+      }
+    }
+
     try {
+      // 1) Update the moved node first (superior + nivel)
       await updateColaborador.mutateAsync({
         id: movedId,
         superior_id: newSuperiorId,
-        nivel: newSup ? newSup.nivel + 1 : 0,
+        nivel: newLevel,
       });
+      // 2) Cascade nivel updates to descendants in parallel
+      if (descendantUpdates.length > 0) {
+        await Promise.all(
+          descendantUpdates.map((d) =>
+            updateColaborador.mutateAsync({ id: d.id, nivel: d.nivel }),
+          ),
+        );
+      }
       toast.success(
         newSup
           ? `${moved.nome} agora reporta a ${newSup.nome}`
