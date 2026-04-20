@@ -85,11 +85,20 @@ export function layoutTree(
       .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
   };
 
+  // Depth resolution:
+  // - Use person.nivel as the visual row when it is greater than parent.depth + 1.
+  // - Always enforce a minimum of parent.depth + 1 so a node never appears above
+  //   or on the same row as its real superior (keeps connectors readable).
+  // - Roots use Math.max(0, person.nivel).
   const build = (
     person: Colaborador,
-    depth: number,
+    parentDepth: number,
     parentId: string | null,
   ): InternalNode => {
+    const minDepth = parentId === null ? 0 : parentDepth + 1;
+    const requested = typeof person.nivel === "number" ? person.nivel : minDepth;
+    const depth = Math.max(minDepth, requested);
+
     const isCollapsed = filters.collapsed.has(person.id);
     const kids = isCollapsed ? [] : childrenOf(person.id);
     const node: InternalNode = {
@@ -102,7 +111,7 @@ export function layoutTree(
       slotCenter: 0,
     };
     internal[person.id] = node;
-    for (const k of kids) build(k, depth + 1, person.id);
+    for (const k of kids) build(k, depth, person.id);
     return node;
   };
 
@@ -112,7 +121,7 @@ export function layoutTree(
   );
   for (const r of sortedRoots) {
     if (!filters.showDesligados && r.status === "desligado") continue;
-    rootNodes.push(build(r, 0, null));
+    rootNodes.push(build(r, -1, null));
   }
 
   // Search prune: keep only branches with at least one match (and their ancestors)

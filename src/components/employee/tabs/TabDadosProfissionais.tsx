@@ -42,6 +42,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
     superior_id: "",
     email_corporativo: "",
     funcoes: "",
+    nivel: 0,
   });
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
         superior_id: data.superior_id ?? "",
         email_corporativo: data.email_corporativo ?? "",
         funcoes: (data.funcoes ?? []).join("\n"),
+        nivel: typeof data.nivel === "number" ? data.nivel : 0,
       });
     }
   }, [data]);
@@ -71,6 +73,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
         superior_id: form.superior_id || null,
         email_corporativo: form.email_corporativo || null,
         funcoes: form.funcoes.split("\n").filter(Boolean),
+        nivel: Number.isFinite(form.nivel) ? form.nivel : 0,
       } as any);
       toast.success("Dados profissionais atualizados!");
     } catch {
@@ -101,6 +104,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
           <ReadOnlyField label="Carga horária" value={data?.carga_horaria} />
           <ReadOnlyField label="Data de início" value={data?.data_inicio ? `${new Date(data.data_inicio).toLocaleDateString("pt-BR")}${tempo ? ` (${tempo})` : ""}` : null} />
           <ReadOnlyField label="Superior direto" value={person.superior ? allColaboradores.find(c => c.id === person.superior)?.nome : null} />
+          <ReadOnlyField label="Nível hierárquico (linha do organograma)" value={typeof data?.nivel === "number" ? String(data.nivel) : null} />
           <ReadOnlyField label="Email corporativo" value={data?.email_corporativo} />
           <ReadOnlyField label="Funções" value={data?.funcoes?.join(", ")} span={2} />
         </div>
@@ -149,6 +153,16 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
               ))}
             </SelectContent>
           </Select>
+        </FieldRow>
+        <FieldRow label="Nível hierárquico (linha do organograma)">
+          <Input
+            type="number"
+            min={0}
+            step={1}
+            value={form.nivel}
+            onChange={(e) => setForm(p => ({ ...p, nivel: Number(e.target.value) || 0 }))}
+            placeholder="0 = topo"
+          />
         </FieldRow>
         <FieldRow label="Email corporativo" span={2}>
           <Input type="email" value={form.email_corporativo} onChange={(e) => setForm(p => ({ ...p, email_corporativo: e.target.value }))} />
