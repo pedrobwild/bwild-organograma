@@ -74,16 +74,50 @@ export default function OrgChart() {
     }
   }, [editMode, isMobile, viewMode, setEditMode]);
 
+  // Close drawer when entering edit mode (otherwise it overlaps the canvas)
+  useEffect(() => {
+    if (editMode && selectedPerson) {
+      closeSidebar();
+    }
+  }, [editMode, selectedPerson, closeSidebar]);
+
   const handleReassign = async (movedId: string, newSuperiorId: string | null) => {
     const moved = byId.get(movedId);
     const newSup = newSuperiorId ? byId.get(newSuperiorId) : null;
     if (!moved) return;
+
+    const newLevel = newSup ? newSup.nivel + 1 : 0;
+    const oldLevel = moved.nivel;
+    const delta = newLevel - oldLevel;
+
+    // Collect descendants of moved node so we can shift their nivel by the same delta
+    const descendantUpdates: { id: string; nivel: number }[] = [];
+    if (delta !== 0) {
+      const queue: string[] = [...moved.subordinados];
+      while (queue.length) {
+        const curr = queue.shift()!;
+        const node = byId.get(curr);
+        if (!node) continue;
+        descendantUpdates.push({ id: node.id, nivel: node.nivel + delta });
+        for (const sid of node.subordinados) queue.push(sid);
+      }
+    }
+
     try {
+      // 1) Update the moved node first (superior + nivel)
       await updateColaborador.mutateAsync({
         id: movedId,
         superior_id: newSuperiorId,
-        nivel: newSup ? newSup.nivel + 1 : 0,
+        nivel: newLevel,
       });
+      // 2) Cascade nivel updates to descendants in parallel
+      if (descendantUpdates.length > 0) {
+        await Promise.all(
+          descendantUpdates.map((d) =>
+            updateColaborador.mutateAsync({ id: d.id, nivel: d.nivel }),
+          ),
+        );
+      }
       toast.success(
         newSup
           ? `${moved.nome} agora reporta a ${newSup.nome}`
@@ -139,6 +173,10 @@ export default function OrgChart() {
 
       if (e.key === "Escape") {
         if (paletteOpen) return;
+        if (editMode) {
+          setEditMode(false);
+          return;
+        }
         if (selectedPerson) {
           closeSidebar();
           return;
@@ -154,6 +192,9 @@ export default function OrgChart() {
       }
 
       if (isTyping(e.target)) return;
+
+      // While editing structure, suppress layout-changing shortcuts to avoid breaking drag
+      if (editMode) return;
 
       switch (e.key) {
         case "+":
@@ -226,6 +267,8 @@ export default function OrgChart() {
     toggleFullscreen,
     setViewMode,
     toggleDensity,
+    editMode,
+    setEditMode,
   ]);
 
   if (isLoading || !root) {
@@ -424,7 +467,6 @@ export default function OrgChart() {
                 onFocusBranch={focusBranch}
                 editMode={editMode}
                 onReassign={handleReassign}
-                zoom={zoom}
               />
             </div>
           </div>

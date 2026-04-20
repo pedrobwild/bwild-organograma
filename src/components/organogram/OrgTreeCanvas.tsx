@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 import { ChevronDown, ChevronRight, Focus, GripVertical, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getDeptColor } from "@/lib/deptColors";
@@ -21,7 +21,6 @@ interface OrgTreeCanvasProps {
   onFocusBranch?: (id: string) => void;
   editMode?: boolean;
   onReassign?: (movedId: string, newSuperiorId: string | null) => void;
-  zoom?: number;
 }
 
 const NODE_W = 264;
@@ -46,11 +45,11 @@ export function OrgTreeCanvas({
   onFocusBranch,
   editMode = false,
   onReassign,
-  zoom = 1,
 }: OrgTreeCanvasProps) {
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [hoverTargetId, setHoverTargetId] = useState<string | null>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
 
   const NODE_H = density === "compact" ? NODE_H_COMPACT : NODE_H_COMFORTABLE;
   const H_GAP = density === "compact" ? H_GAP_COMPACT : H_GAP_COMFORTABLE;
@@ -142,6 +141,40 @@ export function OrgTreeCanvas({
 
   const handleDragStart = (id: string) => {
     setDraggingId(id);
+    setHoverTargetId(null);
+  };
+
+  /**
+   * Hit-test the pointer position (screen coords from framer-motion)
+   * against the absolute coordinates of layout nodes.
+   * Works even with parent CSS transforms (zoom/pan) because we use
+   * getBoundingClientRect() of the canvas itself, which already
+   * accounts for any transform applied above.
+   */
+  const handleDrag = (movedId: string, _e: unknown, info: PanInfo) => {
+    if (!editMode || !canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    if (rect.width === 0) return;
+    // Effective scale of the canvas (parent may apply transform: scale())
+    const scale = rect.width / layout.width;
+    const localX = (info.point.x - rect.left) / scale;
+    const localY = (info.point.y - rect.top) / scale;
+
+    // Find the topmost node under the pointer (excluding the moved node itself)
+    let found: string | null = null;
+    for (const n of layout.nodes) {
+      if (n.id === movedId) continue;
+      if (
+        localX >= n.x &&
+        localX <= n.x + NODE_W &&
+        localY >= n.y &&
+        localY <= n.y + NODE_H
+      ) {
+        found = n.id;
+        break;
+      }
+    }
+    setHoverTargetId((prev) => (prev === found ? prev : found));
   };
 
   const handleDragEnd = () => {
@@ -157,7 +190,7 @@ export function OrgTreeCanvas({
   };
 
   return (
-    <div className="relative" style={{ width: layout.width, height: layout.height }}>
+    <div ref={canvasRef} className="relative" style={{ width: layout.width, height: layout.height }}>
       <svg
         className="absolute top-0 left-0 pointer-events-none"
         width={layout.width}
@@ -233,18 +266,9 @@ export function OrgTreeCanvas({
               dragSnapToOrigin
               dragTransition={{ bounceStiffness: 600, bounceDamping: 30 }}
               onDragStart={() => handleDragStart(person.id)}
+              onDrag={(e, info) => handleDrag(person.id, e, info)}
               onDragEnd={handleDragEnd}
               whileDrag={{ scale: 1.05, zIndex: 50, cursor: "grabbing" }}
-              onMouseEnter={() => {
-                if (editMode && draggingId && draggingId !== person.id) {
-                  setHoverTargetId(person.id);
-                }
-              }}
-              onMouseLeave={() => {
-                if (editMode && hoverTargetId === person.id) {
-                  setHoverTargetId(null);
-                }
-              }}
               style={{
                 position: "absolute",
                 left: n.x,
