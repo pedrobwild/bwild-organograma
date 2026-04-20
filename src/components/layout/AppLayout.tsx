@@ -1,11 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   BarChart3,
-  Car,
-  FolderOpen,
+  LogIn,
   LogOut,
   Network,
-  Percent,
+  ShieldCheck,
   Users,
 } from "lucide-react";
 import {
