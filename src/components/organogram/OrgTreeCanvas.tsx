@@ -342,6 +342,7 @@ function OrgCanvasCard({
   onClick,
   onToggleCollapse,
   onFocus,
+  onChangeNivel,
 }: OrgCanvasCardProps) {
   const colors = getDeptColor(person.departamento);
   const initials = getInitials(person.nome);
