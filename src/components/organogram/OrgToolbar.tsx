@@ -67,6 +67,7 @@ export function OrgToolbar({
   onToggleDensity,
   totalPeople,
   canEdit,
+  isAdmin,
   editMode,
   onToggleEditMode,
 }: OrgToolbarProps) {
