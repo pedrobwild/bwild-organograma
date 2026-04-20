@@ -1,8 +1,11 @@
 import { useEffect, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
 import { ChevronRight, Home, Search, X } from "lucide-react";
+import { toast } from "sonner";
 import { useOrganogram } from "@/hooks/use-organogram";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/use-auth";
+import { useUpdateColaborador } from "@/hooks/use-colaboradores";
 import { setDeptColorMap } from "@/lib/deptColors";
 import { DepartmentLegend } from "./DepartmentLegend";
 import { OrgTreeCanvas } from "./OrgTreeCanvas";
@@ -11,6 +14,7 @@ import { OrgToolbar } from "./OrgToolbar";
 import { EmployeeDrawer } from "@/components/employee/EmployeeDrawer";
 import { CommandPalette } from "./CommandPalette";
 import { ShortcutsHelp } from "./ShortcutsHelp";
+import { EditModeBanner } from "./EditModeBanner";
 
 export default function OrgChart() {
   const {
@@ -53,10 +57,42 @@ export default function OrgChart() {
     focusBreadcrumb,
     density,
     toggleDensity,
+    editMode,
+    toggleEditMode,
+    setEditMode,
   } = useOrganogram();
 
+  const { isAdmin } = useAuth();
+  const updateColaborador = useUpdateColaborador();
   const isMobile = useIsMobile();
   const effectiveViewMode = isMobile ? "list" : viewMode;
+
+  // Disable edit mode automatically on mobile or list view
+  useEffect(() => {
+    if (editMode && (isMobile || viewMode === "list")) {
+      setEditMode(false);
+    }
+  }, [editMode, isMobile, viewMode, setEditMode]);
+
+  const handleReassign = async (movedId: string, newSuperiorId: string | null) => {
+    const moved = byId.get(movedId);
+    const newSup = newSuperiorId ? byId.get(newSuperiorId) : null;
+    if (!moved) return;
+    try {
+      await updateColaborador.mutateAsync({
+        id: movedId,
+        superior_id: newSuperiorId,
+        nivel: newSup ? newSup.nivel + 1 : 0,
+      });
+      toast.success(
+        newSup
+          ? `${moved.nome} agora reporta a ${newSup.nome}`
+          : `${moved.nome} foi movido para a raiz`,
+      );
+    } catch {
+      toast.error("Erro ao atualizar hierarquia");
+    }
+  };
 
   // Sync dynamic dept colors
   useEffect(() => {
@@ -237,7 +273,14 @@ export default function OrgChart() {
         density={density}
         onToggleDensity={toggleDensity}
         totalPeople={colaboradores.length}
+        canEdit={isAdmin && !isMobile && viewMode !== "list"}
+        editMode={editMode}
+        onToggleEditMode={toggleEditMode}
       />
+
+      <AnimatePresence>
+        {editMode && <EditModeBanner onExit={() => setEditMode(false)} />}
+      </AnimatePresence>
 
       {focusedBranchId && focusBreadcrumb.length > 0 && (
         <div className="absolute top-14 left-0 right-0 z-20 pointer-events-none">
@@ -289,32 +332,34 @@ export default function OrgChart() {
 
       <div
         ref={containerRef}
-        className="relative z-10 flex-1 overflow-hidden select-none pt-14"
+        className={`relative z-10 flex-1 overflow-hidden select-none ${editMode ? "pt-24" : "pt-14"}`}
         style={{
           cursor:
-            effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
-              ? isDragging
-                ? "grabbing"
-                : "grab"
-              : "default",
+            editMode
+              ? "default"
+              : effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+                ? isDragging
+                  ? "grabbing"
+                  : "grab"
+                : "default",
         }}
         onMouseDown={
-          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+          !editMode && (effectiveViewMode === "tree" || effectiveViewMode === "tree-h")
             ? handleMouseDown
             : undefined
         }
         onMouseMove={
-          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+          !editMode && (effectiveViewMode === "tree" || effectiveViewMode === "tree-h")
             ? handleMouseMove
             : undefined
         }
         onMouseUp={
-          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+          !editMode && (effectiveViewMode === "tree" || effectiveViewMode === "tree-h")
             ? handleMouseUp
             : undefined
         }
         onMouseLeave={
-          effectiveViewMode === "tree" || effectiveViewMode === "tree-h"
+          !editMode && (effectiveViewMode === "tree" || effectiveViewMode === "tree-h")
             ? handleMouseUp
             : undefined
         }
@@ -377,6 +422,9 @@ export default function OrgChart() {
                 density={density}
                 onSelect={handleSelectPerson}
                 onFocusBranch={focusBranch}
+                editMode={editMode}
+                onReassign={handleReassign}
+                zoom={zoom}
               />
             </div>
           </div>

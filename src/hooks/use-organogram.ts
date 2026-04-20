@@ -68,6 +68,7 @@ export function useOrganogram() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [focusedBranchId, setFocusedBranchId] = useState<string | null>(null);
   const [density, setDensity] = useState<"compact" | "comfortable">("comfortable");
+  const [editMode, setEditMode] = useState(false);
 
   // When a branch is focused, use that person as the root instead
   const root = useMemo(() => {
@@ -259,5 +260,8 @@ export function useOrganogram() {
     density,
     setDensity,
     toggleDensity,
+    editMode,
+    setEditMode,
+    toggleEditMode: () => setEditMode((v) => !v),
   };
 }
