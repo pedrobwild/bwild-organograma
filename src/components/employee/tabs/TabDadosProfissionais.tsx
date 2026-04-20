@@ -42,6 +42,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
     superior_id: "",
     email_corporativo: "",
     funcoes: "",
+    nivel: 0,
   });
 
   useEffect(() => {
@@ -55,6 +56,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
         superior_id: data.superior_id ?? "",
         email_corporativo: data.email_corporativo ?? "",
         funcoes: (data.funcoes ?? []).join("\n"),
+        nivel: typeof data.nivel === "number" ? data.nivel : 0,
       });
     }
   }, [data]);
@@ -71,6 +73,7 @@ export function TabDadosProfissionais({ data, person, editing, colaboradorId, al
         superior_id: form.superior_id || null,
         email_corporativo: form.email_corporativo || null,
         funcoes: form.funcoes.split("\n").filter(Boolean),
+        nivel: Number.isFinite(form.nivel) ? form.nivel : 0,
       } as any);
       toast.success("Dados profissionais atualizados!");
     } catch {
