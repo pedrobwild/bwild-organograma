@@ -222,7 +222,7 @@ export function OrgTreeCanvas({
                 transition={{ duration: 0.45, ease: "easeInOut" }}
                 d={e.path}
                 fill="none"
-                stroke={isInPath ? "#60a5fa" : e.color}
+                stroke="#ffffff"
                 strokeWidth={isInPath ? 2.8 : 1.8}
                 strokeLinecap="round"
                 strokeLinejoin="round"
