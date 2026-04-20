@@ -192,7 +192,7 @@ export function OrgTreeCanvas({
   };
 
   return (
-    <div className="relative" style={{ width: layout.width, height: layout.height }}>
+    <div ref={canvasRef} className="relative" style={{ width: layout.width, height: layout.height }}>
       <svg
         className="absolute top-0 left-0 pointer-events-none"
         width={layout.width}
@@ -268,18 +268,9 @@ export function OrgTreeCanvas({
               dragSnapToOrigin
               dragTransition={{ bounceStiffness: 600, bounceDamping: 30 }}
               onDragStart={() => handleDragStart(person.id)}
+              onDrag={(e, info) => handleDrag(person.id, e, info)}
               onDragEnd={handleDragEnd}
               whileDrag={{ scale: 1.05, zIndex: 50, cursor: "grabbing" }}
-              onMouseEnter={() => {
-                if (editMode && draggingId && draggingId !== person.id) {
-                  setHoverTargetId(person.id);
-                }
-              }}
-              onMouseLeave={() => {
-                if (editMode && hoverTargetId === person.id) {
-                  setHoverTargetId(null);
-                }
-              }}
               style={{
                 position: "absolute",
                 left: n.x,
