@@ -265,9 +265,10 @@ export function OrgToolbar({
             className={cn(
               "h-7 px-2.5 text-[11px] gap-1.5 transition-all",
               editMode
-                ? "bg-amber-500 text-white hover:bg-amber-600"
+                ? "text-white hover:opacity-90"
                 : "text-white/60 hover:bg-white/10 hover:text-white",
             )}
+            style={editMode ? { background: "rgb(245,158,11)" } : undefined}
             title={editMode ? "Sair do modo edição" : "Editar estrutura (drag-and-drop)"}
           >
             <GitBranch className="w-3 h-3" />

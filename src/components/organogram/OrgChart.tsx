@@ -1,8 +1,11 @@
 import { useEffect, useMemo } from "react";
 import { AnimatePresence } from "framer-motion";
 import { ChevronRight, Home, Search, X } from "lucide-react";
+import { toast } from "sonner";
 import { useOrganogram } from "@/hooks/use-organogram";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/hooks/use-auth";
+import { useUpdateColaborador } from "@/hooks/use-colaboradores";
 import { setDeptColorMap } from "@/lib/deptColors";
 import { DepartmentLegend } from "./DepartmentLegend";
 import { OrgTreeCanvas } from "./OrgTreeCanvas";
@@ -11,6 +14,7 @@ import { OrgToolbar } from "./OrgToolbar";
 import { EmployeeDrawer } from "@/components/employee/EmployeeDrawer";
 import { CommandPalette } from "./CommandPalette";
 import { ShortcutsHelp } from "./ShortcutsHelp";
+import { EditModeBanner } from "./EditModeBanner";
 
 export default function OrgChart() {
   const {
