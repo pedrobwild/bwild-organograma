@@ -200,6 +200,20 @@ export function OrgTreeCanvas({
         viewBox={`0 0 ${layout.width} ${layout.height}`}
         style={{ overflow: "visible" }}
       >
+        <defs>
+          {/* Arrow marker for extra-leader (secondary) connections */}
+          <marker
+            id="extra-leader-arrow"
+            viewBox="0 0 10 10"
+            refX="8"
+            refY="5"
+            markerWidth="6"
+            markerHeight="6"
+            orient="auto-start-reverse"
+          >
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b" />
+          </marker>
+        </defs>
         <AnimatePresence>
           {layout.edges.map((e) => {
             const isInPath =
@@ -212,23 +226,33 @@ export function OrgTreeCanvas({
               !!childNode &&
               childNode.person.departamento !== highlightDept &&
               !isInPath;
+
+            const isExtra = e.kind === "extra-leader";
+            const stroke = isExtra ? "#f59e0b" : "#ffffff";
+            const dashArray = isExtra ? "8 5" : e.dashed ? "6 4" : undefined;
+            const baseWidth = isExtra ? 2.2 : 1.8;
+            const strokeWidth = isInPath ? baseWidth + 1 : baseWidth;
+            // Slightly higher base opacity so extra-leader stays readable on the dark BG
+            const baseOpacity = isExtra ? 0.85 : 0.55;
+
             return (
               <motion.path
                 key={e.id}
                 initial={{ pathLength: 0, opacity: 0 }}
                 animate={{
                   pathLength: 1,
-                  opacity: dim ? 0.12 : isInPath ? 1 : 0.55,
+                  opacity: dim ? 0.12 : isInPath ? 1 : baseOpacity,
                 }}
                 exit={{ pathLength: 0, opacity: 0 }}
                 transition={{ duration: 0.45, ease: "easeInOut" }}
                 d={e.path}
                 fill="none"
-                stroke="#ffffff"
-                strokeWidth={isInPath ? 2.8 : 1.8}
+                stroke={stroke}
+                strokeWidth={strokeWidth}
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeDasharray={e.dashed ? "6 4" : undefined}
+                strokeDasharray={dashArray}
+                markerEnd={isExtra ? "url(#extra-leader-arrow)" : undefined}
               />
             );
           })}
