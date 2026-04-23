@@ -243,6 +243,9 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
             </div>
           ) : (
             <Tabs defaultValue="jd" className="h-full flex flex-col">
+              <div className="px-8 pt-4">
+                <ExtraLeadersManager person={person} allColaboradores={allColaboradores} isAdmin={isAdmin} />
+              </div>
               <TabsList className="mx-8 mt-4 mb-0 justify-start bg-slate-100 p-1 rounded-xl flex-shrink-0 flex-wrap">
                 <TabsTrigger value="jd" className="text-xs rounded-lg">Descrição de Cargo</TabsTrigger>
                 <TabsTrigger value="pessoais" className="text-xs rounded-lg">Pessoais</TabsTrigger>
