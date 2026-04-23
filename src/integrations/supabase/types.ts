@@ -52,6 +52,27 @@ export type Database = {
           },
         ]
       }
+      colaborador_lideres: {
+        Row: {
+          colaborador_id: string
+          created_at: string
+          id: string
+          lider_id: string
+        }
+        Insert: {
+          colaborador_id: string
+          created_at?: string
+          id?: string
+          lider_id: string
+        }
+        Update: {
+          colaborador_id?: string
+          created_at?: string
+          id?: string
+          lider_id?: string
+        }
+        Relationships: []
+      }
       colaboradores: {
         Row: {
           agencia: string | null
