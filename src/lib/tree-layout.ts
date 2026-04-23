@@ -15,6 +15,8 @@ export interface LayoutNode {
   y: number;
 }
 
+export type EdgeKind = "primary" | "extra-leader" | "pj";
+
 export interface LayoutEdge {
   id: string;
   parentId: string;
@@ -26,6 +28,7 @@ export interface LayoutEdge {
   cy: number;
   dashed: boolean;
   color: string;
+  kind: EdgeKind;
 }
 
 export interface LayoutResult {
