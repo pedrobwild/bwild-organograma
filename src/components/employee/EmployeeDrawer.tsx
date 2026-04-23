@@ -22,6 +22,7 @@ import { TabHistorico } from "./tabs/TabHistorico";
 import { TabDadosBancarios } from "./tabs/TabDadosBancarios";
 import { TabOnboarding } from "./tabs/TabOnboarding";
 import { EmployeeActions } from "./EmployeeActions";
+import { ExtraLeadersManager } from "./ExtraLeadersManager";
 import { HierarchyEditDialog } from "@/components/organogram/HierarchyEditDialog";
 
 interface EmployeeDrawerProps {
