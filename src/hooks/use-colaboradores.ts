@@ -144,3 +144,31 @@ export function useCreateDepartmentColor() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["department_colors"] }),
   });
 }
+
+export function useAddLeader() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ colaborador_id, lider_id }: { colaborador_id: string; lider_id: string }) => {
+      const { error } = await supabase
+        .from("colaborador_lideres")
+        .insert({ colaborador_id, lider_id });
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["colaboradores"] }),
+  });
+}
+
+export function useRemoveLeader() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ colaborador_id, lider_id }: { colaborador_id: string; lider_id: string }) => {
+      const { error } = await supabase
+        .from("colaborador_lideres")
+        .delete()
+        .eq("colaborador_id", colaborador_id)
+        .eq("lider_id", lider_id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["colaboradores"] }),
+  });
+}
