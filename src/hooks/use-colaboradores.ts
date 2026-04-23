@@ -16,7 +16,11 @@ interface DbColaborador {
   cor_card: string | null;
 }
 
-function dbToColaborador(db: DbColaborador, allDb: DbColaborador[]): Colaborador {
+function dbToColaborador(
+  db: DbColaborador,
+  allDb: DbColaborador[],
+  extraLeaders: Map<string, string[]>,
+): Colaborador {
   const subordinados = allDb
     .filter((c) => c.superior_id === db.id)
     .map((c) => c.id);
@@ -34,6 +38,7 @@ function dbToColaborador(db: DbColaborador, allDb: DbColaborador[]): Colaborador
     status: db.status,
     tipo_contrato: db.tipo_contrato,
     cor_card: db.cor_card,
+    lideres_extras: extraLeaders.get(db.id) ?? [],
   };
 }
 
@@ -41,14 +46,21 @@ export function useColaboradores() {
   return useQuery({
     queryKey: ["colaboradores"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("colaboradores")
-        .select("*")
-        .order("nivel", { ascending: true });
+      const [{ data, error }, { data: lideres, error: lerror }] = await Promise.all([
+        supabase.from("colaboradores").select("*").order("nivel", { ascending: true }),
+        supabase.from("colaborador_lideres").select("colaborador_id, lider_id"),
+      ]);
 
       if (error) throw error;
+      if (lerror) throw lerror;
       const dbRows = data as DbColaborador[];
-      return dbRows.map((row) => dbToColaborador(row, dbRows));
+      const map = new Map<string, string[]>();
+      for (const row of (lideres ?? []) as { colaborador_id: string; lider_id: string }[]) {
+        const arr = map.get(row.colaborador_id) ?? [];
+        arr.push(row.lider_id);
+        map.set(row.colaborador_id, arr);
+      }
+      return dbRows.map((row) => dbToColaborador(row, dbRows, map));
     },
   });
 }
@@ -130,5 +142,33 @@ export function useCreateDepartmentColor() {
       if (error) throw error;
     },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["department_colors"] }),
+  });
+}
+
+export function useAddLeader() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ colaborador_id, lider_id }: { colaborador_id: string; lider_id: string }) => {
+      const { error } = await supabase
+        .from("colaborador_lideres")
+        .insert({ colaborador_id, lider_id });
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["colaboradores"] }),
+  });
+}
+
+export function useRemoveLeader() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async ({ colaborador_id, lider_id }: { colaborador_id: string; lider_id: string }) => {
+      const { error } = await supabase
+        .from("colaborador_lideres")
+        .delete()
+        .eq("colaborador_id", colaborador_id)
+        .eq("lider_id", lider_id);
+      if (error) throw error;
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["colaboradores"] }),
   });
 }

@@ -11,6 +11,7 @@ export interface Colaborador {
   status: string;
   tipo_contrato: string | null;
   cor_card?: string | null;
+  lideres_extras?: string[];
 }
 
 export interface OrganogramaData {

@@ -260,6 +260,60 @@ export function layoutTree(
     });
   }
 
+  // Secondary leaders (N:N) — render dashed connections from each extra leader
+  // to the colaborador, when both are present in the layout.
+  for (const n of nodes) {
+    const extras = n.person.lideres_extras ?? [];
+    for (const leaderId of extras) {
+      const leader = byId[leaderId];
+      if (!leader) continue;
+      // Skip if it duplicates the primary edge
+      if (n.parentId && n.parentId === leaderId) continue;
+
+      let px: number, py: number, cx: number, cy: number, path: string;
+      if (orientation === "vertical") {
+        // Connect from the side of the leader to the top of the colaborador.
+        const leaderRight = leader.x + nodeWidth / 2 < n.x + nodeWidth / 2;
+        px = leader.x + (leaderRight ? nodeWidth : 0);
+        py = leader.y + nodeHeight / 2;
+        cx = n.x + nodeWidth / 2;
+        cy = n.y;
+        // Simple cubic curve for organic secondary lines
+        const dx = cx - px;
+        const c1x = px + dx * 0.5;
+        const c1y = py;
+        const c2x = cx;
+        const c2y = (py + cy) / 2;
+        path = `M ${px} ${py} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${cx} ${cy}`;
+      } else {
+        const leaderBelow = leader.y + nodeHeight / 2 < n.y + nodeHeight / 2;
+        px = leader.x + nodeWidth / 2;
+        py = leader.y + (leaderBelow ? nodeHeight : 0);
+        cx = n.x;
+        cy = n.y + nodeHeight / 2;
+        const dy = cy - py;
+        const c1x = px;
+        const c1y = py + dy * 0.5;
+        const c2x = (px + cx) / 2;
+        const c2y = cy;
+        path = `M ${px} ${py} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${cx} ${cy}`;
+      }
+
+      edges.push({
+        id: `extra-${leader.id}-${n.id}`,
+        parentId: leader.id,
+        childId: n.id,
+        path,
+        px,
+        py,
+        cx,
+        cy,
+        dashed: true,
+        color: getDeptColor(n.person.departamento).bg,
+      });
+    }
+  }
+
   const width =
     nodes.length === 0
       ? 0
