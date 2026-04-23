@@ -315,6 +315,7 @@ export function layoutTree(
         cy,
         dashed: true,
         color: getDeptColor(n.person.departamento).bg,
+        kind: "extra-leader",
       });
     }
   }
