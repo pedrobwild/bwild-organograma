@@ -15,6 +15,8 @@ export interface LayoutNode {
   y: number;
 }
 
+export type EdgeKind = "primary" | "extra-leader" | "pj";
+
 export interface LayoutEdge {
   id: string;
   parentId: string;
@@ -26,6 +28,7 @@ export interface LayoutEdge {
   cy: number;
   dashed: boolean;
   color: string;
+  kind: EdgeKind;
 }
 
 export interface LayoutResult {
@@ -246,6 +249,7 @@ export function layoutTree(
       path = buildHorizontalPath(px, py, cx, cy, cornerR);
     }
 
+    const isPJ = n.person.tipo_contrato === "PJ";
     edges.push({
       id: `${p.id}-${n.id}`,
       parentId: p.id,
@@ -255,8 +259,9 @@ export function layoutTree(
       py,
       cx,
       cy,
-      dashed: n.person.tipo_contrato === "PJ",
+      dashed: isPJ,
       color: getDeptColor(n.person.departamento).bg,
+      kind: isPJ ? "pj" : "primary",
     });
   }
 
@@ -310,6 +315,7 @@ export function layoutTree(
         cy,
         dashed: true,
         color: getDeptColor(n.person.departamento).bg,
+        kind: "extra-leader",
       });
     }
   }

@@ -64,9 +64,31 @@ export function DepartmentLegend({
           <span className="w-2 h-2 rounded-full bg-red-500" />
           <span className="text-[10px] text-white/50">Desligado</span>
         </div>
+      </div>
+
+      {/* Relationship legend */}
+      <div className="mt-2 pt-2 border-t border-white/10">
+        <span className="text-[9px] font-bold uppercase tracking-[0.15em] text-white/30 mb-1 block">
+          Relações
+        </span>
         <div className="flex items-center gap-2 px-2 py-0.5">
-          <svg width="16" height="2"><line x1="0" y1="1" x2="16" y2="1" stroke="rgba(255,255,255,0.4)" strokeWidth="2" strokeDasharray="4 3" /></svg>
-          <span className="text-[10px] text-white/50">PJ</span>
+          <svg width="22" height="3">
+            <line x1="0" y1="1.5" x2="22" y2="1.5" stroke="rgba(255,255,255,0.85)" strokeWidth="2" strokeLinecap="round" />
+          </svg>
+          <span className="text-[10px] text-white/55">Líder principal</span>
+        </div>
+        <div className="flex items-center gap-2 px-2 py-0.5">
+          <svg width="22" height="6" overflow="visible">
+            <line x1="0" y1="3" x2="16" y2="3" stroke="#f59e0b" strokeWidth="2.2" strokeDasharray="4 3" strokeLinecap="round" />
+            <path d="M 16 0 L 22 3 L 16 6 z" fill="#f59e0b" />
+          </svg>
+          <span className="text-[10px] text-white/55">Liderança adicional</span>
+        </div>
+        <div className="flex items-center gap-2 px-2 py-0.5">
+          <svg width="22" height="3">
+            <line x1="0" y1="1.5" x2="22" y2="1.5" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeDasharray="5 3" strokeLinecap="round" />
+          </svg>
+          <span className="text-[10px] text-white/55">Contrato PJ</span>
         </div>
       </div>
     </div>
