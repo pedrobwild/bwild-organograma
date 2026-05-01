@@ -184,6 +184,7 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
                 <tr>
                   <th className="px-4 py-2 text-left">Tipo</th>
                   <th className="px-4 py-2 text-left">Valor</th>
+                  <th className="px-4 py-2 text-left">Pagamento</th>
                   <th className="px-4 py-2 text-left">Status</th>
                   {editing && <th className="px-4 py-2 w-10" />}
                 </tr>
@@ -193,6 +194,7 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
                   <tr key={b.id} className="border-t">
                     <td className="px-4 py-2">{b.tipo}</td>
                     <td className="px-4 py-2">{formatBRL(b.valor)}</td>
+                    <td className="px-4 py-2 text-slate-600">{b.dia_pagamento ? `Dia ${b.dia_pagamento}` : "—"}</td>
                     <td className="px-4 py-2">
                       <span className={`text-xs font-medium ${b.ativo ? "text-emerald-600" : "text-slate-400"}`}>
                         {b.ativo ? "Ativo" : "Inativo"}
@@ -216,12 +218,13 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
         {editing && (
           <div className="mt-3 p-4 bg-slate-50 rounded-lg space-y-3">
             <p className="text-xs font-semibold text-slate-500 uppercase">Adicionar benefício</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <Select value={newBen.tipo} onValueChange={(v) => setNewBen(p => ({ ...p, tipo: v }))}>
                 <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
                 <SelectContent>{BENEFICIO_TIPOS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
               </Select>
               <Input type="number" step="0.01" placeholder="Valor" value={newBen.valor} onChange={(e) => setNewBen(p => ({ ...p, valor: e.target.value }))} />
+              <Input type="number" min={1} max={31} placeholder="Dia pagamento (1-31)" value={newBen.dia_pagamento} onChange={(e) => setNewBen(p => ({ ...p, dia_pagamento: e.target.value }))} />
               <Input placeholder="Descrição" value={newBen.descricao} onChange={(e) => setNewBen(p => ({ ...p, descricao: e.target.value }))} />
             </div>
             <Button size="sm" onClick={addBeneficio}><Plus className="w-3.5 h-3.5 mr-1" /> Adicionar</Button>
@@ -237,10 +240,11 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
             {comissoes.map((c: any) => (
               <div key={c.id} className="p-3 border rounded-lg text-sm space-y-1">
                 <p className="font-medium">{c.descricao}</p>
-                <div className="flex gap-4 text-xs text-muted-foreground">
+                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                   {c.percentual && <span>{c.percentual}%</span>}
                   {c.base_calculo && <span>{c.base_calculo}</span>}
                   {c.meta_mensal && <span>Meta: {formatBRL(c.meta_mensal)}</span>}
+                  {c.dia_pagamento && <span>Pagamento: dia {c.dia_pagamento}</span>}
                 </div>
                 {c.observacoes && <p className="text-xs text-slate-500">{c.observacoes}</p>}
               </div>
