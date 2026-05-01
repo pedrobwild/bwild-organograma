@@ -1,0 +1,1 @@
+UPDATE public.colaboradores SET nivel = 0 WHERE id = 'thiago-dantas';
