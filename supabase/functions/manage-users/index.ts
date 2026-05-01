@@ -132,8 +132,13 @@ Deno.serve(async (req) => {
         if (error) {
           if ((error as { code?: string }).code === "weak_password") {
             return json(
-              { error: "weak_password", message: "Senha vazada ou muito fraca. Escolha uma senha mais forte e única." },
-              400,
+              {
+                ok: false,
+                error: "weak_password",
+                message:
+                  "Senha vazada ou muito fraca. Escolha uma senha mais forte e única.",
+              },
+              200,
             );
           }
           throw error;
