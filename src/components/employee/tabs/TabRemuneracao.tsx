@@ -261,6 +261,7 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
               <Input type="number" step="0.01" placeholder="Percentual (%)" value={newCom.percentual} onChange={(e) => setNewCom(p => ({ ...p, percentual: e.target.value }))} />
               <Input placeholder="Base de cálculo" value={newCom.base_calculo} onChange={(e) => setNewCom(p => ({ ...p, base_calculo: e.target.value }))} />
               <Input type="number" step="0.01" placeholder="Meta mensal (R$)" value={newCom.meta_mensal} onChange={(e) => setNewCom(p => ({ ...p, meta_mensal: e.target.value }))} />
+              <Input type="number" min={1} max={31} placeholder="Dia pagamento (1-31)" value={newCom.dia_pagamento} onChange={(e) => setNewCom(p => ({ ...p, dia_pagamento: e.target.value }))} />
             </div>
             <Input placeholder="Observações" value={newCom.observacoes} onChange={(e) => setNewCom(p => ({ ...p, observacoes: e.target.value }))} />
             <Button size="sm" onClick={addComissao}><Plus className="w-3.5 h-3.5 mr-1" /> Adicionar</Button>
