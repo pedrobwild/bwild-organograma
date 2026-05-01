@@ -180,13 +180,32 @@ export default function AdminUsers() {
       },
     });
     setUpdatingPassword(false);
-    const errCode = (data as { error?: string } | null)?.error;
-    const errMsg = (data as { message?: string } | null)?.message;
+
+    let errCode: string | undefined;
+    let errMsg: string | undefined;
+
+    if (error) {
+      // Non-2xx responses surface here; parse the response body for details
+      try {
+        const ctx = (error as { context?: Response }).context;
+        if (ctx && typeof ctx.json === "function") {
+          const parsed = await ctx.json();
+          errCode = parsed?.error;
+          errMsg = parsed?.message;
+        }
+      } catch {
+        // ignore parse errors
+      }
+    } else {
+      errCode = (data as { error?: string } | null)?.error;
+      errMsg = (data as { message?: string } | null)?.message;
+    }
+
     if (error || errCode) {
       if (errCode === "weak_password") {
         toast.error(errMsg ?? "Senha muito fraca. Escolha uma mais forte e única.");
       } else {
-        toast.error("Erro ao atualizar senha");
+        toast.error(errMsg ?? "Erro ao atualizar senha");
       }
       return;
     }
