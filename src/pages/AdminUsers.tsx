@@ -165,6 +165,30 @@ export default function AdminUsers() {
     refresh();
   };
 
+  const handleUpdatePassword = async () => {
+    if (!passwordTarget) return;
+    if (newPasswordValue.length < 8) {
+      toast.error("Senha deve ter pelo menos 8 caracteres");
+      return;
+    }
+    setUpdatingPassword(true);
+    const { error } = await supabase.functions.invoke("manage-users", {
+      body: {
+        type: "set_password",
+        user_id: passwordTarget.id,
+        password: newPasswordValue,
+      },
+    });
+    setUpdatingPassword(false);
+    if (error) {
+      toast.error("Erro ao atualizar senha");
+      return;
+    }
+    toast.success(`Senha de ${passwordTarget.email} atualizada`);
+    setPasswordTarget(null);
+    setNewPasswordValue("");
+  };
+
   if (loading || !isAdmin) {
     return (
       <AppLayout>
@@ -271,6 +295,19 @@ export default function AdminUsers() {
                                 Tornar admin
                               </>
                             )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setNewPasswordValue("");
+                              setPasswordTarget(u);
+                            }}
+                            className="gap-1.5"
+                            title="Editar senha"
+                          >
+                            <KeyRound className="w-3.5 h-3.5" />
+                            Senha
                           </Button>
                           <Button
                             variant="ghost"
@@ -384,6 +421,60 @@ export default function AdminUsers() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit password dialog */}
+      <Dialog
+        open={!!passwordTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPasswordTarget(null);
+            setNewPasswordValue("");
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="w-4 h-4" />
+              Editar senha
+            </DialogTitle>
+            <DialogDescription>
+              Defina uma nova senha para <strong>{passwordTarget?.email}</strong>.
+              O usuário poderá entrar imediatamente com a nova senha.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2 py-2">
+            <Label htmlFor="edit-password">Nova senha</Label>
+            <Input
+              id="edit-password"
+              type="text"
+              placeholder="Mínimo 8 caracteres"
+              value={newPasswordValue}
+              onChange={(e) => setNewPasswordValue(e.target.value)}
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Compartilhe a nova senha com o usuário por um canal seguro.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setPasswordTarget(null);
+                setNewPasswordValue("");
+              }}
+              disabled={updatingPassword}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={handleUpdatePassword} disabled={updatingPassword}>
+              {updatingPassword ? "Salvando..." : "Salvar nova senha"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
