@@ -67,7 +67,7 @@ export function useComissoes(colaboradorId: string | null) {
 export function useUpsertComissao() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (row: { id?: string; colaborador_id: string; descricao: string; percentual?: number | null; base_calculo?: string | null; meta_mensal?: number | null; observacoes?: string | null; ativo?: boolean }) => {
+    mutationFn: async (row: { id?: string; colaborador_id: string; descricao: string; percentual?: number | null; base_calculo?: string | null; meta_mensal?: number | null; observacoes?: string | null; ativo?: boolean; dia_pagamento?: number | null }) => {
       if (row.id) {
         const { id, ...rest } = row;
         const { error } = await supabase.from("politicas_comissao").update(rest).eq("id", id);
