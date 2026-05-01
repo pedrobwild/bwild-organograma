@@ -79,6 +79,65 @@ export function useDepartmentColors() {
   });
 }
 
+const nullableTextFields = new Set([
+  "foto_url",
+  "superior_id",
+  "tipo_contrato",
+  "cor_card",
+  "motivo_desligamento",
+  "carga_horaria",
+  "email_corporativo",
+  "email_pessoal",
+  "telefone",
+  "cpf",
+  "cnpj",
+  "endereco",
+  "cidade",
+  "estado",
+  "cep",
+  "banco",
+  "agencia",
+  "conta",
+  "tipo_conta",
+  "chave_pix",
+  "observacoes",
+  "senioridade",
+  "missao",
+]);
+
+const nullableDateFields = new Set(["data_inicio", "data_desligamento", "data_nascimento"]);
+const nullableNumberFields = new Set(["salario_base"]);
+const nullableIntegerFields = new Set(["dia_pagamento_1", "dia_pagamento_2"]);
+
+function toNullableString(value: unknown) {
+  if (value == null) return null;
+  if (typeof value !== "string") return value;
+  const trimmed = value.trim();
+  return trimmed === "" ? null : trimmed;
+}
+
+function toNullableNumber(value: unknown) {
+  if (value == null || value === "") return null;
+  const parsed = typeof value === "number" ? value : Number(String(value).replace(",", "."));
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function sanitizeColaboradorUpdates(updates: Record<string, any>) {
+  return Object.fromEntries(
+    Object.entries(updates)
+      .filter(([, value]) => value !== undefined)
+      .map(([key, value]) => {
+        if (nullableDateFields.has(key) || nullableTextFields.has(key)) return [key, toNullableString(value)];
+        if (nullableNumberFields.has(key)) return [key, toNullableNumber(value)];
+        if (nullableIntegerFields.has(key)) {
+          const parsed = toNullableNumber(value);
+          return [key, parsed == null ? null : Math.trunc(parsed)];
+        }
+        return [key, value];
+      }),
+  );
+}
+
 export function useUpdateColaborador() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -86,7 +145,7 @@ export function useUpdateColaborador() {
       const { id, ...rest } = updates;
       const { error } = await supabase
         .from("colaboradores")
-        .update(rest as any)
+        .update(sanitizeColaboradorUpdates(rest) as any)
         .eq("id", id);
       if (error) throw error;
     },
