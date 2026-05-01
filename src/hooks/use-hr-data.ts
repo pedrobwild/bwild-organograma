@@ -21,7 +21,7 @@ export function useBeneficios(colaboradorId: string | null) {
 export function useUpsertBeneficio() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: async (row: { id?: string; colaborador_id: string; tipo: string; valor?: number | null; descricao?: string | null; ativo?: boolean }) => {
+    mutationFn: async (row: { id?: string; colaborador_id: string; tipo: string; valor?: number | null; descricao?: string | null; ativo?: boolean; dia_pagamento?: number | null }) => {
       if (row.id) {
         const { id, ...rest } = row;
         const { error } = await supabase.from("beneficios_colaborador").update(rest).eq("id", id);
