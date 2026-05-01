@@ -172,7 +172,7 @@ export default function AdminUsers() {
       return;
     }
     setUpdatingPassword(true);
-    const { error } = await supabase.functions.invoke("manage-users", {
+    const { data, error } = await supabase.functions.invoke("manage-users", {
       body: {
         type: "set_password",
         user_id: passwordTarget.id,
@@ -180,8 +180,14 @@ export default function AdminUsers() {
       },
     });
     setUpdatingPassword(false);
-    if (error) {
-      toast.error("Erro ao atualizar senha");
+    const errCode = (data as { error?: string } | null)?.error;
+    const errMsg = (data as { message?: string } | null)?.message;
+    if (error || errCode) {
+      if (errCode === "weak_password") {
+        toast.error(errMsg ?? "Senha muito fraca. Escolha uma mais forte e única.");
+      } else {
+        toast.error("Erro ao atualizar senha");
+      }
       return;
     }
     toast.success(`Senha de ${passwordTarget.email} atualizada`);
