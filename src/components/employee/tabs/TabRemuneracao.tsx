@@ -33,15 +33,33 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
   const upsertVeiculo = useUpsertVeiculo();
 
   const [salario, setSalario] = useState("");
+  const [diaPag1, setDiaPag1] = useState("");
+  const [diaPag2, setDiaPag2] = useState("");
   const [chavePix, setChavePix] = useState("");
   useEffect(() => {
     setSalario(data?.salario_base?.toString() ?? "");
+    setDiaPag1(data?.dia_pagamento_1?.toString() ?? "");
+    setDiaPag2(data?.dia_pagamento_2?.toString() ?? "");
     setChavePix(data?.chave_pix ?? "");
   }, [data]);
 
+  const parseDia = (s: string): number | null => {
+    if (!s) return null;
+    const n = parseInt(s, 10);
+    if (Number.isNaN(n) || n < 1 || n > 31) return null;
+    return n;
+  };
+
   const saveSalario = async () => {
+    if (diaPag1 && !parseDia(diaPag1)) { toast.error("Dia de pagamento 1 deve estar entre 1 e 31."); return; }
+    if (diaPag2 && !parseDia(diaPag2)) { toast.error("Dia de pagamento 2 deve estar entre 1 e 31."); return; }
     try {
-      await update.mutateAsync({ id: colaboradorId, salario_base: salario ? parseFloat(salario) : null } as any);
+      await update.mutateAsync({
+        id: colaboradorId,
+        salario_base: salario ? parseFloat(salario) : null,
+        dia_pagamento_1: parseDia(diaPag1),
+        dia_pagamento_2: parseDia(diaPag2),
+      } as any);
       toast.success("Salário atualizado!");
     } catch { toast.error("Erro ao salvar salário."); }
   };
@@ -54,20 +72,28 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
   };
 
   // New beneficio
-  const [newBen, setNewBen] = useState({ tipo: "", valor: "", descricao: "" });
+  const [newBen, setNewBen] = useState({ tipo: "", valor: "", descricao: "", dia_pagamento: "" });
   const addBeneficio = async () => {
     if (!newBen.tipo) return;
+    if (newBen.dia_pagamento && !parseDia(newBen.dia_pagamento)) { toast.error("Dia de pagamento deve estar entre 1 e 31."); return; }
     try {
-      await upsertBeneficio.mutateAsync({ colaborador_id: colaboradorId, tipo: newBen.tipo, valor: newBen.valor ? parseFloat(newBen.valor) : null, descricao: newBen.descricao || null });
-      setNewBen({ tipo: "", valor: "", descricao: "" });
+      await upsertBeneficio.mutateAsync({
+        colaborador_id: colaboradorId,
+        tipo: newBen.tipo,
+        valor: newBen.valor ? parseFloat(newBen.valor) : null,
+        descricao: newBen.descricao || null,
+        dia_pagamento: parseDia(newBen.dia_pagamento),
+      });
+      setNewBen({ tipo: "", valor: "", descricao: "", dia_pagamento: "" });
       toast.success("Benefício adicionado!");
     } catch { toast.error("Erro ao adicionar benefício."); }
   };
 
   // New comissao
-  const [newCom, setNewCom] = useState({ descricao: "", percentual: "", base_calculo: "", meta_mensal: "", observacoes: "" });
+  const [newCom, setNewCom] = useState({ descricao: "", percentual: "", base_calculo: "", meta_mensal: "", observacoes: "", dia_pagamento: "" });
   const addComissao = async () => {
     if (!newCom.descricao) return;
+    if (newCom.dia_pagamento && !parseDia(newCom.dia_pagamento)) { toast.error("Dia de pagamento deve estar entre 1 e 31."); return; }
     try {
       await upsertComissao.mutateAsync({
         colaborador_id: colaboradorId,
@@ -76,8 +102,9 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
         base_calculo: newCom.base_calculo || null,
         meta_mensal: newCom.meta_mensal ? parseFloat(newCom.meta_mensal) : null,
         observacoes: newCom.observacoes || null,
+        dia_pagamento: parseDia(newCom.dia_pagamento),
       });
-      setNewCom({ descricao: "", percentual: "", base_calculo: "", meta_mensal: "", observacoes: "" });
+      setNewCom({ descricao: "", percentual: "", base_calculo: "", meta_mensal: "", observacoes: "", dia_pagamento: "" });
       toast.success("Comissão adicionada!");
     } catch { toast.error("Erro ao adicionar comissão."); }
   };
@@ -107,14 +134,29 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
       <section>
         <h3 className="text-sm font-semibold text-slate-800 mb-3">Salário Base</h3>
         {editing ? (
-          <div className="flex items-end gap-3">
-            <FieldRow label="Valor (R$)">
-              <Input type="number" step="0.01" value={salario} onChange={(e) => setSalario(e.target.value)} />
-            </FieldRow>
-            <Button size="sm" variant="outline" onClick={saveSalario} className="mb-0.5">Salvar</Button>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <FieldRow label="Valor (R$)">
+                <Input type="number" step="0.01" value={salario} onChange={(e) => setSalario(e.target.value)} />
+              </FieldRow>
+              <FieldRow label="Dia de pagamento 1 (opcional)">
+                <Input type="number" min={1} max={31} placeholder="Ex: 5" value={diaPag1} onChange={(e) => setDiaPag1(e.target.value)} />
+              </FieldRow>
+              <FieldRow label="Dia de pagamento 2 (opcional)">
+                <Input type="number" min={1} max={31} placeholder="Ex: 20" value={diaPag2} onChange={(e) => setDiaPag2(e.target.value)} />
+              </FieldRow>
+            </div>
+            <Button size="sm" variant="outline" onClick={saveSalario}>Salvar</Button>
           </div>
         ) : (
-          <p className="text-lg font-semibold text-slate-900">{formatBRL(data?.salario_base)}</p>
+          <div className="space-y-1">
+            <p className="text-lg font-semibold text-slate-900">{formatBRL(data?.salario_base)}</p>
+            {(data?.dia_pagamento_1 || data?.dia_pagamento_2) && (
+              <p className="text-xs text-muted-foreground">
+                Pagamento: {[data?.dia_pagamento_1, data?.dia_pagamento_2].filter(Boolean).map((d) => `dia ${d}`).join(" e ")}
+              </p>
+            )}
+          </div>
         )}
       </section>
 
@@ -142,6 +184,7 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
                 <tr>
                   <th className="px-4 py-2 text-left">Tipo</th>
                   <th className="px-4 py-2 text-left">Valor</th>
+                  <th className="px-4 py-2 text-left">Pagamento</th>
                   <th className="px-4 py-2 text-left">Status</th>
                   {editing && <th className="px-4 py-2 w-10" />}
                 </tr>
@@ -151,6 +194,7 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
                   <tr key={b.id} className="border-t">
                     <td className="px-4 py-2">{b.tipo}</td>
                     <td className="px-4 py-2">{formatBRL(b.valor)}</td>
+                    <td className="px-4 py-2 text-slate-600">{b.dia_pagamento ? `Dia ${b.dia_pagamento}` : "—"}</td>
                     <td className="px-4 py-2">
                       <span className={`text-xs font-medium ${b.ativo ? "text-emerald-600" : "text-slate-400"}`}>
                         {b.ativo ? "Ativo" : "Inativo"}
@@ -174,12 +218,13 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
         {editing && (
           <div className="mt-3 p-4 bg-slate-50 rounded-lg space-y-3">
             <p className="text-xs font-semibold text-slate-500 uppercase">Adicionar benefício</p>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               <Select value={newBen.tipo} onValueChange={(v) => setNewBen(p => ({ ...p, tipo: v }))}>
                 <SelectTrigger><SelectValue placeholder="Tipo" /></SelectTrigger>
                 <SelectContent>{BENEFICIO_TIPOS.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}</SelectContent>
               </Select>
               <Input type="number" step="0.01" placeholder="Valor" value={newBen.valor} onChange={(e) => setNewBen(p => ({ ...p, valor: e.target.value }))} />
+              <Input type="number" min={1} max={31} placeholder="Dia pagamento (1-31)" value={newBen.dia_pagamento} onChange={(e) => setNewBen(p => ({ ...p, dia_pagamento: e.target.value }))} />
               <Input placeholder="Descrição" value={newBen.descricao} onChange={(e) => setNewBen(p => ({ ...p, descricao: e.target.value }))} />
             </div>
             <Button size="sm" onClick={addBeneficio}><Plus className="w-3.5 h-3.5 mr-1" /> Adicionar</Button>
@@ -195,10 +240,11 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
             {comissoes.map((c: any) => (
               <div key={c.id} className="p-3 border rounded-lg text-sm space-y-1">
                 <p className="font-medium">{c.descricao}</p>
-                <div className="flex gap-4 text-xs text-muted-foreground">
+                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
                   {c.percentual && <span>{c.percentual}%</span>}
                   {c.base_calculo && <span>{c.base_calculo}</span>}
                   {c.meta_mensal && <span>Meta: {formatBRL(c.meta_mensal)}</span>}
+                  {c.dia_pagamento && <span>Pagamento: dia {c.dia_pagamento}</span>}
                 </div>
                 {c.observacoes && <p className="text-xs text-slate-500">{c.observacoes}</p>}
               </div>
@@ -215,6 +261,7 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
               <Input type="number" step="0.01" placeholder="Percentual (%)" value={newCom.percentual} onChange={(e) => setNewCom(p => ({ ...p, percentual: e.target.value }))} />
               <Input placeholder="Base de cálculo" value={newCom.base_calculo} onChange={(e) => setNewCom(p => ({ ...p, base_calculo: e.target.value }))} />
               <Input type="number" step="0.01" placeholder="Meta mensal (R$)" value={newCom.meta_mensal} onChange={(e) => setNewCom(p => ({ ...p, meta_mensal: e.target.value }))} />
+              <Input type="number" min={1} max={31} placeholder="Dia pagamento (1-31)" value={newCom.dia_pagamento} onChange={(e) => setNewCom(p => ({ ...p, dia_pagamento: e.target.value }))} />
             </div>
             <Input placeholder="Observações" value={newCom.observacoes} onChange={(e) => setNewCom(p => ({ ...p, observacoes: e.target.value }))} />
             <Button size="sm" onClick={addComissao}><Plus className="w-3.5 h-3.5 mr-1" /> Adicionar</Button>
