@@ -11,6 +11,7 @@ type Action =
   | { type: "list" }
   | { type: "create"; email: string; password: string; role: "admin" | "user" }
   | { type: "set_role"; user_id: string; role: "admin" | "user" }
+  | { type: "set_password"; user_id: string; password: string }
   | { type: "delete"; user_id: string };
 
 Deno.serve(async (req) => {
@@ -118,6 +119,17 @@ Deno.serve(async (req) => {
             .from("user_roles")
             .insert({ user_id: body.user_id, role: "admin" });
         }
+        return json({ ok: true });
+      }
+
+      case "set_password": {
+        if (!body.user_id || !body.password || body.password.length < 8) {
+          return json({ error: "invalid_payload" }, 400);
+        }
+        const { error } = await admin.auth.admin.updateUserById(body.user_id, {
+          password: body.password,
+        });
+        if (error) throw error;
         return json({ ok: true });
       }
 

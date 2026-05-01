@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Plus, Shield, ShieldOff, Trash2, UserPlus } from "lucide-react";
+import { KeyRound, Loader2, Plus, Shield, ShieldOff, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useAuth } from "@/hooks/use-auth";
@@ -74,6 +74,11 @@ export default function AdminUsers() {
   // Delete dialog
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Password dialog
+  const [passwordTarget, setPasswordTarget] = useState<ManagedUser | null>(null);
+  const [newPasswordValue, setNewPasswordValue] = useState("");
+  const [updatingPassword, setUpdatingPassword] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
@@ -158,6 +163,30 @@ export default function AdminUsers() {
     toast.success(`${deleteTarget.email} removido`);
     setDeleteTarget(null);
     refresh();
+  };
+
+  const handleUpdatePassword = async () => {
+    if (!passwordTarget) return;
+    if (newPasswordValue.length < 8) {
+      toast.error("Senha deve ter pelo menos 8 caracteres");
+      return;
+    }
+    setUpdatingPassword(true);
+    const { error } = await supabase.functions.invoke("manage-users", {
+      body: {
+        type: "set_password",
+        user_id: passwordTarget.id,
+        password: newPasswordValue,
+      },
+    });
+    setUpdatingPassword(false);
+    if (error) {
+      toast.error("Erro ao atualizar senha");
+      return;
+    }
+    toast.success(`Senha de ${passwordTarget.email} atualizada`);
+    setPasswordTarget(null);
+    setNewPasswordValue("");
   };
 
   if (loading || !isAdmin) {
@@ -266,6 +295,19 @@ export default function AdminUsers() {
                                 Tornar admin
                               </>
                             )}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              setNewPasswordValue("");
+                              setPasswordTarget(u);
+                            }}
+                            className="gap-1.5"
+                            title="Editar senha"
+                          >
+                            <KeyRound className="w-3.5 h-3.5" />
+                            Senha
                           </Button>
                           <Button
                             variant="ghost"
@@ -379,6 +421,60 @@ export default function AdminUsers() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit password dialog */}
+      <Dialog
+        open={!!passwordTarget}
+        onOpenChange={(open) => {
+          if (!open) {
+            setPasswordTarget(null);
+            setNewPasswordValue("");
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <KeyRound className="w-4 h-4" />
+              Editar senha
+            </DialogTitle>
+            <DialogDescription>
+              Defina uma nova senha para <strong>{passwordTarget?.email}</strong>.
+              O usuário poderá entrar imediatamente com a nova senha.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2 py-2">
+            <Label htmlFor="edit-password">Nova senha</Label>
+            <Input
+              id="edit-password"
+              type="text"
+              placeholder="Mínimo 8 caracteres"
+              value={newPasswordValue}
+              onChange={(e) => setNewPasswordValue(e.target.value)}
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Compartilhe a nova senha com o usuário por um canal seguro.
+            </p>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setPasswordTarget(null);
+                setNewPasswordValue("");
+              }}
+              disabled={updatingPassword}
+            >
+              Cancelar
+            </Button>
+            <Button onClick={handleUpdatePassword} disabled={updatingPassword}>
+              {updatingPassword ? "Salvando..." : "Salvar nova senha"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AppLayout>
   );
 }
