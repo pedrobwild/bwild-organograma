@@ -246,12 +246,14 @@ export function EmployeeDrawer({ person, allColaboradores, onClose }: EmployeeDr
               <div className="px-8 pt-4">
                 <ExtraLeadersManager person={person} allColaboradores={allColaboradores} isAdmin={isAdmin} />
               </div>
-              <TabsList className="mx-8 mt-4 mb-0 justify-start bg-slate-100 p-1 rounded-xl flex-shrink-0 flex-wrap">
-                <TabsTrigger value="jd" className="text-xs rounded-lg">Descrição de Cargo</TabsTrigger>
+              <TabsList className="mx-8 mt-4 mb-0 justify-start bg-slate-100 p-1 rounded-xl flex-shrink-0 flex-wrap h-auto gap-1">
+                <TabsTrigger value="jd" className="text-xs rounded-lg">Descrição de cargo</TabsTrigger>
                 <TabsTrigger value="pessoais" className="text-xs rounded-lg">Pessoais</TabsTrigger>
                 <TabsTrigger value="profissionais" className="text-xs rounded-lg">Profissionais</TabsTrigger>
                 <TabsTrigger value="remuneracao" className="text-xs rounded-lg">Remuneração</TabsTrigger>
+                <TabsTrigger value="bancarios" className="text-xs rounded-lg">Bancários</TabsTrigger>
                 <TabsTrigger value="documentos" className="text-xs rounded-lg">Documentos</TabsTrigger>
+                <TabsTrigger value="onboarding" className="text-xs rounded-lg">Onboarding</TabsTrigger>
                 <TabsTrigger value="historico" className="text-xs rounded-lg">Histórico</TabsTrigger>
               </TabsList>
 
