@@ -20,6 +20,7 @@ export type Database = {
           colaborador_id: string
           created_at: string | null
           descricao: string | null
+          dia_pagamento: number | null
           id: string
           tipo: string
           valor: number | null
@@ -29,6 +30,7 @@ export type Database = {
           colaborador_id: string
           created_at?: string | null
           descricao?: string | null
+          dia_pagamento?: number | null
           id?: string
           tipo: string
           valor?: number | null
@@ -38,6 +40,7 @@ export type Database = {
           colaborador_id?: string
           created_at?: string | null
           descricao?: string | null
+          dia_pagamento?: number | null
           id?: string
           tipo?: string
           valor?: number | null
@@ -91,6 +94,8 @@ export type Database = {
           data_inicio: string | null
           data_nascimento: string | null
           departamento: string
+          dia_pagamento_1: number | null
+          dia_pagamento_2: number | null
           email_corporativo: string | null
           email_pessoal: string | null
           endereco: string | null
@@ -130,6 +135,8 @@ export type Database = {
           data_inicio?: string | null
           data_nascimento?: string | null
           departamento: string
+          dia_pagamento_1?: number | null
+          dia_pagamento_2?: number | null
           email_corporativo?: string | null
           email_pessoal?: string | null
           endereco?: string | null
@@ -169,6 +176,8 @@ export type Database = {
           data_inicio?: string | null
           data_nascimento?: string | null
           departamento?: string
+          dia_pagamento_1?: number | null
+          dia_pagamento_2?: number | null
           email_corporativo?: string | null
           email_pessoal?: string | null
           endereco?: string | null
@@ -382,6 +391,7 @@ export type Database = {
           colaborador_id: string
           created_at: string | null
           descricao: string
+          dia_pagamento: number | null
           id: string
           meta_mensal: number | null
           observacoes: string | null
@@ -394,6 +404,7 @@ export type Database = {
           colaborador_id: string
           created_at?: string | null
           descricao: string
+          dia_pagamento?: number | null
           id?: string
           meta_mensal?: number | null
           observacoes?: string | null
@@ -406,6 +417,7 @@ export type Database = {
           colaborador_id?: string
           created_at?: string | null
           descricao?: string
+          dia_pagamento?: number | null
           id?: string
           meta_mensal?: number | null
           observacoes?: string | null
