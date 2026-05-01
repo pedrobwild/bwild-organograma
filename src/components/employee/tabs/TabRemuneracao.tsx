@@ -33,15 +33,33 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
   const upsertVeiculo = useUpsertVeiculo();
 
   const [salario, setSalario] = useState("");
+  const [diaPag1, setDiaPag1] = useState("");
+  const [diaPag2, setDiaPag2] = useState("");
   const [chavePix, setChavePix] = useState("");
   useEffect(() => {
     setSalario(data?.salario_base?.toString() ?? "");
+    setDiaPag1(data?.dia_pagamento_1?.toString() ?? "");
+    setDiaPag2(data?.dia_pagamento_2?.toString() ?? "");
     setChavePix(data?.chave_pix ?? "");
   }, [data]);
 
+  const parseDia = (s: string): number | null => {
+    if (!s) return null;
+    const n = parseInt(s, 10);
+    if (Number.isNaN(n) || n < 1 || n > 31) return null;
+    return n;
+  };
+
   const saveSalario = async () => {
+    if (diaPag1 && !parseDia(diaPag1)) { toast.error("Dia de pagamento 1 deve estar entre 1 e 31."); return; }
+    if (diaPag2 && !parseDia(diaPag2)) { toast.error("Dia de pagamento 2 deve estar entre 1 e 31."); return; }
     try {
-      await update.mutateAsync({ id: colaboradorId, salario_base: salario ? parseFloat(salario) : null } as any);
+      await update.mutateAsync({
+        id: colaboradorId,
+        salario_base: salario ? parseFloat(salario) : null,
+        dia_pagamento_1: parseDia(diaPag1),
+        dia_pagamento_2: parseDia(diaPag2),
+      } as any);
       toast.success("Salário atualizado!");
     } catch { toast.error("Erro ao salvar salário."); }
   };
