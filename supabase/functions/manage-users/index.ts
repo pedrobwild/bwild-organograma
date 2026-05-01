@@ -129,7 +129,15 @@ Deno.serve(async (req) => {
         const { error } = await admin.auth.admin.updateUserById(body.user_id, {
           password: body.password,
         });
-        if (error) throw error;
+        if (error) {
+          if ((error as { code?: string }).code === "weak_password") {
+            return json(
+              { error: "weak_password", message: "Senha vazada ou muito fraca. Escolha uma senha mais forte e única." },
+              400,
+            );
+          }
+          throw error;
+        }
         return json({ ok: true });
       }
 
