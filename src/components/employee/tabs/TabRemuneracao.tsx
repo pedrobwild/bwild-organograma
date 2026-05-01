@@ -134,14 +134,29 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
       <section>
         <h3 className="text-sm font-semibold text-slate-800 mb-3">Salário Base</h3>
         {editing ? (
-          <div className="flex items-end gap-3">
-            <FieldRow label="Valor (R$)">
-              <Input type="number" step="0.01" value={salario} onChange={(e) => setSalario(e.target.value)} />
-            </FieldRow>
-            <Button size="sm" variant="outline" onClick={saveSalario} className="mb-0.5">Salvar</Button>
+          <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <FieldRow label="Valor (R$)">
+                <Input type="number" step="0.01" value={salario} onChange={(e) => setSalario(e.target.value)} />
+              </FieldRow>
+              <FieldRow label="Dia de pagamento 1 (opcional)">
+                <Input type="number" min={1} max={31} placeholder="Ex: 5" value={diaPag1} onChange={(e) => setDiaPag1(e.target.value)} />
+              </FieldRow>
+              <FieldRow label="Dia de pagamento 2 (opcional)">
+                <Input type="number" min={1} max={31} placeholder="Ex: 20" value={diaPag2} onChange={(e) => setDiaPag2(e.target.value)} />
+              </FieldRow>
+            </div>
+            <Button size="sm" variant="outline" onClick={saveSalario}>Salvar</Button>
           </div>
         ) : (
-          <p className="text-lg font-semibold text-slate-900">{formatBRL(data?.salario_base)}</p>
+          <div className="space-y-1">
+            <p className="text-lg font-semibold text-slate-900">{formatBRL(data?.salario_base)}</p>
+            {(data?.dia_pagamento_1 || data?.dia_pagamento_2) && (
+              <p className="text-xs text-muted-foreground">
+                Pagamento: {[data?.dia_pagamento_1, data?.dia_pagamento_2].filter(Boolean).map((d) => `dia ${d}`).join(" e ")}
+              </p>
+            )}
+          </div>
         )}
       </section>
 
