@@ -8,6 +8,7 @@ import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import Admin from "./pages/Admin.tsx";
 import AdminUsers from "./pages/AdminUsers.tsx";
+import AdminPagamentos from "./pages/AdminPagamentos.tsx";
 import Dashboard from "./pages/Dashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import { useAuth } from "./hooks/use-auth";
@@ -57,6 +58,14 @@ const App = () => (
             element={
               <RequireAuth>
                 <AdminUsers />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin/pagamentos"
+            element={
+              <RequireAuth>
+                <AdminPagamentos />
               </RequireAuth>
             }
           />

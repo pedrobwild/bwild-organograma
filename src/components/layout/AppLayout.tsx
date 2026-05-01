@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   BarChart3,
+  CalendarDays,
   LogIn,
   LogOut,
   Network,
@@ -29,6 +30,7 @@ const NAV_ITEMS = [
   { title: "Organograma", url: "/", icon: Network, adminOnly: false },
   { title: "Dashboard", url: "/dashboard", icon: BarChart3, adminOnly: true },
   { title: "Colaboradores", url: "/admin", icon: Users, adminOnly: true },
+  { title: "Pagamentos", url: "/admin/pagamentos", icon: CalendarDays, adminOnly: true },
   { title: "Usuários", url: "/admin/usuarios", icon: ShieldCheck, adminOnly: true },
 ];
 
