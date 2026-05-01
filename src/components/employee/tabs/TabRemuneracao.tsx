@@ -72,20 +72,28 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
   };
 
   // New beneficio
-  const [newBen, setNewBen] = useState({ tipo: "", valor: "", descricao: "" });
+  const [newBen, setNewBen] = useState({ tipo: "", valor: "", descricao: "", dia_pagamento: "" });
   const addBeneficio = async () => {
     if (!newBen.tipo) return;
+    if (newBen.dia_pagamento && !parseDia(newBen.dia_pagamento)) { toast.error("Dia de pagamento deve estar entre 1 e 31."); return; }
     try {
-      await upsertBeneficio.mutateAsync({ colaborador_id: colaboradorId, tipo: newBen.tipo, valor: newBen.valor ? parseFloat(newBen.valor) : null, descricao: newBen.descricao || null });
-      setNewBen({ tipo: "", valor: "", descricao: "" });
+      await upsertBeneficio.mutateAsync({
+        colaborador_id: colaboradorId,
+        tipo: newBen.tipo,
+        valor: newBen.valor ? parseFloat(newBen.valor) : null,
+        descricao: newBen.descricao || null,
+        dia_pagamento: parseDia(newBen.dia_pagamento),
+      });
+      setNewBen({ tipo: "", valor: "", descricao: "", dia_pagamento: "" });
       toast.success("Benefício adicionado!");
     } catch { toast.error("Erro ao adicionar benefício."); }
   };
 
   // New comissao
-  const [newCom, setNewCom] = useState({ descricao: "", percentual: "", base_calculo: "", meta_mensal: "", observacoes: "" });
+  const [newCom, setNewCom] = useState({ descricao: "", percentual: "", base_calculo: "", meta_mensal: "", observacoes: "", dia_pagamento: "" });
   const addComissao = async () => {
     if (!newCom.descricao) return;
+    if (newCom.dia_pagamento && !parseDia(newCom.dia_pagamento)) { toast.error("Dia de pagamento deve estar entre 1 e 31."); return; }
     try {
       await upsertComissao.mutateAsync({
         colaborador_id: colaboradorId,
@@ -94,8 +102,9 @@ export function TabRemuneracao({ data, editing, colaboradorId, isAdmin }: Props)
         base_calculo: newCom.base_calculo || null,
         meta_mensal: newCom.meta_mensal ? parseFloat(newCom.meta_mensal) : null,
         observacoes: newCom.observacoes || null,
+        dia_pagamento: parseDia(newCom.dia_pagamento),
       });
-      setNewCom({ descricao: "", percentual: "", base_calculo: "", meta_mensal: "", observacoes: "" });
+      setNewCom({ descricao: "", percentual: "", base_calculo: "", meta_mensal: "", observacoes: "", dia_pagamento: "" });
       toast.success("Comissão adicionada!");
     } catch { toast.error("Erro ao adicionar comissão."); }
   };
