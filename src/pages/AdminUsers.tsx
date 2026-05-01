@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2, Plus, Shield, ShieldOff, Trash2, UserPlus } from "lucide-react";
+import { KeyRound, Loader2, Plus, Shield, ShieldOff, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useAuth } from "@/hooks/use-auth";
@@ -74,6 +74,11 @@ export default function AdminUsers() {
   // Delete dialog
   const [deleteTarget, setDeleteTarget] = useState<ManagedUser | null>(null);
   const [deleting, setDeleting] = useState(false);
+
+  // Password dialog
+  const [passwordTarget, setPasswordTarget] = useState<ManagedUser | null>(null);
+  const [newPasswordValue, setNewPasswordValue] = useState("");
+  const [updatingPassword, setUpdatingPassword] = useState(false);
 
   useEffect(() => {
     if (!loading && (!user || !isAdmin)) {
